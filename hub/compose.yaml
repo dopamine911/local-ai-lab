@@ -68,6 +68,7 @@ services:
       --backend-store-uri sqlite:////mlflow/mlflow.db
       --artifacts-destination /mlflow/artifacts
       --allowed-hosts mlflow.${DOMAIN},127.0.0.1:5000,localhost:5000
+      --cors-allowed-origins https://mlflow.${DOMAIN}
     volumes:
       - ./data/mlflow:/mlflow            # every test result; keep this folder
 
