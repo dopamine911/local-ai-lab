@@ -111,6 +111,8 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 | 2026-10-28 | Server: both with MTP depth 2 | | 58.0–60.0 / 51.7–53.7 | Card 2 ~10% behind |
 | 2026-10-28 | Kernel 7.0.0-38 → 7.0.0-42 (reboot), card 1 | 1117.93 | 28.56 | No real change (reading ~3% lower; Strata download running) |
 | 2026-10-28 | Same kernel change, card 2, Ornith (vs 21:46 run) | 2341 ± 278 (was 2433 ± 466) | 131.6 (was 131.6) | No change; reading varies a lot run to run |
+| 2026-10-28 | Image 267 → 267-media (speech/image programs added), card 1 | 1105.14 | 28.54 | No change |
+| 2026-10-28 | Same image change, card 2, Ornith | 2441 | 132.3 | No change |
 
 ## Ideas to test next
 1. Why card 2 is ~10% slower with MTP (repeat with `temperature: 0`, several runs).

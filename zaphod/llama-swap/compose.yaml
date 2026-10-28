@@ -1,7 +1,7 @@
 name: llama-swap   # keeps the same Docker stack name whatever the folder is called
 services:
   llama-swap:
-    image: llama-swap-zaphod:267
+    image: llama-swap-zaphod:267-media
     container_name: llama-swap
     restart: unless-stopped
     ports:

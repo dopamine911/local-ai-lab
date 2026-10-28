@@ -17,7 +17,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 | `tuning/` | Benchmarks and results (see tuning/README.md) |
 
 ## llama-swap on zaphod
-- Image `llama-swap-zaphod:267`: official llama-swap 267 programs on Ubuntu 26.04's Mesa (built from the Dockerfile). Models in /srv/models.
+- Image `llama-swap-zaphod:267-media`: official llama-swap 267 programs (llama.cpp b11870, plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa, built from the Dockerfile. Previous image `:267` (text only) is kept for rollback. Models in /srv/models.
 - Models: `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context. `coder-tb`: card 1, 256K context, q8_0 KV, MTP, for Terminal-Bench; swaps with `coder`. `flint`: Recursive Flint UD-Q4_K_XL, card 2, 256K q8_0 context; swaps with `coder-2`. `coder-long`: both cards, 256K, not yet tested.
 - Listens on 127.0.0.1:8080 only; `tailscale serve --bg --tcp=8080 tcp://localhost:8080` exposes it on the tailnet. Also https://zaphod.ai.dopamine911.com via Caddy.
 - Config edits reload automatically. Check with `cd ~/llama-swap && docker compose logs --tail 20`.
