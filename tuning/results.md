@@ -100,4 +100,5 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 2. MTP draft depth 3, then 4.
 3. `-ub` 512 / 1024 / 2048 (reading speed).
 4. `coder-long` speed (both cards).
-5. New models: Flint, Qwen3-Coder-Next, Gemma 4 31B.
+5. New models: Qwen3-Coder-Next, Gemma 4 31B.
+6. Flint: on hold (2026-10-28) until a newer Flint release or llama.cpp update. Then re-run 3 seeds at temp 1.0 and compare with the table above (average 87).
