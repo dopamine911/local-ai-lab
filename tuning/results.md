@@ -109,6 +109,8 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 | 2026-10-28 | Card 2, GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1 | 1153.09 | 29.25 | Fixed, kept |
 | 2026-10-28 | Server: `coder` MTP depth 2 vs `coder-2` without | | 57.7–59.6 vs 28.2 | Kept |
 | 2026-10-28 | Server: both with MTP depth 2 | | 58.0–60.0 / 51.7–53.7 | Card 2 ~10% behind |
+| 2026-10-28 | Kernel 7.0.0-38 → 7.0.0-42 (reboot), card 1 | 1117.93 | 28.56 | No real change (reading ~3% lower; Strata download running) |
+| 2026-10-28 | Same kernel change, card 2, Ornith (vs 21:46 run) | 2341 ± 278 (was 2433 ± 466) | 131.6 (was 131.6) | No change; reading varies a lot run to run |
 
 ## Ideas to test next
 1. Why card 2 is ~10% slower with MTP (repeat with `temperature: 0`, several runs).
