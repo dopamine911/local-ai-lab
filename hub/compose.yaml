@@ -80,7 +80,7 @@ services:
     environment:
       HOSTNAME: 127.0.0.1
       PORT: 3001
-      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN}
+      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN},homepage.${DOMAIN}
       HOMEPAGE_VAR_DOMAIN: ${DOMAIN}
     volumes:
       - ./homepage:/app/config
