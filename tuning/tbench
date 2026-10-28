@@ -9,17 +9,17 @@
 #   ./tbench log "note"               # log the newest finished result to MLflow (done
 #                                     #   automatically after smoke/full)
 #
-# Model: MODEL=coder by default (QUANT and PROFILE describe it in the results):
+# Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
 #   MODEL=coder-2 ./tbench smoke "card 2"
 set -e
 cd "$(dirname "$0")"
 REPO=https://github.com/kyuz0/terminal-bench-mini.git
 PIN=60739af                         # Terminal-Bench-Local commit, 2026-10-27
 DIR=terminal-bench
-MODEL="${MODEL:-coder}"
+MODEL="${MODEL:-coder-tb}"       # card 1, 256K context, q8_0 context memory, MTP
 MODEL_NAME="${MODEL_NAME:-Qwen3.8-27B}"
 QUANT="${QUANT:-UD-Q4_K_XL}"
-PROFILE="${PROFILE:-mtp2}"          # describe the setup: e.g. mtp2, mtp3, mtp2-kvq8
+PROFILE="${PROFILE:-mtp2-256k-kvq8}"   # describe the setup: e.g. mtp3-256k-kvq8
 
 usage() { sed -n '2,13p' "$0"; exit 1; }
 need_repo() { [ -d "$DIR" ] || { echo "Run ./tbench setup first."; exit 1; }; }
