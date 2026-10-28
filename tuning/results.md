@@ -12,6 +12,13 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | Card 1 (`coder`) with MTP | 57.7–60.0 tokens/s |
 | Card 2 (`coder-2`) with MTP | 51.7–53.7 tokens/s |
 
+## Quality (tool-eval-bench 3.0.0, short suite, temp 0, seed 42)
+
+| Date | Model / setup | Score | Points | Notes |
+| --- | --- | ---: | ---: | --- |
+| 2026-10-28 | `coder`, MTP depth 2 | 97 | 29/30 | Only miss: TC-14 Malformed Response (partial) |
+| 2026-10-28 | Same, repeated | 97 | 29/30 | Repeatable |
+
 ## The slow-card fix (2026-10-28)
 
 Cause: Resizable BAR is off (needs CSM disabled; zaphod's Ubuntu needs CSM on). llama.cpp's Vulkan backend then put part of the model in system RAM and read it over PCIe for every token, so speed tracked each card's PCIe link.

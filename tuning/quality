@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Tool-use quality test (tool-eval-bench 3.0.0) through llama-swap, logged to MLflow.
+#
+# Usage: ./quality <model> "<note>" [--full] [extra tool-eval-bench options]
+# Examples:
+#   ./quality coder "baseline"                  # 15 core scenarios, about 2 minutes
+#   ./quality coder "MTP depth 3" --full        # all 69 standard scenarios, about 10 minutes
+#   ./quality coder "temp 0.6" --temperature 0.6
+#
+# Defaults: temperature 0 and seed 42, so the same model and settings give the
+# same answers every time and runs compare cleanly. The model runs with its normal
+# thinking. Results: score out of 100 plus a per-category breakdown, in MLflow.
+set -e
+cd "$(dirname "$0")"
+MODEL="$1"; NOTE="$2"; shift 2 || { sed -n '2,13p' "$0"; exit 1; }
+SUITE="--short"
+if [ "$1" = "--full" ]; then SUITE=""; shift; fi
+set -a; . ~/llama-swap/.env; set +a
+mkdir -p tool-eval/data tool-eval/runs
+OUT="$(date +%Y-%m-%d-%H%M)-${MODEL//\//_}.json"
+
+echo "== tool-eval-bench on $MODEL ${SUITE:-(full)}"
+docker run --rm --network host -u "$(id -u):$(id -g)" \
+  -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" \
+  tool-eval-bench:3.0.0 run $SUITE --seed 42 \
+  --base-url http://127.0.0.1:8080/v1 --api-key "$ZAPHOD_KEY" --model "$MODEL" \
+  --no-live --json-file "/app/runs/$OUT" "$@" > "tool-eval/runs/${OUT%.json}.log" 2>&1 \
+  || { echo "tool-eval-bench failed:"; tail -5 "tool-eval/runs/${OUT%.json}.log"; exit 1; }
+
+REPORT=$(python3 -c "import json;print(json.load(open('tool-eval/runs/$OUT'))['report_path'].replace('/app/','tool-eval/'))")
+echo "== results (full report with every conversation: $REPORT)"
+./log "${MACHINE:-zaphod}" "$MODEL" "$NOTE" "tool-eval/runs/$OUT" "$REPORT"

@@ -92,6 +92,39 @@ def read_bench(path):
     return params, metrics
 
 
+def read_tool_eval(path):
+    """Settings and results from a tool-eval-bench --json-file result."""
+    try:
+        with open(path) as f:
+            d = json.load(f)
+    except (ValueError, OSError):
+        return None, None
+    if "tool_eval_bench_version" not in d or "scores" not in d:
+        return None, None
+    s, m = d["scores"], d.get("metadata", {})
+    params = {
+        "quality.tool": "tool-eval-bench",
+        "quality.version": d["tool_eval_bench_version"],
+        "quality.suite": m.get("scenario_selector", ""),
+        "quality.temperature": m.get("temperature", ""),
+        "quality.seed": m.get("seed", ""),
+        "quality.thinking": m.get("thinking_enabled", ""),
+        "quality.trials": m.get("trials", ""),
+    }
+    metrics = {
+        "tooleval_score": s["final_score"],
+        "tooleval_points": s["total_points"],
+        "tooleval_max_points": s["max_points"],
+        "tooleval_deployability": s.get("deployability") or 0,
+        "tooleval_responsiveness": s.get("responsiveness") or 0,
+        "tooleval_median_turn_ms": s.get("median_turn_ms") or 0,
+        "tooleval_total_tokens": s.get("total_tokens") or 0,
+    }
+    for c in s.get("category_scores", []):
+        metrics[f"tooleval_cat_{c['category']}"] = c["percent"]
+    return params, metrics
+
+
 def main():
     if len(sys.argv) < 4:
         sys.exit(__doc__)
@@ -102,13 +135,21 @@ def main():
     mlflow.set_tracking_uri(MLFLOW_URL)
     mlflow.set_experiment(EXPERIMENT)
     with mlflow.start_run(run_name=f"{machine}/{model}", description=note) as run:
-        mlflow.set_tags({"machine": machine, "model": model, "mlflow.note.content": note})
+        mlflow.set_tags({"machine": machine, "model": model, "mlflow.note.content": note,
+                         "config_commit": os.environ.get("CONFIG_COMMIT", "unknown")})
         if cmd:
             mlflow.log_params(flags_to_params(cmd))
             mlflow.log_text(cmd, "server_cmd.txt")
         for item in rest:
             if os.path.isfile(item):
                 mlflow.log_artifact(item)
+                if item.endswith(".json"):
+                    p, m = read_tool_eval(item)
+                    if p:
+                        mlflow.log_params(p)
+                        mlflow.log_metrics(m)
+                        print(f"  tool-eval score = {m['tooleval_score']} "
+                              f"({m['tooleval_points']}/{m['tooleval_max_points']} points)")
                 if item.endswith(".jsonl"):
                     p, m = read_bench(item)
                     if p:
@@ -122,7 +163,8 @@ def main():
                 mlflow.log_metric(name, float(value))
             else:
                 sys.exit(f"Not a file or name=value: {item}")
-        print(f"Logged run {run.info.run_id}  ->  https://mlflow.ai.dopamine911.com")
+        print(f"Logged run {run.info.run_id}  ->  https://mlflow.ai.dopamine911.com"
+              f"  (config: {os.environ.get('CONFIG_COMMIT', 'unknown')})")
 
 
 if __name__ == "__main__":

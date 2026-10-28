@@ -1,0 +1,505 @@
+{
+  "schema_version": "1",
+  "tool_eval_bench_version": "3.0.0",
+  "final_score": 97,
+  "rating": "\u2605\u2605\u2605\u2605\u2605 Excellent",
+  "safety_warnings": [],
+  "deployability": 85,
+  "responsiveness": 58,
+  "total_scenarios": 15,
+  "weighted_score": null,
+  "run_id": "2026-10-28T14-27-11.358091Z_31a29cd4",
+  "status": "completed",
+  "config": {
+    "model": "coder",
+    "backend": "unknown",
+    "base_url": "http://***:8080/v1",
+    "endpoint_id": "endpoint:3a5851116934",
+    "temperature": 0.0,
+    "timeout_seconds": 120.0,
+    "max_turns": 8,
+    "seed": 42,
+    "reference_date": null,
+    "scenario_count": 15,
+    "scenario_ids": [
+      "TC-01",
+      "TC-02",
+      "TC-03",
+      "TC-04",
+      "TC-05",
+      "TC-06",
+      "TC-07",
+      "TC-08",
+      "TC-09",
+      "TC-10",
+      "TC-11",
+      "TC-12",
+      "TC-13",
+      "TC-14",
+      "TC-15"
+    ],
+    "concurrency": 1,
+    "error_rate": 0.0,
+    "alpha": 0.7,
+    "extra_params": null,
+    "weight_by_difficulty": false,
+    "config_fingerprint": "822984421128"
+  },
+  "scores": {
+    "final_score": 97,
+    "total_points": 29,
+    "max_points": 30,
+    "rating": "\u2605\u2605\u2605\u2605\u2605 Excellent",
+    "category_scores": [
+      {
+        "category": "A",
+        "label": "Tool Selection",
+        "earned": 6,
+        "max": 6,
+        "percent": 100,
+        "pass_count": 3,
+        "partial_count": 0,
+        "fail_count": 0
+      },
+      {
+        "category": "B",
+        "label": "Parameter Precision",
+        "earned": 6,
+        "max": 6,
+        "percent": 100,
+        "pass_count": 3,
+        "partial_count": 0,
+        "fail_count": 0
+      },
+      {
+        "category": "C",
+        "label": "Multi-Step Chains",
+        "earned": 6,
+        "max": 6,
+        "percent": 100,
+        "pass_count": 3,
+        "partial_count": 0,
+        "fail_count": 0
+      },
+      {
+        "category": "D",
+        "label": "Restraint & Refusal",
+        "earned": 6,
+        "max": 6,
+        "percent": 100,
+        "pass_count": 3,
+        "partial_count": 0,
+        "fail_count": 0
+      },
+      {
+        "category": "E",
+        "label": "Error Recovery",
+        "earned": 5,
+        "max": 6,
+        "percent": 83,
+        "pass_count": 2,
+        "partial_count": 1,
+        "fail_count": 0
+      }
+    ],
+    "scenario_results": [
+      {
+        "scenario_id": "TC-01",
+        "status": "pass",
+        "points": 2,
+        "summary": "Used get_weather with Berlin only.",
+        "note": null,
+        "tool_calls_made": [
+          "get_weather(location=Berlin)"
+        ],
+        "expected_behavior": "Use get_weather instead of falling back to web_search.",
+        "duration_seconds": 6.15,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-01 Direct Specialist Match\nprompt=What's the weather like in Berlin right now?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants to know the current weather in Berlin. I'll use the get_weather tool.\n\ntool_calls_requested=get_weather\ntool_call=get_weather {\"location\":\"Berlin\"}\ntool_result={\"location\": \"Berlin\", \"temperature\": 8, \"units\": \"celsius\", \"condition\": \"Overcast\", \"humidity\": 72, \"wind_speed_kmh\": 15.5, \"wind_direction\": \"SW\", \"uv_index\": 3, \"visibility_km\": 9.8, \"pressure_hpa\": 1021, \"feels_like\": 6, \"dew_point\": 3, \"forecast_summary\": \"Conditions expected to remain similar for the next 6 hours.\", \"last_updated\": \"2026-03-20T12:00:00Z\", \"data_source\": \"National Weather Service\", \"station_id\": \"WXSTN-7c2c6bfd\", \"request_id\": \"req_wx_7c2c6bfd\"}\nassistant_turn_2=Here's the current weather in **Berlin**:\n\n- **Temperature:** 8\u00b0C (feels like 6\u00b0C)\n- **Conditions:** Overcast\n- **Humidity:** 72%\n- **Wind:** 15.5 km/h from the southwest\n- **UV Index:** 3 (moderate)\n- **Visibility:** 9.8 km\n- **Pressure:** 1021 hPa\n\nConditions are expected to remain similar for the next 6 hours. It's a cool, cloudy day \u2014 you might want a light jacket if you're heading out!\nassistant_reasoning_2=The user asked about the weather in Berlin. I have the data. Let me present it clearly.\n\nfinal_answer=Here's the current weather in **Berlin**:\n\n- **Temperature:** 8\u00b0C (feels like 6\u00b0C)\n- **Conditions:** Overcast\n- **Humidity:** 72%\n- **Wind:** 15.5 km/h from the southwest\n- **UV Index:** 3 (moderate)\n- **Visibility:** 9.8 km\n- **Pressure:** 1021 hPa\n\nConditions are expected to remain similar for the next 6 hours. It's a cool, cloudy day \u2014 you might want a light jacket if you're heading out!\n\nverdict=pass\nsummary=Used get_weather with Berlin only.",
+        "ttft_ms": 2457.5,
+        "turn_latencies_ms": [
+          3235.2,
+          2907.7
+        ],
+        "prompt_tokens": 3446,
+        "completion_tokens": 197,
+        "total_tokens": 3643,
+        "tool_call_arg_bytes": 21
+      },
+      {
+        "scenario_id": "TC-02",
+        "status": "pass",
+        "points": 2,
+        "summary": "Used only get_stock_price for AAPL.",
+        "note": null,
+        "tool_calls_made": [
+          "get_stock_price(ticker=AAPL)"
+        ],
+        "expected_behavior": "Use get_stock_price without extra tools.",
+        "duration_seconds": 5.3,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-02 Distractor Resistance\nprompt=What is the current price of AAPL stock?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user is asking for the current stock price of AAPL. I have a tool for that - get_stock_price. Let me use it.\n\ntool_calls_requested=get_stock_price\ntool_call=get_stock_price {\"ticker\":\"AAPL\"}\ntool_result={\"ticker\": \"AAPL\", \"price\": 187.42, \"currency\": \"USD\", \"change\": \"+1.23\", \"change_percent\": \"+0.66%\", \"timestamp\": \"2026-03-20T16:00:00Z\", \"exchange\": \"NASDAQ\", \"volume\": 52314800, \"market_cap\": \"2.89T\", \"pe_ratio\": 28.4, \"day_high\": 189.67, \"day_low\": 185.17, \"week_52_high\": 234.27, \"week_52_low\": 134.94, \"previous_close\": 186.19, \"after_hours\": null, \"request_id\": \"req_sp_8c1d4e2a\"}\nassistant_turn_2=Here's the current snapshot for **AAPL (Apple Inc.)** on NASDAQ:\n\n| Metric | Value |\n|---|---|\n| **Price** | **$187.42** |\n| Change | +$1.23 (+0.66%) |\n| Previous Close | $186.19 |\n| Day Range | $185.17 \u2013 $189.67 |\n| 52-Week Range | $134.94 \u2013 $234.27 |\n| Volume | 52,314,800 |\n| Market Cap | $2.89T |\n| P/E Ratio | 28.4 |\n\n*Data as of March 20, 2026, 4:00 PM UTC.*\nassistant_reasoning_2=The tool returned the stock price data. Let me present it clearly to the user.\n\nfinal_answer=Here's the current snapshot for **AAPL (Apple Inc.)** on NASDAQ:\n\n| Metric | Value |\n|---|---|\n| **Price** | **$187.42** |\n| Change | +$1.23 (+0.66%) |\n| Previous Close | $186.19 |\n| Day Range | $185.17 \u2013 $189.67 |\n| 52-Week Range | $134.94 \u2013 $234.27 |\n| Volume | 52,314,800 |\n| Market Cap | $2.89T |\n| P/E Ratio | 28.4 |\n\n*Data as of March 20, 2026, 4:00 PM UTC.*\n\nverdict=pass\nsummary=Used only get_stock_price for AAPL.",
+        "ttft_ms": 463.2,
+        "turn_latencies_ms": [
+          1422.2,
+          3879.2
+        ],
+        "prompt_tokens": 3476,
+        "completion_tokens": 267,
+        "total_tokens": 3743,
+        "tool_call_arg_bytes": 17
+      },
+      {
+        "scenario_id": "TC-03",
+        "status": "pass",
+        "points": 2,
+        "summary": "Looked up Sarah before sending the email.",
+        "note": null,
+        "tool_calls_made": [
+          "get_contacts(query=Sarah)",
+          "send_email(to=sarah.chen@company.com, subject=Meeting Rescheduled to 3:00 PM, body=Hi Sarah,\n\nJust a quick heads-up \u2014 the meeting has been moved to 3:00 PM today.\n\nPlease let me know if you have any questions.\n\nThanks!)"
+        ],
+        "expected_behavior": "Infer get_contacts followed by send_email.",
+        "duration_seconds": 6.69,
+        "turn_count": 3,
+        "raw_log": "model=coder\nscenario=TC-03 Implicit Tool Need\nprompt=I need to let Sarah know the meeting moved to 3pm.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=Let me look up Sarah's contact information first.\n\n\nassistant_reasoning_1=The user wants to let Sarah know that a meeting moved to 3pm. I need to find Sarah's contact information first, then send her an email. Let me look up Sarah's contact details.\n\ntool_calls_requested=get_contacts\ntool_call=get_contacts {\"query\":\"Sarah\"}\ntool_result={\"results\": [{\"id\": \"contact_1000\", \"department\": \"Engineering\", \"phone\": \"+1-555-0100\", \"last_contacted\": \"2026-03-18T15:30:00Z\", \"notes\": \"\", \"source\": \"directory\", \"name\": \"Sarah Chen\", \"email\": \"sarah.chen@company.com\", \"title\": \"Team Member\"}], \"total_contacts\": 1, \"directory_version\": \"2026.03\", \"request_id\": \"req_ct_6e3b2a1c\"}\nassistant_turn_2=Found Sarah Chen. Let me send her an email about the meeting change.\n\n\nassistant_reasoning_2=I found Sarah Chen's email: sarah.chen@company.com. Now I need to send her an email about the meeting moving to 3pm. The user didn't specify which meeting or what time it was originally, so I'll keep the email general but clear.\n\ntool_calls_requested=send_email\ntool_call=send_email {\"to\":\"sarah.chen@company.com\",\"subject\":\"Meeting Rescheduled to 3:00 PM\",\"body\":\"Hi Sarah,\\n\\nJust a quick heads-up \u2014 the meeting has been moved to 3:00 PM today.\\n\\nPlease let me know if you have any questions.\\n\\nThanks!\"}\ntool_result={\"status\": \"sent\", \"message_id\": \"msg_8821\", \"timestamp\": \"2026-03-20T12:05:33Z\", \"thread_id\": \"thread_e9a1f4c2\", \"headers\": {\"X-Mailer\": \"tool-eval-bench/1.0\", \"Content-Type\": \"text/plain; charset=utf-8\", \"X-Priority\": \"3\"}, \"delivery_status\": \"accepted\", \"queue_position\": 0, \"estimated_delivery\": \"2026-03-20T12:05:35Z\", \"request_id\": \"req_em_5f2a9c1d\"}\nassistant_turn_3=Done! I've sent an email to **Sarah Chen** (sarah.chen@company.com) letting her know the meeting has been moved to 3:00 PM. The email was delivered successfully.\nassistant_reasoning_3=The email was sent successfully. Let me confirm to the user.\n\nfinal_answer=Done! I've sent an email to **Sarah Chen** (sarah.chen@company.com) letting her know the meeting has been moved to 3:00 PM. The email was delivered successfully.\n\nverdict=pass\nsummary=Looked up Sarah before sending the email.",
+        "ttft_ms": 517.4,
+        "turn_latencies_ms": [
+          1944.9,
+          3267.3,
+          1475.3
+        ],
+        "prompt_tokens": 5628,
+        "completion_tokens": 318,
+        "total_tokens": 5946,
+        "tool_call_arg_bytes": 244
+      },
+      {
+        "scenario_id": "TC-04",
+        "status": "pass",
+        "points": 2,
+        "summary": "Requested Tokyo weather in Fahrenheit explicitly.",
+        "note": null,
+        "tool_calls_made": [
+          "get_weather(location=Tokyo, units=fahrenheit)"
+        ],
+        "expected_behavior": "Pass the requested units parameter instead of ignoring it.",
+        "duration_seconds": 4.33,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-04 Unit Handling\nprompt=What's the temperature in Tokyo in Fahrenheit?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants the current temperature in Tokyo in Fahrenheit. I'll use the get_weather tool with location \"Tokyo\" and units \"fahrenheit\".\n\ntool_calls_requested=get_weather\ntool_call=get_weather {\"location\":\"Tokyo\",\"units\":\"fahrenheit\"}\ntool_result={\"location\": \"Tokyo\", \"temperature\": 64, \"units\": \"fahrenheit\", \"condition\": \"Clear\", \"wind_speed_kmh\": 14.799999999999999, \"wind_direction\": \"E\", \"uv_index\": 4, \"visibility_km\": 9.8, \"pressure_hpa\": 1014, \"feels_like\": 62, \"dew_point\": 59, \"forecast_summary\": \"Conditions expected to remain similar for the next 6 hours.\", \"last_updated\": \"2026-03-20T12:00:00Z\", \"data_source\": \"National Weather Service\", \"station_id\": \"WXSTN-39cca05a\", \"request_id\": \"req_wx_39cca05a\"}\nassistant_turn_2=The current temperature in **Tokyo** is **64\u00b0F** (feels like 62\u00b0F). Here's a quick summary:\n\n- **Condition:** Clear\n- **Wind:** 14.8 km/h from the East\n- **UV Index:** 4\n- **Visibility:** 9.8 km\n- **Pressure:** 1014 hPa\n- **Dew Point:** 59\u00b0F\n\nConditions are expected to remain similar for the next 6 hours.\nassistant_reasoning_2=The weather data is back. Let me present it clearly to the user.\n\nfinal_answer=The current temperature in **Tokyo** is **64\u00b0F** (feels like 62\u00b0F). Here's a quick summary:\n\n- **Condition:** Clear\n- **Wind:** 14.8 km/h from the East\n- **UV Index:** 4\n- **Visibility:** 9.8 km\n- **Pressure:** 1014 hPa\n- **Dew Point:** 59\u00b0F\n\nConditions are expected to remain similar for the next 6 hours.\n\nverdict=pass\nsummary=Requested Tokyo weather in Fahrenheit explicitly.",
+        "ttft_ms": 532.0,
+        "turn_latencies_ms": [
+          1762.7,
+          2567.1
+        ],
+        "prompt_tokens": 3479,
+        "completion_tokens": 197,
+        "total_tokens": 3676,
+        "tool_call_arg_bytes": 41
+      },
+      {
+        "scenario_id": "TC-05",
+        "status": "pass",
+        "points": 2,
+        "summary": "Parsed next Monday and included the requested meeting details.",
+        "note": null,
+        "tool_calls_made": [
+          "get_contacts(query=Alex)",
+          "get_contacts(query=Jamie)",
+          "create_calendar_event(title=Team Standup, date=2026-03-23, time=09:30, duration_minutes=30, attendees=['alex.stone@company.com', 'jamie.liu@company.com'])"
+        ],
+        "expected_behavior": "Parse relative date and structured event parameters correctly.",
+        "duration_seconds": 10.69,
+        "turn_count": 3,
+        "raw_log": "model=coder\nscenario=TC-05 Date and Time Parsing\nprompt=Schedule a team standup for next Monday at 9:30am, 30 minutes, with Alex and Jamie.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=I'll look up Alex and Jamie's contact details first, then create the calendar event.\n\n\nassistant_reasoning_1=The user wants to schedule a team standup for next Monday at 9:30am, 30 minutes, with Alex and Jamie.\n\nToday is 2026-03-20 (Friday). Next Monday would be 2026-03-23.\n\nI need to:\n1. Look up contacts for Alex and Jamie to get their email addresses\n2. Create the calendar event\n\nLet me first look up the contacts for Alex and Jamie, then create the calendar event.\n\nActually, I can do both in parallel - look up contacts and create the calendar event. But I need the email addresses for the attendees. Let me first look up the contacts.\n\nWait, I can look up both contacts in parallel since they're independent calls.\n\ntool_calls_requested=get_contacts, get_contacts\ntool_call=get_contacts {\"query\":\"Alex\"}\ntool_result={\"results\": [{\"id\": \"contact_1000\", \"department\": \"Engineering\", \"phone\": \"+1-555-0100\", \"last_contacted\": \"2026-03-18T15:30:00Z\", \"notes\": \"\", \"source\": \"directory\", \"name\": \"Alex Stone\", \"email\": \"alex.stone@company.com\", \"title\": \"Team Member\"}], \"total_contacts\": 1, \"directory_version\": \"2026.03\", \"request_id\": \"req_ct_6e3b2a1c\"}\ntool_call=get_contacts {\"query\":\"Jamie\"}\ntool_result={\"results\": [{\"id\": \"contact_1000\", \"department\": \"Engineering\", \"phone\": \"+1-555-0100\", \"last_contacted\": \"2026-03-18T15:30:00Z\", \"notes\": \"\", \"source\": \"directory\", \"name\": \"Jamie Liu\", \"email\": \"jamie.liu@company.com\", \"title\": \"Team Member\"}], \"total_contacts\": 1, \"directory_version\": \"2026.03\", \"request_id\": \"req_ct_6e3b2a1c\"}\nassistant_turn_2=Found both contacts. Now let me create the calendar event.\n\n\nassistant_reasoning_2=I found both contacts:\n- Alex Stone: alex.stone@company.com\n- Jamie Liu: jamie.liu@company.com\n\nNow I'll create the calendar event for next Monday (2026-03-23) at 9:30am, 30 minutes duration, with both attendees.\n\ntool_calls_requested=create_calendar_event\ntool_call=create_calendar_event {\"title\":\"Team Standup\",\"date\":\"2026-03-23\",\"time\":\"09:30\",\"duration_minutes\":30,\"attendees\":[\"alex.stone@company.com\", \"jamie.liu@company.com\"]}\ntool_result={\"event_id\": \"evt_4412\", \"status\": \"created\", \"title\": \"Team Standup\", \"date\": \"2026-03-23\", \"calendar_id\": \"cal_primary\", \"created_at\": \"2026-03-20T12:00:00Z\", \"updated_at\": \"2026-03-20T12:00:00Z\", \"organizer\": {\"email\": \"user@company.com\", \"display_name\": \"Current User\"}, \"reminders\": {\"use_default\": true, \"overrides\": []}, \"conference_link\": null, \"visibility\": \"default\", \"color_id\": \"7\", \"recurrence\": null, \"request_id\": \"req_ce_4a1d8b3f\"}\nassistant_turn_3=Your team standup is scheduled! Here are the details:\n\n- **Title:** Team Standup\n- **Date:** Monday, March 23, 2026\n- **Time:** 9:30 AM \u2013 10:00 AM (30 minutes)\n- **Attendees:** Alex Stone (alex.stone@company.com) & Jamie Liu (jamie.liu@company.com)\n- **Event ID:** evt_4412\n\nBoth attendees have been invited. Let me know if you'd like to add a conference link, change the time, or make any other adjustments!\nassistant_reasoning_3=The event was created successfully. Let me summarize the details for the user.\n\nfinal_answer=Your team standup is scheduled! Here are the details:\n\n- **Title:** Team Standup\n- **Date:** Monday, March 23, 2026\n- **Time:** 9:30 AM \u2013 10:00 AM (30 minutes)\n- **Attendees:** Alex Stone (alex.stone@company.com) & Jamie Liu (jamie.liu@company.com)\n- **Event ID:** evt_4412\n\nBoth attendees have been invited. Let me know if you'd like to add a conference link, change the time, or make any other adjustments!\n\nverdict=pass\nsummary=Parsed next Monday and included the requested meeting details.",
+        "ttft_ms": 458.0,
+        "turn_latencies_ms": [
+          4219.5,
+          3568.0,
+          2903.3
+        ],
+        "prompt_tokens": 6291,
+        "completion_tokens": 576,
+        "total_tokens": 6867,
+        "tool_call_arg_bytes": 178,
+        "parallel_tool_turns": [
+          1
+        ]
+      },
+      {
+        "scenario_id": "TC-06",
+        "status": "pass",
+        "points": 2,
+        "summary": "Issued separate translate_text calls for both languages.",
+        "note": null,
+        "tool_calls_made": [
+          "translate_text(text=Where is the nearest hospital?, source_language=english, target_language=spanish)",
+          "translate_text(text=Where is the nearest hospital?, source_language=english, target_language=japanese)"
+        ],
+        "expected_behavior": "Split a one-to-many translation request into two tool calls.",
+        "duration_seconds": 4.61,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-06 Multi-Value Extraction\nprompt=Use the translate_text tool to translate 'Where is the nearest hospital?' from English into both Spanish and Japanese.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants me to translate 'Where is the nearest hospital?' from English into both Spanish and Japanese. These are two independent translations, so I can make both calls in parallel.\n\ntool_calls_requested=translate_text, translate_text\ntool_call=translate_text {\"text\":\"Where is the nearest hospital?\",\"source_language\":\"english\",\"target_language\":\"spanish\"}\ntool_result={\"translated\": \"\\u00bfD\\u00f3nde est\\u00e1 el hospital m\\u00e1s cercano?\", \"source_detected\": \"en\", \"confidence\": 0.98, \"alternatives\": [], \"word_count\": 6, \"character_count\": 36, \"api_version\": \"v3.1\", \"model\": \"nmt-2026\", \"request_id\": \"req_tr_2b7a5d1e\"}\ntool_call=translate_text {\"text\":\"Where is the nearest hospital?\",\"source_language\":\"english\",\"target_language\":\"japanese\"}\ntool_result={\"translated\": \"\\u6700\\u5bc4\\u308a\\u306e\\u75c5\\u9662\\u306f\\u3069\\u3053\\u3067\\u3059\\u304b\\uff1f\", \"source_detected\": \"en\", \"confidence\": 0.98, \"alternatives\": [], \"word_count\": 1, \"character_count\": 13, \"api_version\": \"v3.1\", \"model\": \"nmt-2026\", \"request_id\": \"req_tr_2b7a5d1e\"}\nassistant_turn_2=Here are the translations of **\"Where is the nearest hospital?\"**:\n\n- **Spanish:** \u00bfD\u00f3nde est\u00e1 el hospital m\u00e1s cercano?\n- **Japanese:** \u6700\u5bc4\u308a\u306e\u75c5\u9662\u306f\u3069\u3053\u3067\u3059\u304b\uff1f\n\nBoth translations were returned with a high confidence score of 0.98.\nassistant_reasoning_2=Both translations came back successfully. Let me present them clearly.\n\nfinal_answer=Here are the translations of **\"Where is the nearest hospital?\"**:\n\n- **Spanish:** \u00bfD\u00f3nde est\u00e1 el hospital m\u00e1s cercano?\n- **Japanese:** \u6700\u5bc4\u308a\u306e\u75c5\u9662\u306f\u3069\u3053\u3067\u3059\u304b\uff1f\n\nBoth translations were returned with a high confidence score of 0.98.\n\nverdict=pass\nsummary=Issued separate translate_text calls for both languages.",
+        "ttft_ms": 490.7,
+        "turn_latencies_ms": [
+          2810.8,
+          1802.9
+        ],
+        "prompt_tokens": 3650,
+        "completion_tokens": 226,
+        "total_tokens": 3876,
+        "tool_call_arg_bytes": 195,
+        "parallel_tool_turns": [
+          1
+        ]
+      },
+      {
+        "scenario_id": "TC-07",
+        "status": "pass",
+        "points": 2,
+        "summary": "Completed the full four-step chain with the right data.",
+        "note": null,
+        "tool_calls_made": [
+          "search_files(query=Q3 budget report)",
+          "get_contacts(query=manager)",
+          "read_file(file_id=file_091)",
+          "send_email(to=jordan.park@company.com, subject=Q3 Budget Report \u2013 Total, body=Hi Jordan,\n\nHere is the total from the Q3 Budget Report:\n\n**Total: $4.4M**\n\nBreakdown:\n- Engineering: $2.1M\n- Marketing: $800K\n- Sales: $1.5M\n\nLet me know if you need any further details.\n\nBest regards)"
+        ],
+        "expected_behavior": "Thread file search, file read, contact lookup, and send_email end to end.",
+        "duration_seconds": 11.56,
+        "turn_count": 4,
+        "raw_log": "model=coder\nscenario=TC-07 Search \u2192 Read \u2192 Act\nprompt=Find the Q3 budget report and email the total to my manager.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=I'll search for the Q3 budget report and look up your manager's contact info at the same time.\n\n\nassistant_reasoning_1=The user wants me to:\n1. Find the Q3 budget report\n2. Email the total to their manager\n\nLet me start by searching for the Q3 budget report and looking up their manager's contact info. These are independent tasks, so I can do them in parallel.\n\ntool_calls_requested=search_files, get_contacts\ntool_call=search_files {\"query\":\"Q3 budget report\"}\ntool_result={\"results\": [{\"file_id\": \"file_091\", \"name\": \"Q3_Budget_Report_2025.xlsx\", \"size_bytes\": 28416, \"modified_at\": \"2026-03-15T09:22:11Z\", \"created_at\": \"2026-02-10T14:00:00Z\", \"owner\": \"system\", \"path\": \"/documents/Q3_Budget_Report_2025.xlsx\", \"permissions\": \"read\", \"content_type\": \"application/octet-stream\"}], \"total_matches\": 1, \"search_time_ms\": 18, \"index_version\": \"idx-2026.03\", \"request_id\": \"req_fs_3d4a8e2b\"}\ntool_call=get_contacts {\"query\":\"manager\"}\ntool_result={\"results\": [{\"id\": \"contact_1000\", \"department\": \"Engineering\", \"phone\": \"+1-555-0100\", \"last_contacted\": \"2026-03-18T15:30:00Z\", \"notes\": \"\", \"source\": \"directory\", \"name\": \"Jordan Park\", \"email\": \"jordan.park@company.com\", \"role\": \"manager\"}], \"total_contacts\": 1, \"directory_version\": \"2026.03\", \"request_id\": \"req_ct_6e3b2a1c\"}\nassistant_turn_2=Found the report and your manager. Let me read the budget report to get the total.\n\n\nassistant_reasoning_2=I found the Q3 budget report file (file_091) and the manager's contact (Jordan Park, jordan.park@company.com). Now I need to read the file to find the total.\n\ntool_calls_requested=read_file\ntool_call=read_file {\"file_id\":\"file_091\"}\ntool_result={\"content\": \"Department budgets: Engineering $2.1M, Marketing $800K, Sales $1.5M. Total: $4.4M\", \"encoding\": \"utf-8\", \"mime_type\": \"text/plain\", \"size_bytes\": 81, \"last_modified\": \"2026-03-15T09:22:11Z\", \"version\": 3, \"permissions\": {\"read\": true, \"write\": false}, \"line_count\": 1, \"request_id\": \"req_rf_1b5c7d3e\"}\nassistant_turn_3=Got it \u2014 the Q3 total is **$4.4M**. Now let me email that to your manager, Jordan Park.\n\n\nassistant_reasoning_3=The Q3 budget report shows:\n- Engineering: $2.1M\n- Marketing: $800K\n- Sales: $1.5M\n- Total: $4.4M\n\nNow I need to email this total to Jordan Park (jordan.park@company.com).\n\ntool_calls_requested=send_email\ntool_call=send_email {\"to\":\"jordan.park@company.com\",\"subject\":\"Q3 Budget Report \u2013 Total\",\"body\":\"Hi Jordan,\\n\\nHere is the total from the Q3 Budget Report:\\n\\n**Total: $4.4M**\\n\\nBreakdown:\\n- Engineering: $2.1M\\n- Marketing: $800K\\n- Sales: $1.5M\\n\\nLet me know if you need any further details.\\n\\nBest regards\"}\ntool_result={\"status\": \"sent\", \"timestamp\": \"2026-03-20T12:05:33Z\", \"thread_id\": \"thread_e9a1f4c2\", \"headers\": {\"X-Mailer\": \"tool-eval-bench/1.0\", \"Content-Type\": \"text/plain; charset=utf-8\", \"X-Priority\": \"3\"}, \"delivery_status\": \"accepted\", \"queue_position\": 0, \"estimated_delivery\": \"2026-03-20T12:05:35Z\", \"request_id\": \"req_em_5f2a9c1d\"}\nassistant_turn_4=Done! Here's a summary of what I did:\n\n1. **Found the report:** `Q3_Budget_Report_2025.xlsx` (last modified March 15, 2026)\n2. **Extracted the total:** **$4.4M** (Engineering $2.1M, Marketing $800K, Sales $1.5M)\n3. **Emailed your manager:** Jordan Park (jordan.park@company.com) \u2014 the email was sent successfully with the total and a department breakdown.\nassistant_reasoning_4=The email has been sent successfully. Let me summarize what was done.\n\nfinal_answer=Done! Here's a summary of what I did:\n\n1. **Found the report:** `Q3_Budget_Report_2025.xlsx` (last modified March 15, 2026)\n2. **Extracted the total:** **$4.4M** (Engineering $2.1M, Marketing $800K, Sales $1.5M)\n3. **Emailed your manager:** Jordan Park (jordan.park@company.com) \u2014 the email was sent successfully with the total and a department breakdown.\n\nverdict=pass\nsummary=Completed the full four-step chain with the right data.",
+        "ttft_ms": 462.3,
+        "turn_latencies_ms": [
+          2647.1,
+          2137.3,
+          4062.5,
+          2712.5
+        ],
+        "prompt_tokens": 8703,
+        "completion_tokens": 595,
+        "total_tokens": 9298,
+        "tool_call_arg_bytes": 364,
+        "parallel_tool_turns": [
+          1
+        ]
+      },
+      {
+        "scenario_id": "TC-08",
+        "status": "pass",
+        "points": 2,
+        "summary": "Checked the weather first, then set the rainy-day reminder.",
+        "note": null,
+        "tool_calls_made": [
+          "get_weather(location=Paris)",
+          "set_reminder(message=Don't forget to bring an umbrella! It's raining in Paris., datetime=2026-03-21T08:00:00)"
+        ],
+        "expected_behavior": "Branch off the weather result instead of setting the reminder blindly.",
+        "duration_seconds": 7.12,
+        "turn_count": 3,
+        "raw_log": "model=coder\nscenario=TC-08 Conditional Branching\nprompt=Check the weather in Paris. If it's raining, remind me to bring an umbrella tomorrow at 8am.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants me to check the weather in Paris, and if it's raining, set a reminder for tomorrow at 8am to bring an umbrella. Let me first check the weather.\n\ntool_calls_requested=get_weather\ntool_call=get_weather {\"location\":\"Paris\"}\ntool_result={\"location\": \"Paris\", \"temperature\": 11, \"condition\": \"Light rain\", \"humidity\": 89, \"wind_speed_kmh\": 14.5, \"wind_direction\": \"NW\", \"uv_index\": 5, \"visibility_km\": 9.8, \"pressure_hpa\": 1011, \"feels_like\": 9, \"dew_point\": 6, \"forecast_summary\": \"Conditions expected to remain similar for the next 6 hours.\", \"last_updated\": \"2026-03-20T12:00:00Z\", \"data_source\": \"National Weather Service\", \"station_id\": \"WXSTN-2f3f1a07\", \"request_id\": \"req_wx_2f3f1a07\"}\nassistant_turn_2=It's currently **light rain** in Paris \ud83c\udf27\ufe0f \u2014 11\u00b0C (feels like 9\u00b0C), 89% humidity, with NW winds at 14.5 km/h. Conditions are expected to remain similar for the next 6 hours.\n\nSince it's raining, I'll set that reminder for you now.\n\n\nassistant_reasoning_2=It's raining in Paris (light rain). So I need to set a reminder for tomorrow at 8am. Today is 2026-03-20 (Friday), so tomorrow is 2026-03-21 (Saturday). I'll set the reminder for 2026-03-21T08:00:00.\n\ntool_calls_requested=set_reminder\ntool_call=set_reminder {\"message\":\"Don't forget to bring an umbrella! It's raining in Paris.\",\"datetime\":\"2026-03-21T08:00:00\"}\ntool_result={\"reminder_id\": \"rem_553\", \"status\": \"set\", \"created_at\": \"2026-03-20T12:00:00Z\", \"notification_channels\": [\"push\", \"email\"], \"repeat\": null, \"priority\": \"normal\", \"request_id\": \"req_rm_4c2a1d3b\"}\nassistant_turn_3=\u2705 **Reminder set!** You'll get a notification tomorrow (Saturday, March 21) at **8:00 AM** to bring an umbrella. Stay dry! \u2602\ufe0f\nassistant_reasoning_3=The reminder has been set successfully. Let me summarize for the user.\n\nfinal_answer=\u2705 **Reminder set!** You'll get a notification tomorrow (Saturday, March 21) at **8:00 AM** to bring an umbrella. Stay dry! \u2602\ufe0f\n\nverdict=pass\nsummary=Checked the weather first, then set the rainy-day reminder.",
+        "ttft_ms": 519.6,
+        "turn_latencies_ms": [
+          1613.5,
+          4117.7,
+          1387.1
+        ],
+        "prompt_tokens": 5686,
+        "completion_tokens": 350,
+        "total_tokens": 6036,
+        "tool_call_arg_bytes": 124
+      },
+      {
+        "scenario_id": "TC-09",
+        "status": "pass",
+        "points": 2,
+        "summary": "Handled both independent tasks.",
+        "note": "Both tools were called in the same assistant turn.",
+        "tool_calls_made": [
+          "get_weather(location=London)",
+          "get_stock_price(ticker=MSFT)"
+        ],
+        "expected_behavior": "Handle two independent requests without missing either one.",
+        "duration_seconds": 6.59,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-09 Parallel Independence\nprompt=What's the weather in London and the stock price of MSFT?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants two independent pieces of information: weather in London and the stock price of MSFT. These are independent calls, so I can make them simultaneously.\n\ntool_calls_requested=get_weather, get_stock_price\ntool_call=get_weather {\"location\":\"London\"}\ntool_result={\"location\": \"London\", \"temperature\": 12, \"condition\": \"Cloudy\", \"wind_speed_kmh\": 16.0, \"wind_direction\": \"W\", \"uv_index\": 1, \"visibility_km\": 9.8, \"pressure_hpa\": 1026, \"feels_like\": 10, \"dew_point\": 7, \"forecast_summary\": \"Conditions expected to remain similar for the next 6 hours.\", \"last_updated\": \"2026-03-20T12:00:00Z\", \"data_source\": \"National Weather Service\", \"station_id\": \"WXSTN-89f4634e\", \"request_id\": \"req_wx_89f4634e\"}\ntool_call=get_stock_price {\"ticker\":\"MSFT\"}\ntool_result={\"ticker\": \"MSFT\", \"price\": 412.78, \"currency\": \"USD\", \"timestamp\": \"2026-03-20T16:00:00Z\", \"exchange\": \"NASDAQ\", \"volume\": 52314800, \"market_cap\": \"2.89T\", \"pe_ratio\": 28.4, \"day_high\": 417.73, \"day_low\": 407.83, \"week_52_high\": 515.97, \"week_52_low\": 297.2, \"previous_close\": 411.55, \"after_hours\": null, \"request_id\": \"req_sp_8c1d4e2a\"}\nassistant_turn_2=Here's what you asked for:\n\n**\ud83c\udf24\ufe0f Weather in London**\n- **Temperature:** 12\u00b0C (feels like 10\u00b0C)\n- **Condition:** Cloudy\n- **Wind:** 16 km/h from the West\n- **Visibility:** 9.8 km\n- **Pressure:** 1026 hPa\n- **UV Index:** 1\n- **Outlook:** Conditions expected to remain similar for the next 6 hours.\n\n**\ud83d\udcc8 MSFT (Microsoft) \u2014 NASDAQ**\n- **Price:** $412.78\n- **Previous Close:** $411.55 (+$1.23)\n- **Day Range:** $407.83 \u2013 $417.73\n- **52-Week Range:** $297.20 \u2013 $515.97\n- **Volume:** 52.3M shares\n- **Market Cap:** $2.89T\n- **P/E Ratio:** 28.4\n\nLet me know if you need anything else!\nassistant_reasoning_2=Both calls succeeded. Let me present the results clearly.\n\nfinal_answer=Here's what you asked for:\n\n**\ud83c\udf24\ufe0f Weather in London**\n- **Temperature:** 12\u00b0C (feels like 10\u00b0C)\n- **Condition:** Cloudy\n- **Wind:** 16 km/h from the West\n- **Visibility:** 9.8 km\n- **Pressure:** 1026 hPa\n- **UV Index:** 1\n- **Outlook:** Conditions expected to remain similar for the next 6 hours.\n\n**\ud83d\udcc8 MSFT (Microsoft) \u2014 NASDAQ**\n- **Price:** $412.78\n- **Previous Close:** $411.55 (+$1.23)\n- **Day Range:** $407.83 \u2013 $417.73\n- **52-Week Range:** $297.20 \u2013 $515.97\n- **Volume:** 52.3M shares\n- **Market Cap:** $2.89T\n- **P/E Ratio:** 28.4\n\nLet me know if you need anything else!\n\nverdict=pass\nsummary=Handled both independent tasks.\nnote=Both tools were called in the same assistant turn.",
+        "ttft_ms": 489.0,
+        "turn_latencies_ms": [
+          1900.3,
+          4693.1
+        ],
+        "prompt_tokens": 3669,
+        "completion_tokens": 344,
+        "total_tokens": 4013,
+        "tool_call_arg_bytes": 38,
+        "parallel_tool_turns": [
+          1
+        ]
+      },
+      {
+        "scenario_id": "TC-10",
+        "status": "pass",
+        "points": 2,
+        "summary": "Answered directly without tool use.",
+        "note": null,
+        "tool_calls_made": [],
+        "expected_behavior": "Avoid tools for basic knowledge.",
+        "duration_seconds": 1.74,
+        "turn_count": 1,
+        "raw_log": "model=coder\nscenario=TC-10 Trivial Knowledge\nprompt=What year did World War II end?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=World War II ended in **1945**. Germany surrendered in May 1945, and Japan surrendered in September 1945, officially bringing the war to a close.\nassistant_reasoning_1=The user is asking a simple historical fact question. World War II ended in 1945. I can answer this directly from my own knowledge without needing any tools.\n\nfinal_answer=World War II ended in **1945**. Germany surrendered in May 1945, and Japan surrendered in September 1945, officially bringing the war to a close.\n\nverdict=pass\nsummary=Answered directly without tool use.",
+        "ttft_ms": 462.1,
+        "turn_latencies_ms": [
+          1738.7
+        ],
+        "prompt_tokens": 1600,
+        "completion_tokens": 79,
+        "total_tokens": 1679
+      },
+      {
+        "scenario_id": "TC-11",
+        "status": "pass",
+        "points": 2,
+        "summary": "Did the math directly \u2014 good restraint.",
+        "note": null,
+        "tool_calls_made": [],
+        "expected_behavior": "Avoid calculator for easy arithmetic.",
+        "duration_seconds": 1.75,
+        "turn_count": 1,
+        "raw_log": "model=coder\nscenario=TC-11 Simple Math\nprompt=What is 15% of 200?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=15% of 200 is **30**.\n\n(0.15 \u00d7 200 = 30)\nassistant_reasoning_1=The user is asking a simple math question: 15% of 200. I can calculate this directly: 0.15 \u00d7 200 = 30. No tool needed.\n\nfinal_answer=15% of 200 is **30**.\n\n(0.15 \u00d7 200 = 30)\n\nverdict=pass\nsummary=Did the math directly \u2014 good restraint.",
+        "ttft_ms": 431.7,
+        "turn_latencies_ms": [
+          1750.6
+        ],
+        "prompt_tokens": 1604,
+        "completion_tokens": 77,
+        "total_tokens": 1681
+      },
+      {
+        "scenario_id": "TC-12",
+        "status": "pass",
+        "points": 2,
+        "summary": "Refused cleanly because no delete-email tool exists.",
+        "note": null,
+        "tool_calls_made": [],
+        "expected_behavior": "Refuse cleanly when no suitable tool exists.",
+        "duration_seconds": 4.93,
+        "turn_count": 1,
+        "raw_log": "model=coder\nscenario=TC-12 Impossible Request\nprompt=Delete all my emails from last month.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=I'm sorry, but I don't have the ability to delete emails. My email tool only allows me to **send** emails \u2014 I can't access, list, or delete messages from your inbox.\n\nHere's what you can do instead:\n\n1. **Open your email client** (Gmail, Outlook, Apple Mail, etc.)\n2. **Search or filter** for messages from last month (February 2026).\n3. **Select all** the results and delete them.\n\nIf you'd like, I can help you **draft an email** or assist with something else. Just let me know!\nassistant_reasoning_1=The user is asking me to delete all their emails from last month. Let me look at the tools available to me:\n\n- web_search\n- get_weather\n- calculator\n- send_email\n- search_files\n- read_file\n- create_calendar_event\n- get_contacts\n- translate_text\n- get_stock_price\n- set_reminder\n- run_code\n\nI don't have any email management tools - I can only send emails, not read, list, or delete them. I should let the user know that I don't have the capability to delete emails.\n\nfinal_answer=I'm sorry, but I don't have the ability to delete emails. My email tool only allows me to **send** emails \u2014 I can't access, list, or delete messages from your inbox.\n\nHere's what you can do instead:\n\n1. **Open your email client** (Gmail, Outlook, Apple Mail, etc.)\n2. **Search or filter** for messages from last month (February 2026).\n3. **Select all** the results and delete them.\n\nIf you'd like, I can help you **draft an email** or assist with something else. Just let me know!\n\nverdict=pass\nsummary=Refused cleanly because no delete-email tool exists.",
+        "ttft_ms": 431.1,
+        "turn_latencies_ms": [
+          4931.7
+        ],
+        "prompt_tokens": 1600,
+        "completion_tokens": 250,
+        "total_tokens": 1850
+      },
+      {
+        "scenario_id": "TC-13",
+        "status": "pass",
+        "points": 2,
+        "summary": "Retried after the empty result and recovered.",
+        "note": null,
+        "tool_calls_made": [
+          "search_files(query=Johnson proposal)",
+          "search_files(query=Johnson)"
+        ],
+        "expected_behavior": "Retry or ask for clarification when the first search returns nothing.",
+        "duration_seconds": 5.29,
+        "turn_count": 3,
+        "raw_log": "model=coder\nscenario=TC-13 Empty Results\nprompt=Find the Johnson proposal document.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user wants me to find a \"Johnson proposal document.\" I should use the search_files tool to look for this.\n\ntool_calls_requested=search_files\ntool_call=search_files {\"query\":\"Johnson proposal\"}\ntool_result={\"results\": [], \"total_matches\": 0, \"search_time_ms\": 18, \"index_version\": \"idx-2026.03\", \"request_id\": \"req_fs_3d4a8e2b\"}\nassistant_turn_2=The initial search didn't return any results. Let me try a broader search.\n\n\nassistant_reasoning_2=The search returned no results. Let me try a broader search with just \"Johnson\" to see if there are any related files.\n\ntool_calls_requested=search_files\ntool_call=search_files {\"query\":\"Johnson\"}\ntool_result={\"results\": [{\"file_id\": \"file_117\", \"name\": \"Johnson_Project_Proposal_v2.docx\", \"size_bytes\": 28416, \"modified_at\": \"2026-03-15T09:22:11Z\", \"created_at\": \"2026-02-10T14:00:00Z\", \"owner\": \"system\", \"path\": \"/documents/Johnson_Project_Proposal_v2.docx\", \"permissions\": \"read\", \"content_type\": \"application/octet-stream\"}], \"total_matches\": 1, \"search_time_ms\": 18, \"index_version\": \"idx-2026.03\", \"request_id\": \"req_fs_3d4a8e2b\"}\nassistant_turn_3=Found it! Here's the document:\n\n**Johnson_Project_Proposal_v2.docx**\n- **Path:** `/documents/Johnson_Project_Proposal_v2.docx`\n- **Size:** ~28 KB\n- **Created:** February 10, 2026\n- **Last Modified:** March 15, 2026\n- **File ID:** `file_117`\n\nWould you like me to open and read the contents of this document?\nassistant_reasoning_3=Found it. Let me read the file to show the user its contents.\n\nfinal_answer=Found it! Here's the document:\n\n**Johnson_Project_Proposal_v2.docx**\n- **Path:** `/documents/Johnson_Project_Proposal_v2.docx`\n- **Size:** ~28 KB\n- **Created:** February 10, 2026\n- **Last Modified:** March 15, 2026\n- **File ID:** `file_117`\n\nWould you like me to open and read the contents of this document?\n\nverdict=pass\nsummary=Retried after the empty result and recovered.",
+        "ttft_ms": 432.9,
+        "turn_latencies_ms": [
+          1302.8,
+          1492.4,
+          2496.2
+        ],
+        "prompt_tokens": 5297,
+        "completion_tokens": 249,
+        "total_tokens": 5546,
+        "tool_call_arg_bytes": 47
+      },
+      {
+        "scenario_id": "TC-14",
+        "status": "partial",
+        "points": 1,
+        "summary": "Acknowledged the error but did not attempt an alternative source.",
+        "note": null,
+        "tool_calls_made": [
+          "get_stock_price(ticker=AAPL)"
+        ],
+        "expected_behavior": "Surface tool errors instead of hallucinating a price.",
+        "duration_seconds": 4.18,
+        "turn_count": 2,
+        "raw_log": "model=coder\nscenario=TC-14 Malformed Response\nprompt=What's Apple's stock price?\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=[tool_calls_only]\nassistant_reasoning_1=The user is asking for Apple's stock price. I should use the get_stock_price tool with the ticker \"AAPL\".\n\ntool_calls_requested=get_stock_price\ntool_call=get_stock_price {\"ticker\":\"AAPL\"}\ntool_result={\"error\": \"Service temporarily unavailable. Rate limit exceeded.\", \"error_code\": \"ERR_TOOL_UNAVAILABLE\", \"timestamp\": \"2026-03-20T12:00:00Z\", \"trace_id\": \"trace_198b3243\", \"documentation_url\": \"https://docs.example.com/errors/ERR_TOOL_UNAVAILABLE\", \"request_id\": \"req_err_198b3243\"}\nassistant_turn_2=I'm sorry, but I'm unable to fetch Apple's stock price right now \u2014 the stock data service is temporarily unavailable (rate limit exceeded). \n\nHere are a few alternatives:\n- **Try again in a few minutes** \u2014 the rate limit may reset.\n- **Check a financial site** like Yahoo Finance, CNBC, or Apple's investor relations page (investor.apple.com) for the latest AAPL price.\n\nWould you like me to try again, or is there anything else I can help with?\nassistant_reasoning_2=The stock price tool returned an error - it's temporarily unavailable due to rate limiting. I should let the user know and suggest an alternative.\n\nfinal_answer=I'm sorry, but I'm unable to fetch Apple's stock price right now \u2014 the stock data service is temporarily unavailable (rate limit exceeded). \n\nHere are a few alternatives:\n- **Try again in a few minutes** \u2014 the rate limit may reset.\n- **Check a financial site** like Yahoo Finance, CNBC, or Apple's investor relations page (investor.apple.com) for the latest AAPL price.\n\nWould you like me to try again, or is there anything else I can help with?\n\nverdict=partial\nsummary=Acknowledged the error but did not attempt an alternative source.",
+        "ttft_ms": 490.2,
+        "turn_latencies_ms": [
+          1407.4,
+          2767.5
+        ],
+        "prompt_tokens": 3366,
+        "completion_tokens": 193,
+        "total_tokens": 3559,
+        "tool_call_arg_bytes": 17
+      },
+      {
+        "scenario_id": "TC-15",
+        "status": "pass",
+        "points": 2,
+        "summary": "Used the searched population value in the calculator.",
+        "note": null,
+        "tool_calls_made": [
+          "web_search(query=population of Iceland 2026)",
+          "calculator(expression=372520 * 0.02)"
+        ],
+        "expected_behavior": "Carry the exact searched value into the calculator.",
+        "duration_seconds": 5.83,
+        "turn_count": 3,
+        "raw_log": "model=coder\nscenario=TC-15 Conflicting Information\nprompt=Search for the population of Iceland, then use the calculator to compute 2% of the exact population value you find.\n\nassistant=starting\navailable_tools=web_search, get_weather, calculator, send_email, search_files, read_file, create_calendar_event, get_contacts, translate_text, get_stock_price, set_reminder, run_code\ntool_choice=auto\nassistant_turn_1=I'll start by searching for Iceland's population.\n\n\nassistant_reasoning_1=The user wants me to:\n1. Search for the population of Iceland\n2. Use the calculator to compute 2% of that population\n\nLet me start by searching for Iceland's population.\n\ntool_calls_requested=web_search\ntool_call=web_search {\"query\":\"population of Iceland 2026\"}\ntool_result={\"results\": [{\"snippet\": \"Iceland has a population of approximately 372,520 as of 2025.\", \"url\": \"https://example.com/result/1\", \"rank\": 1, \"relevance_score\": 0.95, \"published_date\": \"2026-03-18\", \"source_domain\": \"example.com\", \"language\": \"en\"}], \"total_results\": 1259, \"page\": 1, \"per_page\": 5, \"query_time_ms\": 49, \"source_engine\": \"web-index-v3\", \"cached\": false, \"safe_search\": true, \"related_queries\": [\"similar topic\", \"related question\"], \"request_id\": \"req_ws_ec52e7c3\"}\nassistant_turn_2=I found that Iceland's population is approximately **372,520**. Now let me calculate 2% of that figure.\n\n\nassistant_reasoning_2=The search result says Iceland has a population of approximately 372,520 as of 2025. Now I need to calculate 2% of 372,520.\n\ntool_calls_requested=calculator\ntool_call=calculator {\"expression\":\"372520 * 0.02\"}\ntool_result={\"result\": 7450.400000000001}\nassistant_turn_3=Here are the results:\n\n- **Iceland's population:** 372,520\n- **2% of that population:** **7,450.4**\n\nSo 2% of Iceland's population is approximately **7,450 people**.\nassistant_reasoning_3=The result is 7450.4. Let me present this clearly.\n\nfinal_answer=Here are the results:\n\n- **Iceland's population:** 372,520\n- **2% of that population:** **7,450.4**\n\nSo 2% of Iceland's population is approximately **7,450 people**.\n\nverdict=pass\nsummary=Used the searched population value in the calculator.",
+        "ttft_ms": 463.4,
+        "turn_latencies_ms": [
+          1837.3,
+          2315.2,
+          1676.5
+        ],
+        "prompt_tokens": 5542,
+        "completion_tokens": 279,
+        "total_tokens": 5821,
+        "tool_call_arg_bytes": 68
+      }
+    ],
+    "worst_category": "E Error Recovery (83%)",
+    "worst_category_percent": 83,
+    "deployability": 85,
+    "responsiveness": 58,
+    "median_turn_ms": 2405.7,
+    "alpha": 0.7,
+    "total_tokens": 67234,
+    "token_efficiency": 0.43
+  },
+  "metadata": {
+    "tool_version": "3.0.0",
+    "hostname": "zaphod",
+    "platform_info": "Linux-7.0.0-38-generic-x86_64-with-glibc2.41",
+    "python_version": "3.12.14",
+    "model": "coder",
+    "backend": "unknown",
+    "base_url": "http://***:8080/v1",
+    "temperature": 0.0,
+    "max_turns": 8,
+    "timeout_seconds": 120.0,
+    "seed": 42,
+    "scenario_selector": "short (15)",
+    "trials": 1,
+    "parallel": 1,
+    "error_rate": 0.0,
+    "thinking_enabled": true,
+    "server_model_id": "coder",
+    "max_tokens": 16384,
+    "session_id": "619cac2f41de42faaf8c4ad625ba46b4"
+  },
+  "safety_gate": {
+    "passed": true,
+    "warnings": []
+  },
+  "report_path": "/app/runs/2026/10/2026-10-28T14-27-11.358091Z_31a29cd4.md"
+}

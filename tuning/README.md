@@ -23,7 +23,7 @@ Change one setting at a time, test it the same way every time, and record the re
 5. **Run the test** that matches the setting (table below), and log it.
 6. **Keep or revert.** Keep only if it beats the normal run-to-run wobble and nothing else got worse. To revert: `git revert HEAD`. Write "kept" or "reverted" in a final log note.
 
-## The two commands
+## The three commands
 
 **`./bench`**: one card, llama-bench, 3 repeats, logged automatically. It stops llama-swap while it runs and starts it again after.
 
@@ -42,6 +42,16 @@ Note: llama-bench doesn't use speculative decoding (MTP). Test MTP with a server
 ./log zaphod coder "MTP depth 3 vs 2" server_tg_tps=61.2
 ./log <machine> <model> "<note>" [name=value ...] [files ...]
 ```
+
+**`./quality`**: is the model still good at using tools? (tool-eval-bench 3.0.0, through llama-swap). Run it after any change that `./bench` says is faster, so faster never means worse.
+
+```bash
+./quality coder "baseline"                    # 15 core scenarios, about 1.5 minutes
+./quality coder "MTP depth 3" --full          # all 69 scenarios, about 10 minutes
+./quality coder "temp 0.6" --temperature 0.6  # test a sampling setting
+```
+Good: `tool-eval score = 97 (29/30 points)` or close to it, then `Logged run ...`.
+It uses temperature 0 and seed 42, so the same settings give the same score every time; a change of even 1 point is real. Each run's full report (every conversation, what passed and failed) is in `tool-eval/runs/`, and attached to the run in MLflow.
 
 **Server speed test** (uses MTP, the real setup), 3 runs, same answer each time:
 ```bash
@@ -76,7 +86,7 @@ Which test to use depends on what kind of setting it is.
 | `--reasoning-effort` | How long it thinks first | quality test | medium → high |
 | Quant (model file) | Q4 vs Q5/Q6: size vs accuracy | KL-divergence (full guide) | UD-Q4_K_XL → Q5_K_XL |
 
-Quality tests (tool-eval-bench, Harbor Bench, Terminal-Bench) and KL-divergence are in the full guide; set them up when speed tuning is done.
+Other quality tests (KL-divergence for model file sizes, Terminal-Bench-Local overnight for finalists, a SWE-bench sample) are in the full guide; not set up yet.
 
 ## Files here
 
@@ -84,6 +94,8 @@ Quality tests (tool-eval-bench, Harbor Bench, Terminal-Bench) and KL-divergence 
 | --- | --- |
 | `bench` | Benchmark one card and log it |
 | `log` | Log any result (runs `log_run.py` inside the MLflow container; nothing to install) |
+| `quality` | Tool-use quality test and log it |
 | `log_run.py` | The logging script |
+| `tool-eval/runs/` | Quality reports: one `.json` (scores) and one `.md` (every conversation) per run |
 | `runs/` | Raw llama-bench output, one file per run |
 | `results.md` | Written summary and next ideas |
