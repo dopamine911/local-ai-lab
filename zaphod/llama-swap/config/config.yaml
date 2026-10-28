@@ -27,8 +27,8 @@ models:
     name: "North-Mini-Code-1.0 30B-A3B (Cohere), card 2, 256K context"
     cmd: ${server} --device Vulkan1 -m /models/North-Mini-Code-1.0-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95
   ornith:
-    name: "Ornith-1.5 35B-A3B, card 2, 256K context"
-    cmd: ${server} --device Vulkan1 -m /models/ornith/Ornith-1.5-35B-Q4_K_M.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
+    name: "Ornith-1.5 35B-A3B, card 2, 256K context, vision"
+    cmd: ${server} --device Vulkan1 -m /models/ornith/Ornith-1.5-35B-Q4_K_M.gguf --mmproj /models/ornith/mmproj-Ornith-1.5-35B-BF16.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan0,Vulkan1 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
