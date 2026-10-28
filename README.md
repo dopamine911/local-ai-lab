@@ -17,6 +17,8 @@
 | Address | Service | Listens on |
 | --- | --- | --- |
 | `https://<DOMAIN>` | Homepage | 127.0.0.1:3001 |
+| (internal) | SearXNG: private web search for Open WebUI | 127.0.0.1:8888 |
+| (internal) | Open Terminal: sandboxed shell for the models, used by Open WebUI | 127.0.0.1:8000 |
 | `https://chat.<DOMAIN>` | Open WebUI | 127.0.0.1:3000 |
 | `https://monitor.<DOMAIN>` | Beszel | 127.0.0.1:8090 |
 | `https://models.<DOMAIN>` | Models panel | files in hub/models-panel |
@@ -24,6 +26,15 @@
 | `https://marvin.<DOMAIN>` | marvin llama-swap | marvin:8080 over Tailscale |
 
 Caddy listens only on zaphod's Tailscale address, so none of this is reachable from the home network or the internet.
+
+## Open WebUI tools
+
+- **Web search:** SearXNG (`hub/searxng/settings.yml`), private, no API keys. Defaults set in compose; check Admin Panel → Settings → Web Search.
+- **Open Terminal:** a sandboxed Linux shell and file area (own container, own home folder in `hub/data/open-terminal`, no Docker socket, no host files). Key: `OPEN_TERMINAL_API_KEY` in `hub/.env`. Connected in Admin Panel → Settings → Integrations → Open Terminal, URL `http://127.0.0.1:8000`.
+- **Context7 (MCP):** current library documentation for coding questions. Hosted by Upstash (queries leave zaphod), no key. Admin Panel → Settings → Integrations → External Tool Servers, type MCP (Streamable HTTP), URL `https://mcp.context7.com/mcp`, auth None.
+- Built in already (no setup): read a web page, current time, run code, memory, knowledge bases.
+- Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
+- `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.
 
 ## Tonight: set up marvin
 

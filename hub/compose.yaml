@@ -30,6 +30,15 @@ services:
       OPENAI_API_BASE_URL: http://127.0.0.1:8080/v1   # zaphod's llama-swap (also lists marvin's models)
       OPENAI_API_KEY: ${ZAPHOD_KEY}
       ENABLE_OLLAMA_API: "false"
+      # Fixed key: otherwise a new one is made on every container recreate (logs you out,
+      # breaks saved tool logins). Copied from the key Open WebUI generated on first start.
+      WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
+      # Web search through the private SearXNG below. These are defaults: once changed in
+      # Admin Panel -> Settings -> Web Search, the saved values there win.
+      ENABLE_WEB_SEARCH: "true"
+      WEB_SEARCH_ENGINE: searxng
+      SEARXNG_QUERY_URL: http://127.0.0.1:8888/search?q=<query>
+      WEB_SEARCH_RESULT_COUNT: "5"
     volumes:
       - ./data/open-webui:/app/backend/data
 
@@ -71,6 +80,33 @@ services:
       --cors-allowed-origins https://mlflow.${DOMAIN}
     volumes:
       - ./data/mlflow:/mlflow            # every test result; keep this folder
+
+  # Private web search for Open WebUI. Its own network; only zaphod can reach it.
+  searxng:
+    image: searxng/searxng:2026.10.25-54ca1d9cf
+    container_name: searxng
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8888:8080"
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET}
+      SEARXNG_BASE_URL: http://127.0.0.1:8888/
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+      - ./data/searxng-cache:/var/cache/searxng
+
+  # A sandboxed Linux shell + files for the models (connected in Open WebUI as a terminal).
+  # The AI works inside this container only: own home folder, no Docker socket, no host files.
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal:0.14.5
+    container_name: open-terminal
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      OPEN_TERMINAL_API_KEY: ${OPEN_TERMINAL_API_KEY}
+    volumes:
+      - ./data/open-terminal:/home/user
 
   homepage:
     image: ghcr.io/gethomepage/homepage:v2.7.0

@@ -1,0 +1,12 @@
+# SearXNG for Open WebUI on zaphod. Private: reachable only from zaphod itself (127.0.0.1:8888).
+use_default_settings: true
+server:
+  secret_key: "set-by-SEARXNG_SECRET"   # overridden by the SEARXNG_SECRET env var
+  limiter: false                        # private instance, one user: no rate limiting needed
+  image_proxy: false
+  public_instance: false
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json                              # required by Open WebUI
