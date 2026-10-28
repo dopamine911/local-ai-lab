@@ -37,3 +37,11 @@ same card will run out of memory.
 Decided 2026-10-28: **image mode switch.** ComfyUI uses card 2. One command unloads card 2's
 llama-swap models (`coder-2`, `ornith`, ...) before generating images and switches back after;
 `coder` on card 1 keeps running throughout.
+
+## Progress
+
+- 2026-10-28 Step 1 done: Ornith vision (mmproj BF16, sha256 1921a36a). Test image described correctly; tool-use still 93.
+- 2026-10-28 Step 2 done: image `llama-swap-zaphod:267-media`; speeds unchanged.
+- 2026-10-28 Step 3 models done: `embed` (Qwen3-Embedding-4B Q6_K) + `rerank` (Qwen3-Reranker-0.6B Q8_0), always loaded on card 1.
+  Open WebUI connection: set by hand in Admin Panel (see README.md, Open WebUI tools).
+- 2026-10-28 Found and fixed: llama.cpp's Vulkan0 is card 2; models were on the opposite card to their names.

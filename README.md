@@ -32,6 +32,10 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
 - **Web search:** SearXNG (`hub/searxng/settings.yml`), private, no API keys. Defaults set in compose; check Admin Panel → Settings → Web Search.
 - **Open Terminal:** a sandboxed Linux shell and file area (own container, own home folder in `hub/data/open-terminal`, no Docker socket, no host files). Key: `OPEN_TERMINAL_API_KEY` in `hub/.env`. Connected in Admin Panel → Settings → Integrations → Open Terminal, URL `http://127.0.0.1:8000`.
 - **Context7 (MCP):** current library documentation for coding questions. Hosted by Upstash (queries leave zaphod), no key. Admin Panel → Settings → Integrations → External Tool Servers, type MCP (Streamable HTTP), URL `https://mcp.context7.com/mcp`, auth None.
+- **Document search (embeddings + reranker on zaphod):** Admin Panel → Settings → Documents.
+  Embedding Model Engine: **OpenAI**, URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `embed`.
+  Hybrid Search: **on**. Reranking Engine: **External**, URL `http://127.0.0.1:8080/v1/rerank`, key: ZAPHOD_KEY, model `rerank`.
+  After changing the embedding model, re-index existing documents (same page, "Reindex Knowledge Base Vectors").
 - Built in already (no setup): read a web page, current time, run code, memory, knowledge bases.
 - Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
 - `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.
