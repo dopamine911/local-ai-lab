@@ -23,6 +23,9 @@ models:
   flint:
     name: "Flint 40B-A2.5B (Recursive), card 2, 256K context"
     cmd: ${server} --device Vulkan1 -m /models/flint-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
+  north:
+    name: "North-Mini-Code-1.0 30B-A3B (Cohere), card 2, 256K context"
+    cmd: ${server} --device Vulkan1 -m /models/North-Mini-Code-1.0-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan0,Vulkan1 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
@@ -32,7 +35,7 @@ routing:
     settings:
       matrix:
         sets:
-          one_per_card: "(coder | coder-tb) & (coder-2 | flint)"
+          one_per_card: "(coder | coder-tb) & (coder-2 | flint | north)"
           both_cards: "coder-long"
 hooks:
   on_startup:
