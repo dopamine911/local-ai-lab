@@ -1,0 +1,33 @@
+healthCheckTimeout: 300
+logToStdout: "proxy,upstream"
+sendLoadingState: true
+store:
+  path: /data/activity.sqlite
+apiKeys:
+  - "${env.ZAPHOD_KEY}"
+macros:
+  server: llama-server --port ${PORT} -ngl 999 -fa on
+  qwen27: /models/Qwen3.8-27B-UD-Q4_K_XL.gguf
+  qwen-sampling: --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0 --reasoning-effort medium
+  mtp: --model-draft /models/mtp-Qwen3.8-27B-Q4_0.gguf --spec-type draft-mtp --spec-draft-n-max 2
+models:
+  coder:
+    name: "Qwen3.8-27B, card 1"
+    cmd: ${server} --device Vulkan0 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
+  coder-2:
+    name: "Qwen3.8-27B, card 2"
+    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
+  coder-long:
+    name: "Qwen3.8-27B, both cards, long context"
+    cmd: ${server} --device Vulkan0,Vulkan1 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
+routing:
+  router:
+    use: matrix
+    settings:
+      matrix:
+        sets:
+          one_per_card: "coder & coder-2"
+          both_cards: "coder-long"
+hooks:
+  on_startup:
+    preload: [coder, coder-2]
