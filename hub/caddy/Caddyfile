@@ -1,0 +1,59 @@
+{
+	# Listen only on zaphod's Tailscale address: unreachable from the home network or internet.
+	default_bind {$TS_IP}
+}
+
+{$DOMAIN}, *.{$DOMAIN} {
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+	}
+
+	@zaphod  host zaphod.{$DOMAIN}
+	@marvin  host marvin.{$DOMAIN}
+	@chat    host chat.{$DOMAIN}
+	@monitor host monitor.{$DOMAIN}
+	@models  host models.{$DOMAIN}
+	@mlflow  host mlflow.{$DOMAIN}
+
+	# llama-swap UIs (each still asks for its own API key)
+	handle @zaphod {
+		reverse_proxy 127.0.0.1:8080
+	}
+	handle @marvin {
+		reverse_proxy marvin:8080
+	}
+
+	handle @chat {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle @mlflow {
+		reverse_proxy 127.0.0.1:5000
+	}
+	handle @monitor {
+		reverse_proxy 127.0.0.1:8090
+	}
+
+	# Models panel: Caddy adds the API keys, so the browser never sees them.
+	# Anyone on your tailnet who opens it can load/unload models.
+	handle @models {
+		handle_path /zaphod/* {
+			reverse_proxy 127.0.0.1:8080 {
+				header_up Authorization "Bearer {env.ZAPHOD_KEY}"
+			}
+		}
+		handle_path /marvin/* {
+			reverse_proxy marvin:8080 {
+				header_up Authorization "Bearer {env.MARVIN_KEY}"
+			}
+		}
+		handle {
+			root * /srv/models-panel
+			file_server
+		}
+	}
+
+	# Everything else: the Homepage start page
+	handle {
+		reverse_proxy 127.0.0.1:3001
+	}
+}

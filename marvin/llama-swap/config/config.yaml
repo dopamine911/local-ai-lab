@@ -1,0 +1,30 @@
+# llama-swap config for marvin. Big models, one at a time.
+healthCheckTimeout: 900            # big models take a while to load
+logToStdout: "proxy,upstream"
+sendLoadingState: true
+store:
+  path: /data/activity.sqlite
+
+apiKeys:
+  - "${env.MARVIN_KEY}"
+
+macros:
+  # -lm dio: direct I/O loading; loads a 93 GB model in about 33 s on Strix Halo.
+  server: llama-server --port ${PORT} -ngl 999 -fa on -lm dio
+  qwen-sampling: --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0 --reasoning-effort medium
+  # Speculative decoding. Add ${mtp} to big's cmd once the plain model works.
+  mtp: --model-draft /models/mtp-Qwen3.8-Flash-Next-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 3
+
+models:
+  big:
+    name: "Qwen3.8-Flash-Next (marvin)"
+    description: "Strongest model. Two agents share 128K of context."
+    cmd: |
+      ${server}
+      -m /models/Qwen3.8-Flash-Next-UD-IQ4_XS-00001-of-00003.gguf
+      -c 131072 -np 2 -kvu
+      ${qwen-sampling}
+
+hooks:
+  on_startup:
+    preload: [big]

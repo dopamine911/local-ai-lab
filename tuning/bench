@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Benchmark one card with llama-bench, save the output, and log it to MLflow.
+#
+# Usage: ./bench <card 1|2> "<note>" [extra llama-bench options]
+# Examples:
+#   ./bench 1 "baseline"
+#   ./bench 2 "ubatch sweep" -ub 512,1024,2048
+#   MODEL=/models/flint-UD-Q4_K_XL.gguf ./bench 1 "flint first look"
+#
+# It stops llama-swap (so the card is free), runs the test 3 times,
+# starts llama-swap again, and records everything in MLflow.
+set -e
+cd "$(dirname "$0")"
+CARD="$1"; NOTE="$2"; shift 2 || { sed -n '2,10p' "$0"; exit 1; }
+case "$CARD" in 1) DEV=renderD128 ;; 2) DEV=renderD129 ;; *) echo "card must be 1 or 2"; exit 1 ;; esac
+MODEL="${MODEL:-/models/Qwen3.8-27B-UD-Q4_K_XL.gguf}"
+OUT="runs/$(date +%Y-%m-%d-%H%M)-card$CARD.jsonl"
+
+echo "== stopping llama-swap"; (cd ~/llama-swap && docker compose stop -t 30 >/dev/null)
+trap 'echo "== starting llama-swap"; (cd ~/llama-swap && docker compose start >/dev/null)' EXIT
+
+echo "== benchmarking card $CARD ($(basename "$MODEL"))"
+docker run --rm --device /dev/dri/$DEV -e GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1 \
+  -v /srv/models:/models:ro --entrypoint llama-bench llama-swap-zaphod:267 \
+  -m "$MODEL" -ngl 999 -fa 1 -p 512 -n 128 -r 3 "$@" -o jsonl 2> "${OUT%.jsonl}.err" > "$OUT" || { echo "llama-bench failed:"; tail -5 "${OUT%.jsonl}.err"; exit 1; }
+
+echo "== results (tokens/s; saved in $OUT)"
+./log zaphod "card$CARD:$(basename "$MODEL" .gguf)" "$NOTE" "$OUT"

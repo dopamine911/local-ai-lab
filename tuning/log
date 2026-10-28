@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Run log_run.py inside the MLflow image (nothing to install on zaphod).
+# Usage: ./log <machine> <model> "<note>" [name=value ...] [files ...]
+set -e
+HERE="$(cd "$(dirname "$0")" && pwd)"
+exec docker run --rm --network host \
+  --env-file "$HOME/homelab/hub/.env" \
+  -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \
+  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@"

@@ -1,0 +1,80 @@
+# Homelab
+
+```
+~/homelab/
+  CLAUDE.md                  notes for Claude (link to ~/llama-swap/CLAUDE.md)
+  hub/                       zaphod's web services: Caddy, Open WebUI, Beszel, Homepage
+    compose.yaml
+    .env.example             copy to .env and fill in
+    caddy/Caddyfile          routes per subdomain
+    caddy/Dockerfile         Caddy + Cloudflare DNS module (image caddy-cloudflare:2.11.7, already built)
+    homepage/                start page links
+    models-panel/            put index.html here (from the claude.ai project)
+  marvin/llama-swap/         files to copy to marvin tonight
+~/llama-swap/                zaphod's llama-swap (running; separate on purpose)
+```
+
+| Address | Service | Listens on |
+| --- | --- | --- |
+| `https://<DOMAIN>` | Homepage | 127.0.0.1:3001 |
+| `https://chat.<DOMAIN>` | Open WebUI | 127.0.0.1:3000 |
+| `https://monitor.<DOMAIN>` | Beszel | 127.0.0.1:8090 |
+| `https://models.<DOMAIN>` | Models panel | files in hub/models-panel |
+| `https://zaphod.<DOMAIN>` | zaphod llama-swap | 127.0.0.1:8080 |
+| `https://marvin.<DOMAIN>` | marvin llama-swap | marvin:8080 over Tailscale |
+
+Caddy listens only on zaphod's Tailscale address, so none of this is reachable from the home network or the internet.
+
+## Tonight: set up marvin
+
+1. **Install Ubuntu 26.04 Server** on marvin, same as zaphod. Name it `marvin`. In the installer, pick **UEFI** boot if asked (avoids zaphod's CSM problem).
+2. **BIOS:** set the GPU memory (UMA frame buffer) to its lowest option. Linux gives the GPU memory instead.
+3. **Basics**, same as zaphod: Wi-Fi or Ethernet, `sudo apt update && sudo apt full-upgrade -y`, Tailscale (`tailscale up`), SSH.
+   Good: from zaphod, `ssh marvin` works.
+4. **Let the GPU use nearly all 128 GB.** Add to `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`:
+   ```
+   amdgpu.gttsize=126976 ttm.pages_limit=32505856
+   ```
+   then `sudo update-grub && sudo reboot`.
+   Good: `sudo dmesg | grep -i 'gtt'` shows about 124 GB.
+5. **GPU groups and Docker** (as on zaphod):
+   ```bash
+   sudo usermod -aG render,video $USER
+   sudo apt install -y docker.io docker-compose-v2 && sudo usermod -aG docker $USER
+   ```
+   Log out and back in. Good: `docker run --rm hello-world` works.
+6. **Copy the files from zaphod** (run on zaphod):
+   ```bash
+   scp -r ~/homelab/marvin/llama-swap marvin:~/
+   ```
+7. **On marvin, build the image and make the key:**
+   ```bash
+   cd ~/llama-swap && docker build -t llama-swap-zaphod:267 .
+   printf 'MARVIN_KEY=sk-%s\n' "$(openssl rand -hex 24)" > .env && chmod 600 .env && cat .env
+   ```
+   Save the key in your password manager.
+8. **Download the model (about 94 GB)** on marvin:
+   ```bash
+   sudo mkdir -p /srv/models && sudo chown $USER: /srv/models
+   for p in 1 2 3; do wget -c -P /srv/models https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/main/UD-IQ4_XS/Qwen3.8-Flash-Next-UD-IQ4_XS-0000$p-of-00003.gguf; done
+   ```
+9. **Start it:** `docker compose up -d && docker compose logs -f`.
+   Good: `Health check passed` for `big`.
+10. **Make it reachable from zaphod:** `sudo tailscale serve --bg --tcp=8080 tcp://localhost:8080`
+11. **Add marvin to zaphod** (back on zaphod): put `MARVIN_KEY=...` in `~/llama-swap/.env`, remove the `#` from the `peers:` block in `~/llama-swap/config/config.yaml`, then `cd ~/llama-swap && docker compose up -d`.
+    Good: `curl -s -H "Authorization: Bearer $ZAPHOD_KEY" http://localhost:8080/v1/models` lists `marvin/big`.
+12. Later: speculative decoding on marvin (download `MTP/mtp-Qwen3.8-Flash-Next-Q8_0.gguf`, add `${mtp}` to `big`).
+
+## Hub (after marvin, or any time)
+
+Needs your real domain on Cloudflare and a Cloudflare API token.
+
+1. `cd ~/homelab/hub && cp .env.example .env && chmod 600 .env`
+2. Copy the key: `grep ZAPHOD_KEY ~/llama-swap/.env >> .env`, then `nano .env`: set `DOMAIN`, `CF_API_TOKEN`, `MARVIN_KEY`, and delete the `ZAPHOD_KEY=CHANGE_ME` line.
+3. In Cloudflare DNS: `A` records for `<DOMAIN>` and `*.<DOMAIN>` → `100.117.73.97` (zaphod's Tailscale address), **DNS only** (grey cloud).
+4. `docker compose up -d`
+   Good: `docker compose logs caddy` says `certificate obtained successfully`.
+5. Open `https://<DOMAIN>` from a device on Tailscale. Good: the Homepage start page.
+6. Open `https://chat.<DOMAIN>` and create the admin account (first user becomes admin). Good: `coder`, `coder-2` (and `marvin/big`) in the model list.
+7. **Monitoring:** open `https://monitor.<DOMAIN>`, create the account, **Add system**: name `zaphod`, host `127.0.0.1`, port `45876`. Copy the key it shows into `BESZEL_KEY` in `.env`, then `docker compose --profile agent up -d`. For marvin: host `marvin`, port `45876`, and the same steps in marvin's folder.
+8. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.

@@ -1,0 +1,85 @@
+# Hub services on zaphod. llama-swap itself lives in ~/llama-swap (separate, already running).
+# Start:  cd ~/homelab/hub && docker compose up -d --build     Logs: docker compose logs -f
+#
+# Every service uses the host network but listens only on 127.0.0.1, so nothing is
+# reachable from your home network. Caddy is the only door in, and it listens only on
+# zaphod's Tailscale address (TS_IP in .env).
+services:
+  caddy:
+    build: ./caddy                      # Caddy 2.11.7 + Cloudflare DNS module
+    image: caddy-cloudflare:2.11.7
+    container_name: caddy
+    restart: unless-stopped
+    network_mode: host
+    env_file: .env                      # DOMAIN, TS_IP, CF_API_TOKEN, ZAPHOD_KEY, MARVIN_KEY
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./models-panel:/srv/models-panel:ro
+      - ./data/caddy:/data              # certificates; keep this folder
+      - ./data/caddy-config:/config
+
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.12.4
+    container_name: open-webui
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      HOST: 127.0.0.1
+      PORT: 3000
+      WEBUI_URL: https://chat.${DOMAIN}
+      OPENAI_API_BASE_URL: http://127.0.0.1:8080/v1   # zaphod's llama-swap (also lists marvin's models)
+      OPENAI_API_KEY: ${ZAPHOD_KEY}
+      ENABLE_OLLAMA_API: "false"
+    volumes:
+      - ./data/open-webui:/app/backend/data
+
+  beszel:
+    image: henrygd/beszel:0.21.1
+    container_name: beszel
+    restart: unless-stopped
+    network_mode: host
+    command: ["serve", "--http=127.0.0.1:8090"]
+    volumes:
+      - ./data/beszel:/beszel_data
+
+  # Monitoring agent for zaphod. Starts only with:  docker compose --profile agent up -d
+  # Fill BESZEL_KEY in .env first (README step 7).
+  beszel-agent:
+    image: henrygd/beszel-agent:0.21.1
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    profiles: [agent]
+    environment:
+      LISTEN: 127.0.0.1:45876
+      KEY: ${BESZEL_KEY:-}
+      GPU_COLLECTOR: amd_sysfs        # reads the R9700s straight from /sys
+    volumes:
+      - ./data/beszel-agent:/var/lib/beszel-agent
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.17.2
+    container_name: mlflow
+    restart: unless-stopped
+    network_mode: host
+    command: >
+      mlflow server --host 127.0.0.1 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --allowed-hosts mlflow.${DOMAIN},127.0.0.1:5000,localhost:5000
+    volumes:
+      - ./data/mlflow:/mlflow            # every test result; keep this folder
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:v2.7.0
+    container_name: homepage
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      HOSTNAME: 127.0.0.1
+      PORT: 3001
+      HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN}
+      HOMEPAGE_VAR_DOMAIN: ${DOMAIN}
+    volumes:
+      - ./homepage:/app/config

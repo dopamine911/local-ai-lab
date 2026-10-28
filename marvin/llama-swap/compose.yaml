@@ -1,0 +1,34 @@
+# llama-swap on marvin (Bosgame M5, Strix Halo, 128 GB shared memory).
+# Build: docker build -t llama-swap-zaphod:267 ~/llama-swap   (same image as zaphod)
+# Start: docker compose up -d     Logs: docker compose logs -f
+services:
+  llama-swap:
+    image: llama-swap-zaphod:267
+    container_name: llama-swap
+    restart: unless-stopped
+    # Only marvin itself can reach 8080; `tailscale serve` exposes it to the tailnet.
+    ports:
+      - "127.0.0.1:8080:8080"
+    devices:
+      - /dev/dri
+    volumes:
+      - /srv/models:/models:ro
+      - ./config:/etc/llama-swap/config
+      - ./data:/data
+    env_file: .env
+    # No GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM here: marvin's GPU shares system memory,
+    # so the zaphod fix doesn't apply.
+
+  beszel-agent:
+    image: henrygd/beszel-agent:0.21.1
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    profiles: [agent]
+    environment:
+      LISTEN: 45876                    # zaphod's Beszel hub connects over Tailscale
+      KEY: ${BESZEL_KEY:-}
+      GPU_COLLECTOR: amd_sysfs
+    volumes:
+      - ./data/beszel-agent:/var/lib/beszel-agent
+      - /var/run/docker.sock:/var/run/docker.sock:ro

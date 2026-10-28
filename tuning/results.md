@@ -1,0 +1,50 @@
+# zaphod speed results
+
+Written summary. Every individual test with its exact settings is in MLflow: https://mlflow.ai.dopamine911.com (experiment `llama-tuning`).
+
+## Current setup (2026-10-28)
+
+Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP speculative decoding, draft depth 2.
+
+| Setup | Writing speed through llama-swap |
+| --- | ---: |
+| One card, no speculative decoding | 28.2–29.4 tokens/s |
+| Card 1 (`coder`) with MTP | 57.7–60.0 tokens/s |
+| Card 2 (`coder-2`) with MTP | 51.7–53.7 tokens/s |
+
+## The slow-card fix (2026-10-28)
+
+Cause: Resizable BAR is off (needs CSM disabled; zaphod's Ubuntu needs CSM on). llama.cpp's Vulkan backend then put part of the model in system RAM and read it over PCIe for every token, so speed tracked each card's PCIe link.
+Fix: `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` in `~/llama-swap/compose.yaml`.
+
+| Card | Before (reading / writing) | After |
+| --- | --- | --- |
+| Card 1 (OCuLink, PCIe 3.0 x4) | 157 / 2.8 | 1115 / 27.75 |
+| Card 2 (x16 slot, PCIe 4.0 x8) | 551 / 9.4 | 1153 / 29.25 |
+
+Did NOT matter: PCIe ASPM policy, GPU power level, runtime power saving, Mesa 25.2 vs 26.0 for writing speed (26.0 gave +15% reading), the PSU.
+
+## Full history
+
+Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` (pp512 = reading, tg128 = writing, tokens/s)
+
+| Date | Change tested | pp512 | tg128 | Notes |
+| --- | --- | ---: | ---: | --- |
+| 2026-10-27 | Baseline, official image, Mesa 25.2 | 1003.76 | 18.22 | |
+| 2026-10-27 | Custom image, Mesa 26.0 | 1152.70 | 18.42 | Kept |
+| 2026-10-27 | PCIe ASPM = performance | 552.63 | 9.42 | |
+| 2026-10-27 | ASPM performance + power level high | 988.52 | 18.09 | |
+| 2026-10-28 | Card 1 only, defaults | 156.74 | 2.81 | |
+| 2026-10-28 | Card 2 only, defaults | 551.40 | 9.43 | |
+| 2026-10-28 | Cards kept awake (runtime PM off) | 155.74 / 550.47 | 2.79 / 9.42 | No change |
+| 2026-10-28 | Card 1, GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1 | 1115.41 | 27.75 | Fixed, kept |
+| 2026-10-28 | Card 2, GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1 | 1153.09 | 29.25 | Fixed, kept |
+| 2026-10-28 | Server: `coder` MTP depth 2 vs `coder-2` without | | 57.7–59.6 vs 28.2 | Kept |
+| 2026-10-28 | Server: both with MTP depth 2 | | 58.0–60.0 / 51.7–53.7 | Card 2 ~10% behind |
+
+## Ideas to test next
+1. Why card 2 is ~10% slower with MTP (repeat with `temperature: 0`, several runs).
+2. MTP draft depth 3, then 4.
+3. `-ub` 512 / 1024 / 2048 (reading speed).
+4. `coder-long` speed (both cards).
+5. New models: Flint, Qwen3-Coder-Next, Gemma 4 31B.
