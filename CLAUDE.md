@@ -37,7 +37,8 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 1. Terminal-Bench full run of `coder-tb`, with and without the-craft (overnight, in tmux).
 2. Set up marvin, then add it as a peer in zaphod/llama-swap/config/config.yaml (block is there, commented out).
 3. Tuning ideas in tuning/results.md.
-4. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
+4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.
+5. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
 
 Disk: root LVM volume expanded 2026-10-28 from 100 GB to the full 929 GB SSD.
 Hub: DOMAIN=ai.dopamine911.com; Cloudflare A records ai + *.ai -> zaphod's Tailscale IP (DNS only). models-panel/index.html still needs copying from the claude.ai project.
