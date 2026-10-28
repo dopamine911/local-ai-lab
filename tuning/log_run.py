@@ -184,7 +184,8 @@ def main():
     machine, model, note, *rest = sys.argv[1:]
     if machine not in LLAMA_SWAP:
         sys.exit(f"Unknown machine {machine}. Known: {', '.join(LLAMA_SWAP)}")
-    cmd = server_cmd(machine, model)
+    # kld:/history:/card labels are not llama-swap models, so there are no server settings to read
+    cmd = None if model.split(":")[0] in ("kld", "history") or model.startswith("card") else server_cmd(machine, model)
     mlflow.set_tracking_uri(MLFLOW_URL)
     mlflow.set_experiment(EXPERIMENT)
     mlflow.set_experiment_tag("mlflow.experimentKind", "custom_model_development")  # open on the runs table

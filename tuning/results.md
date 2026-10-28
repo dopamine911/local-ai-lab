@@ -19,6 +19,15 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | 2026-10-28 | `coder`, MTP depth 2 | 97 | 29/30 | Only miss: TC-14 Malformed Response (partial) |
 | 2026-10-28 | Same, repeated | 97 | 29/30 | Repeatable |
 
+## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
+
+| Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |
+| --- | --- | ---: | ---: | ---: | --- |
+| 2026-10-28 | UD-Q4_K_XL, f16 context (`coder`) | 0.0086 ± 0.0004 | 97.7% ± 0.2 | 1.0025 | Very close to full precision |
+| 2026-10-28 | UD-Q4_K_XL, q8_0 context (`coder-tb`) | 0.0088 ± 0.0005 | 97.6% ± 0.2 | 1.0023 | Same as f16 within error: q8_0 context is free. Kept for 256K. |
+
+Reference: Q8_0 perplexity 2.2318 on the code sample.
+
 ## The slow-card fix (2026-10-28)
 
 Cause: Resizable BAR is off (needs CSM disabled; zaphod's Ubuntu needs CSM on). llama.cpp's Vulkan backend then put part of the model in system RAM and read it over PCIe for every token, so speed tracked each card's PCIe link.
