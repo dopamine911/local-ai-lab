@@ -187,6 +187,7 @@ def main():
     cmd = server_cmd(machine, model)
     mlflow.set_tracking_uri(MLFLOW_URL)
     mlflow.set_experiment(EXPERIMENT)
+    mlflow.set_experiment_tag("mlflow.experimentKind", "custom_model_development")  # open on the runs table
     with mlflow.start_run(run_name=f"{machine}/{model}", description=note) as run:
         mlflow.set_tags({"machine": machine, "model": model, "mlflow.note.content": note,
                          "config_commit": os.environ.get("CONFIG_COMMIT", "unknown")})
