@@ -19,6 +19,14 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | 2026-10-28 | `coder`, MTP depth 2 | 97 | 29/30 | Only miss: TC-14 Malformed Response (partial) |
 | 2026-10-28 | Same, repeated | 97 | 29/30 | Repeatable |
 
+## Models compared (2026-10-28, one card each, Q4 files)
+
+| Model | Writing (llama-bench) | Writing (server) | Reading (llama-bench) | Tool-use score | Wrong actions | Honest stops |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| coder: Qwen3.8-27B + MTP | 29 (no MTP) | ~60 | 1,153 | 92 | 4 | 3 |
+| flint: Recursive Flint 40B-A2.5B | 100 | ~70 | 2,130 | 88 | 7 | 3 |
+| north: Cohere North-Mini-Code 30B-A3B | 140 | ~95 | 2,375 | 86 | 4 | 9 |
+
 ## Skill tests (tool-eval-bench full suite, misses sorted by hand)
 
 | Model | Skill | Score | Fabrication | Wrong action | Honest stop | Server bug | Grader wrong |
@@ -29,6 +37,7 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | flint | none | 88 | 0 | 7 | 3 | 0 | 2 |
 | flint | the-craft@3c329d0 | 83 | 0 | 11 | 6 | 0 | 1 |
 | flint | j5-craft@0c284ed7 | 78 | 1 | 16 | 4 | 0 | 1 |
+| north | none | 86 | 0 | 4 | 9 | 0 | 1 |
 
 "Server bug": llama.cpp b11913 rejects Qwen3.8 requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Details: `tool-eval/compare/`.
 
