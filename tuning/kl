@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# KL-divergence: how far a model file or setting drifts from the full-precision
+# reference (Q8_0). Lower = closer to the original. Logged to MLflow.
+#
+# One-time setup (needs the 29 GB Q8_0 file and about 4 GB for the reference):
+#   ./kl base
+# Then, for each thing you want to measure:
+#   ./kl test "Q4_K_XL as served"                                    # current model file
+#   ./kl test "Q4_K_XL, q8_0 context" -ctk q8_0 -ctv q8_0             # a context-memory setting
+#   MODEL=/models/Qwen3.8-27B-UD-Q5_K_XL.gguf ./kl test "Q5_K_XL"     # another model file
+#
+# It stops llama-swap while it runs (the reference needs both cards) and starts it after.
+set -e
+cd "$(dirname "$0")"
+IMG=ghcr.io/ggml-org/llama.cpp:full-vulkan-b11913   # same llama.cpp build (b11913) as llama-swap 267
+REF_FILE=Qwen3.8-27B-Q8_0.gguf
+REF=kld/qwen3.8-27b-q8_0.c512x32.kld                # under /srv/models
+SAMPLE=/tuning/kld/code-sample.txt                  # fixed text; never edit (checksum in kld/code-sample.sha256)
+COMMON=(-c 512 --chunks 32 -ngl 999 -fa on -b 512 -ub 512)
+
+usage() { sed -n '2,12p' "$0"; exit 1; }
+run() { docker run --rm --device /dev/dri -e GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1 \
+          -v /srv/models:/models -v "$PWD:/tuning:ro" --entrypoint /app/llama-perplexity "$IMG" "$@"; }
+pause_swap() {
+  echo "== stopping llama-swap"; (cd ~/llama-swap && docker compose stop -t 30 >/dev/null)
+  trap 'echo "== starting llama-swap"; (cd ~/llama-swap && docker compose start >/dev/null)' EXIT
+}
+[ "$(sha256sum kld/code-sample.txt | cut -c1-16)" = "$(cat kld/code-sample.sha256)" ] \
+  || { echo "kld/code-sample.txt has changed; results would not be comparable. Restore it with git."; exit 1; }
+
+case "$1" in
+base)
+  if [ ! -f "/srv/models/$REF_FILE" ]; then
+    echo "Missing /srv/models/$REF_FILE. Download it first (29 GB):"
+    echo "  wget -c -P /srv/models https://huggingface.co/unsloth/Qwen3.8-27B-GGUF/resolve/main/$REF_FILE"
+    exit 1
+  fi
+  mkdir -p /srv/models/kld
+  pause_swap
+  echo "== building the reference from Q8_0 on both cards (about 10 minutes)"
+  run -m "/models/$REF_FILE" -f "$SAMPLE" "${COMMON[@]}" -dev Vulkan0,Vulkan1 \
+    --kl-divergence-base "/models/$REF" 2>&1 | tail -4
+  ls -lh "/srv/models/$REF"
+  ;;
+test)
+  [ $# -ge 2 ] || usage
+  NOTE="$2"; shift 2
+  [ -f "/srv/models/$REF" ] || { echo "No reference yet. Run: ./kl base"; exit 1; }
+  MODEL="${MODEL:-/models/Qwen3.8-27B-UD-Q4_K_XL.gguf}"
+  mkdir -p kld/runs
+  OUT="kld/runs/$(date +%Y-%m-%d-%H%M)-$(basename "$MODEL" .gguf).kld.txt"
+  pause_swap
+  echo "== KL-divergence: $(basename "$MODEL") $* (card 1)"
+  { echo "# model=$MODEL extra=$*"
+    run -m "$MODEL" -f "$SAMPLE" "${COMMON[@]}" -dev Vulkan0 \
+      --kl-divergence-base "/models/$REF" --kl-divergence "$@" 2>&1; } > "$OUT" \
+    || { echo "llama-perplexity failed:"; tail -8 "$OUT"; exit 1; }
+  ./log zaphod "kld:$(basename "$MODEL" .gguf)" "$NOTE" "$OUT"
+  ;;
+*) usage ;;
+esac

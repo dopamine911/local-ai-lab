@@ -86,7 +86,28 @@ Which test to use depends on what kind of setting it is.
 | `--reasoning-effort` | How long it thinks first | quality test | medium → high |
 | Quant (model file) | Q4 vs Q5/Q6: size vs accuracy | KL-divergence (full guide) | UD-Q4_K_XL → Q5_K_XL |
 
-Other quality tests (KL-divergence for model file sizes, Terminal-Bench-Local overnight for finalists, a SWE-bench sample) are in the full guide; not set up yet.
+## Deeper quality tests
+
+**`./kl`: KL-divergence.** How far a smaller model file, or a context-memory setting, drifts from the full-precision original (Q8_0). Lower is closer. Same llama.cpp build as llama-swap (b11913), same fixed code sample every time (`kld/code-sample.txt`; the script refuses to run if it changes).
+```bash
+./kl base                                             # once, after downloading the 29 GB Q8_0 file
+./kl test "Q4_K_XL as served"
+./kl test "q8_0 context" -ctk q8_0 -ctv q8_0
+MODEL=/models/Qwen3.8-27B-UD-Q5_K_XL.gguf ./kl test "Q5_K_XL"
+```
+Good: `mean KLD` under about 0.05 and `same top token` above about 90% for a Q4 file. Use it to compare files and settings with each other, not as a pass mark. Stops llama-swap while it runs.
+
+**`./tbench`: Terminal-Bench-Local (Core-19).** 19 real terminal tasks in containers, graded pass/fail, 2 attempts each. The test your earlier model scores (18/19) came from. You start it yourself; Claude Code won't run downloaded benchmark code on its own.
+```bash
+./tbench setup                 # once
+./tbench doctor                # checks, no inference
+./tbench smoke "first try"     # 1 task, 10-30 minutes
+tmux new -s tbench             # full run: about 10 hours, so inside tmux
+./tbench full "coder MTP2"     # Ctrl-b then d to detach; tmux attach -t tbench to return
+```
+Set `PROFILE` to describe what you changed (e.g. `PROFILE=mtp3 ./tbench full "MTP depth 3"`). Results are logged to MLflow automatically when a run finishes. Use the full run only for your final 2-3 setups.
+
+Not set up: a SWE-bench sample (heavy; see the full guide).
 
 ## Files here
 
@@ -95,6 +116,10 @@ Other quality tests (KL-divergence for model file sizes, Terminal-Bench-Local ov
 | `bench` | Benchmark one card and log it |
 | `log` | Log any result (runs `log_run.py` inside the MLflow container; nothing to install) |
 | `quality` | Tool-use quality test and log it |
+| `kl` | KL-divergence test and log it |
+| `tbench` | Terminal-Bench-Local: setup, smoke, full run, log |
+| `kld/` | Fixed code sample, its checksum, and KL results |
+| `terminal-bench/` | The benchmark itself (downloaded by `./tbench setup`; not in git) |
 | `log_run.py` | The logging script |
 | `tool-eval/runs/` | Quality reports: one `.json` (scores) and one `.md` (every conversation) per run |
 | `runs/` | Raw llama-bench output, one file per run |

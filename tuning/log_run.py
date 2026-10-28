@@ -92,13 +92,36 @@ def read_bench(path):
     return params, metrics
 
 
+def read_terminal_bench(d):
+    """Results from a Terminal-Bench-Local summary.json."""
+    suite = d.get("suite", {})
+    params = {
+        "quality.tool": "terminal-bench-local",
+        "tbench.suite": f"{suite.get('id', '')} {suite.get('version', '')}",
+        "tbench.profile": d.get("inference_profile") or "",
+        "tbench.quant": d.get("quant") or "",
+    }
+    tok = d.get("tokens", {})
+    metrics = {
+        "tbench_passed": d.get("passed_tasks", 0),
+        "tbench_total": d.get("total_tasks", 0),
+        "tbench_pass_rate_pct": round(100 * (d.get("pass_rate") or 0), 1),
+        "tbench_hours": round((d.get("total_duration_ms") or 0) / 3.6e6, 2),
+        "tbench_output_tokens": tok.get("output", 0),
+    }
+    return params, metrics
+
+
 def read_tool_eval(path):
-    """Settings and results from a tool-eval-bench --json-file result."""
+    """Settings and results from a tool-eval-bench --json-file result,
+    or a Terminal-Bench-Local summary.json."""
     try:
         with open(path) as f:
             d = json.load(f)
     except (ValueError, OSError):
         return None, None
+    if "passed_tasks" in d and "suite" in d:
+        return read_terminal_bench(d)
     if "tool_eval_bench_version" not in d or "scores" not in d:
         return None, None
     s, m = d["scores"], d.get("metadata", {})
@@ -125,6 +148,36 @@ def read_tool_eval(path):
     return params, metrics
 
 
+KLD_LINES = {  # llama-perplexity --kl-divergence output label -> MLflow metric name
+    r"Mean PPL\(Q\)\s*:": "kld_ppl_q",
+    r"Mean PPL\(base\)\s*:": "kld_ppl_base",
+    r"Mean PPL\(Q\)/PPL\(base\)\s*:": "kld_ppl_ratio",
+    r"Mean\s+KLD:": "kld_mean",
+    r"Maximum KLD:": "kld_max",
+    r"99\.0%\s+KLD:": "kld_p99",
+    r"Median\s+KLD:": "kld_median",
+    r"RMS Δp\s*:": "kld_rms_dp_pct",
+    r"Same top p:": "kld_same_top_p_pct",
+}
+
+
+def read_kld(path):
+    """Results from llama-perplexity --kl-divergence output (saved by ./kl)."""
+    import re
+    with open(path, errors="replace") as f:
+        text = f.read()
+    if "KLD" not in text:
+        return None, None
+    metrics = {}
+    for label, name in KLD_LINES.items():
+        m = re.search(label + r"\s*(-?[0-9.]+)", text)
+        if m:
+            metrics[name] = float(m.group(1))
+    first = text.splitlines()[0] if text else ""
+    params = {"quality.tool": "kl-divergence", "kld.run": first.lstrip("# ")[:250]}
+    return params, metrics
+
+
 def main():
     if len(sys.argv) < 4:
         sys.exit(__doc__)
@@ -148,8 +201,19 @@ def main():
                     if p:
                         mlflow.log_params(p)
                         mlflow.log_metrics(m)
-                        print(f"  tool-eval score = {m['tooleval_score']} "
-                              f"({m['tooleval_points']}/{m['tooleval_max_points']} points)")
+                        if "tbench_passed" in m:
+                            print(f"  Terminal-Bench: {m['tbench_passed']}/{m['tbench_total']} tasks "
+                                  f"({m['tbench_pass_rate_pct']}%) in {m['tbench_hours']} h")
+                        else:
+                            print(f"  tool-eval score = {m['tooleval_score']} "
+                                  f"({m['tooleval_points']}/{m['tooleval_max_points']} points)")
+                if item.endswith(".kld.txt"):
+                    p, m = read_kld(item)
+                    if p:
+                        mlflow.log_params(p)
+                        mlflow.log_metrics(m)
+                        print(f"  mean KLD = {m.get('kld_mean')}   same top token = "
+                              f"{m.get('kld_same_top_p_pct')}%   PPL ratio = {m.get('kld_ppl_ratio')}")
                 if item.endswith(".jsonl"):
                     p, m = read_bench(item)
                     if p:

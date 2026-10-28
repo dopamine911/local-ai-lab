@@ -4,3 +4,4 @@
 **/data/
 tuning/runs/*.err
 hub/homepage/logs/
+tuning/terminal-bench/

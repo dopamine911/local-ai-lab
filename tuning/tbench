@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Terminal-Bench-Local (Core-19): 19 real terminal tasks, graded pass/fail.
+# Each task gets up to 2 attempts (pass@2). Results are logged to MLflow.
+#
+#   ./tbench setup                    # once: download the benchmark (pinned version)
+#   ./tbench doctor                   # checks Docker, the endpoint and the tasks; no inference
+#   ./tbench smoke "first try"        # 1 task, about 10-30 minutes
+#   ./tbench full "coder MTP2"        # all 19 tasks, about 10 hours: run it inside tmux
+#   ./tbench log "note"               # log the newest finished result to MLflow (done
+#                                     #   automatically after smoke/full)
+#
+# Model: MODEL=coder by default (QUANT and PROFILE describe it in the results):
+#   MODEL=coder-2 ./tbench smoke "card 2"
+set -e
+cd "$(dirname "$0")"
+REPO=https://github.com/kyuz0/terminal-bench-mini.git
+PIN=60739af                         # Terminal-Bench-Local commit, 2026-10-27
+DIR=terminal-bench
+MODEL="${MODEL:-coder}"
+MODEL_NAME="${MODEL_NAME:-Qwen3.8-27B}"
+QUANT="${QUANT:-UD-Q4_K_XL}"
+PROFILE="${PROFILE:-mtp2}"          # describe the setup: e.g. mtp2, mtp3, mtp2-kvq8
+
+usage() { sed -n '2,13p' "$0"; exit 1; }
+need_repo() { [ -d "$DIR" ] || { echo "Run ./tbench setup first."; exit 1; }; }
+key() { set -a; . ~/llama-swap/.env; set +a; export TBENCH_API_KEY="$ZAPHOD_KEY"; }
+
+log_latest() {
+  local note="$1" f
+  f=$(find "$DIR/results/suites" -path '*r9700*' -name summary.json -printf '%T@ %p\n' 2>/dev/null \
+      | sort -n | tail -1 | cut -d' ' -f2-)
+  [ -n "$f" ] || { echo "No finished zaphod result found yet."; exit 1; }
+  echo "== logging $f"
+  MACHINE=zaphod ./log zaphod "$MODEL" "$note" "$f"
+}
+
+run_tier() {
+  local tier="$1" note="$2"
+  need_repo; key
+  (cd "$DIR" && ./terminal_bench.py run --suite core19 --tier "$tier" \
+     --endpoint http://127.0.0.1:8080/v1 --model "$MODEL" \
+     --platform r9700 --platform-name "zaphod, Radeon AI PRO R9700" \
+     --model-name "$MODEL_NAME" --engine llama.cpp --backend vulkan --backend-version "mesa-26.0" \
+     --quant "$QUANT" --inference-profile "$PROFILE")
+  log_latest "$note"
+}
+
+case "$1" in
+setup)
+  [ -d "$DIR" ] || git clone -q "$REPO" "$DIR"
+  (cd "$DIR" && git fetch -q && git checkout -q "$PIN" && git log -1 --format='Terminal-Bench-Local pinned at %h (%cd)')
+  ;;
+doctor) need_repo; key
+  (cd "$DIR" && ./terminal_bench.py doctor --suite core19 --tier smoke \
+     --endpoint http://127.0.0.1:8080/v1 --model "$MODEL") ;;
+smoke) [ -n "$2" ] || usage; run_tier smoke "$2" ;;
+full)  [ -n "$2" ] || usage
+  [ -n "$TMUX" ] || { echo "A full run takes about 10 hours. Start it inside tmux:"
+                      echo "  tmux new -s tbench"; echo "  cd ~/homelab/tuning && ./tbench full \"$2\""
+                      echo "Detach with Ctrl-b then d; reattach with: tmux attach -t tbench"; exit 1; }
+  run_tier full "$2" ;;
+log)   [ -n "$2" ] || usage; log_latest "$2" ;;
+*) usage ;;
+esac
