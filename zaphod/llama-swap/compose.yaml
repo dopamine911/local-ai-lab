@@ -1,0 +1,16 @@
+services:
+  llama-swap:
+    image: llama-swap-zaphod:267
+    container_name: llama-swap
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    devices:
+      - /dev/dri
+    volumes:
+      - /srv/models:/models:ro
+      - ./config:/etc/llama-swap/config
+      - ./data:/data
+    env_file: .env
+    environment:
+      GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM: "1"
