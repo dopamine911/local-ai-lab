@@ -29,6 +29,12 @@ models:
   ornith:
     name: "Ornith-1.5 35B-A3B, card 2, 256K context, vision"
     cmd: ${server} --device Vulkan1 -m /models/ornith/Ornith-1.5-35B-Q4_K_M.gguf --mmproj /models/ornith/mmproj-Ornith-1.5-35B-BF16.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
+  embed:
+    name: "Qwen3-Embedding-4B (document search), card 1"
+    cmd: ${server} --device Vulkan0 -m /models/search/Qwen3-Embedding-4B-Q6_K.gguf --embedding --pooling last -c 8192 -b 8192 -ub 8192 -np 1
+  rerank:
+    name: "Qwen3-Reranker-0.6B (document search), card 1"
+    cmd: ${server} --device Vulkan0 -m /models/search/qwen3-reranker-0.6b-q8_0.gguf --reranking -c 8192 -b 8192 -ub 8192 -np 1
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan0,Vulkan1 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
@@ -38,7 +44,8 @@ routing:
     settings:
       matrix:
         sets:
-          one_per_card: "(coder | coder-tb) & (coder-2 | flint | north | ornith)"
+          helpers: "embed & rerank"   # small models that stay loaded next to everything below
+          one_per_card: "+helpers & (coder | coder-tb) & (coder-2 | flint | north | ornith)"
           both_cards: "coder-long"
 hooks:
   on_startup:
