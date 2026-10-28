@@ -59,13 +59,17 @@ services:
     restart: unless-stopped
     network_mode: host
     profiles: [agent]
+    security_opt:
+      - apparmor:unconfined   # Docker's AppArmor profile blocks the D-Bus calls for systemd status
     environment:
       LISTEN: 127.0.0.1:45876
       KEY: ${BESZEL_KEY:-}
       GPU_COLLECTOR: amd_sysfs        # reads the R9700s straight from /sys
+      SERVICE_PATTERNS: "docker*,containerd*,tailscaled*,ssh*"  # systemd services to show
     volumes:
       - ./data/beszel-agent:/var/lib/beszel-agent
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro  # systemd service status
 
   mlflow:
     image: ghcr.io/mlflow/mlflow:v3.17.2
