@@ -4,8 +4,9 @@
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 CONFIG_COMMIT=$(git -C "$HOME/llama-swap" log -1 --format="%h %s" 2>/dev/null || echo unknown)
-exec docker run --rm --network host \
+docker run --rm --network host \
   -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" \
   --env-file "$HOME/homelab/hub/.env" \
   -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \
-  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@"
+  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@" 2>&1 | grep -vE "View (run|experiment) "
+exit ${PIPESTATUS[0]}
