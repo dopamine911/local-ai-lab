@@ -19,6 +19,19 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | 2026-10-28 | `coder`, MTP depth 2 | 97 | 29/30 | Only miss: TC-14 Malformed Response (partial) |
 | 2026-10-28 | Same, repeated | 97 | 29/30 | Repeatable |
 
+## Skill tests (tool-eval-bench full suite, misses sorted by hand)
+
+| Model | Skill | Score | Fabrication | Wrong action | Honest stop | Server bug | Grader wrong |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| coder | none | 92 | 0 | 4 | 3 | 4 | 0 |
+| coder | the-craft@3c329d0 | 93 | 0 | 0 | 7 | 4 | 0 |
+| coder | j5-craft@0c284ed7 | 95 | 0 | 4 | 1 | 4 | 0 |
+| flint | none | 88 | 0 | 7 | 3 | 0 | 2 |
+| flint | the-craft@3c329d0 | 83 | 0 | 11 | 6 | 0 | 1 |
+| flint | j5-craft@0c284ed7 | 78 | 1 | 16 | 4 | 0 | 1 |
+
+"Server bug": llama.cpp b11913 rejects Qwen3.8 requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Details: `tool-eval/compare/`.
+
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
 | Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |
