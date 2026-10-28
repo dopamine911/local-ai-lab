@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Write the hand-sorted misses (tool-eval/classifications.json) to MLflow. Safe to repeat.
+set -e
+cd "$(dirname "$0")"
+docker run --rm --network host -e GIT_PYTHON_REFRESH=quiet -v "$PWD:/tuning:ro" \
+  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/tool-eval/sort_to_mlflow.py
