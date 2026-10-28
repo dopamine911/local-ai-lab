@@ -5,3 +5,4 @@
 tuning/runs/*.err
 hub/homepage/logs/
 tuning/terminal-bench/
+__pycache__/
