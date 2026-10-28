@@ -107,6 +107,19 @@ tmux new -s tbench             # full run: about 10 hours, so inside tmux
 ```
 Set `PROFILE` to describe what you changed (e.g. `PROFILE=mtp3 ./tbench full "MTP depth 3"`). Results are logged to MLflow automatically when a run finishes. Use the full run only for your final 2-3 setups.
 
+## Testing a skill (instruction file)
+
+Does an instruction file, such as `the-craft`, change how well a model works? Both tests can add one to the model's prompt. Pinned copies live in `instructions/` (e.g. `instructions/the-craft@3c329d0.md`: the standard install, SKILL.md + the two always-on rules, from brewpirate/acme-frontier-ai at commit 3c329d0).
+
+```bash
+SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full    # tool use, ~30 min
+./compare-skill instructions/the-craft@3c329d0.md coder flint                    # both arms, side-by-side table
+SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"                # Terminal-Bench
+```
+- tool-eval-bench: the file is added after the built-in system prompt (`tool-eval/default-system-prompt.txt`).
+- Terminal-Bench: added to the agent's prompt by a small patch to its prompt hook (`tbench-skill-patch.py`, applied by `./tbench setup`). The profile gets `+<skill>` appended, so these runs are never compared with plain ones by accident.
+- MLflow records the skill name and a checksum on every run. Comparison tables are saved in `tool-eval/compare/`.
+
 Not set up: a SWE-bench sample (heavy; see the full guide).
 
 ## Files here
@@ -117,6 +130,9 @@ Not set up: a SWE-bench sample (heavy; see the full guide).
 | `log` | Log any result (runs `log_run.py` inside the MLflow container; nothing to install) |
 | `quality` | Tool-use quality test and log it |
 | `kl` | KL-divergence test and log it |
+| `compare-skill` | A/B test of an instruction file (skill) on one or more models |
+| `instructions/` | Pinned instruction files (skills) for testing |
+| `tbench-skill-patch.py` | Adds skill support to Terminal-Bench's prompt hook |
 | `tbench` | Terminal-Bench-Local: setup, smoke, full run, log |
 | `kld/` | Fixed code sample, its checksum, and KL results |
 | `terminal-bench/` | The benchmark itself (downloaded by `./tbench setup`; not in git) |

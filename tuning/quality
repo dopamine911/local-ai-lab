@@ -6,6 +6,8 @@
 #   ./quality coder "baseline"                  # 15 core scenarios, about 2 minutes
 #   ./quality coder "MTP depth 3" --full        # all 69 standard scenarios, about 10 minutes
 #   ./quality coder "temp 0.6" --temperature 0.6
+#   SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full
+#     (SKILL adds an instruction file after the built-in system prompt; frontmatter is stripped)
 #
 # Defaults: temperature 0 and seed 42, so the same model and settings give the
 # same answers every time and runs compare cleanly. The model runs with its normal
@@ -18,13 +20,24 @@ if [ "$1" = "--full" ]; then SUITE=""; shift; fi
 set -a; . ~/llama-swap/.env; set +a
 mkdir -p tool-eval/data tool-eval/runs
 OUT="$(date +%Y-%m-%d-%H%M)-${MODEL//\//_}.json"
+PROMPT_ARGS=()
+if [ -n "$SKILL" ]; then
+  [ -f "$SKILL" ] || { echo "SKILL file not found: $SKILL"; exit 1; }
+  export SKILL_NAME=$(basename "$SKILL" .md) SKILL_SHA=$(sha256sum "$SKILL" | cut -c1-12)
+  mkdir -p tool-eval/prompts
+  PF="tool-eval/prompts/$SKILL_NAME-$SKILL_SHA.txt"
+  { cat tool-eval/default-system-prompt.txt; printf '\n\n'
+    python3 -c 'import re,sys;print(re.sub(r"\A---\n.*?\n---\n","",open(sys.argv[1]).read(),count=1,flags=re.S).strip())' "$SKILL"; } > "$PF"
+  PROMPT_ARGS=(--system-prompt-file "/app/$PF")
+  echo "== with instructions: $SKILL_NAME ($SKILL_SHA, $(wc -c < "$PF") bytes of system prompt)"
+fi
 
 echo "== tool-eval-bench on $MODEL ${SUITE:-(full)}"
 docker run --rm --network host -u "$(id -u):$(id -g)" \
-  -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" \
+  -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" -v "$PWD/tool-eval/prompts:/app/tool-eval/prompts:ro" \
   tool-eval-bench:3.0.0 run $SUITE --seed 42 \
   --base-url http://127.0.0.1:8080/v1 --api-key "$ZAPHOD_KEY" --model "$MODEL" \
-  --no-live --json-file "/app/runs/$OUT" "$@" > "tool-eval/runs/${OUT%.json}.log" 2>&1 \
+  --no-live --json-file "/app/runs/$OUT" "${PROMPT_ARGS[@]}" "$@" > "tool-eval/runs/${OUT%.json}.log" 2>&1 \
   || { echo "tool-eval-bench failed:"; tail -5 "tool-eval/runs/${OUT%.json}.log"; exit 1; }
 
 REPORT=$(python3 -c "import json;print(json.load(open('tool-eval/runs/$OUT'))['report_path'].replace('/app/','tool-eval/'))")

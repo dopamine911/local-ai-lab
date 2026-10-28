@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# Does a skill (instruction file) change tool-use quality? A/B test with tool-eval-bench.
+#
+# Usage: ./compare-skill <path/to/SKILL.md> [model ...]        (default models: coder flint)
+# Example:
+#   ./compare-skill instructions/the-craft@3c329d0.md coder flint
+#
+# For each model it runs the full suite (69 scenarios) twice under identical conditions
+# (temperature 0, seed 42): once with the built-in system prompt, once with the skill
+# appended to it. Both runs go to MLflow; a side-by-side table is printed and saved in
+# tool-eval/compare/. Takes about 20-40 minutes per model per arm.
+set -e
+cd "$(dirname "$0")"
+SKILL_FILE="$1"; shift || true
+[ -f "$SKILL_FILE" ] || { sed -n '2,12p' "$0"; exit 1; }
+MODELS=("$@"); [ ${#MODELS[@]} -gt 0 ] || MODELS=(coder flint)
+NAME=$(sed -n 's/^name: *//p' "$SKILL_FILE" | head -1); [ -n "$NAME" ] || NAME=$(basename "$SKILL_FILE" .md)
+mkdir -p tool-eval/compare
+REPORT="tool-eval/compare/$(date +%Y-%m-%d-%H%M)-$NAME.md"
+echo "# Skill comparison: $NAME" > "$REPORT"
+echo >> "$REPORT"
+echo "Skill file: \`$SKILL_FILE\` (sha256 $(sha256sum "$SKILL_FILE" | cut -c1-12)). tool-eval-bench 3.0.0, full suite, temperature 0, seed 42." >> "$REPORT"
+
+for M in "${MODELS[@]}"; do
+  echo; echo "################ $M: without skill"
+  ./quality "$M" "skill A/B: $NAME OFF" --full
+  BASE=$(ls -t tool-eval/runs/*-"${M//\//_}".json | head -1)
+  echo; echo "################ $M: with $NAME"
+  SKILL="$SKILL_FILE" ./quality "$M" "skill A/B: $NAME ON" --full
+  WITH=$(ls -t tool-eval/runs/*-"${M//\//_}".json | head -1)
+  python3 tool-eval/compare.py "$M" "$BASE" "$WITH" "$NAME" | tee -a "$REPORT"
+done
+echo; echo "Saved: $REPORT"

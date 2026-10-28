@@ -11,6 +11,10 @@
 #
 # Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
 #   MODEL=coder-2 ./tbench smoke "card 2"
+#
+# With a skill (instruction file added to the agent's prompt; frontmatter stripped):
+#   SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"
+#   (the profile name gets "+<skill>" appended, so these runs never mix with plain ones)
 set -e
 cd "$(dirname "$0")"
 REPO=https://github.com/kyuz0/terminal-bench-mini.git
@@ -21,8 +25,19 @@ MODEL_NAME="${MODEL_NAME:-Qwen3.8-27B}"
 QUANT="${QUANT:-UD-Q4_K_XL}"
 PROFILE="${PROFILE:-mtp2-256k-kvq8}"   # describe the setup: e.g. mtp3-256k-kvq8
 
-usage() { sed -n '2,13p' "$0"; exit 1; }
+usage() { sed -n '2,17p' "$0"; exit 1; }
 need_repo() { [ -d "$DIR" ] || { echo "Run ./tbench setup first."; exit 1; }; }
+if [ -n "$SKILL" ]; then
+  [ -f "$SKILL" ] || { echo "SKILL file not found: $SKILL"; exit 1; }
+  grep -q 'local-ai-lab: extra instructions' "$DIR/compat/harbor_prompt/sitecustomize.py" 2>/dev/null \
+    || { echo "Skill support not installed. Run: ./tbench setup"; exit 1; }
+  export TBENCH_EXTRA_INSTRUCTIONS="$(realpath "$SKILL")"
+  export SKILL_NAME=$(basename "$SKILL" .md) SKILL_SHA=$(sha256sum "$SKILL" | cut -c1-12)
+  PROFILE="$PROFILE+$SKILL_NAME"
+  echo "== with instructions: $SKILL_NAME ($SKILL_SHA); profile $PROFILE"
+else
+  unset TBENCH_EXTRA_INSTRUCTIONS
+fi
 key() { set -a; . ~/llama-swap/.env; set +a; export TBENCH_API_KEY="$ZAPHOD_KEY"; }
 
 log_latest() {
@@ -49,6 +64,7 @@ case "$1" in
 setup)
   [ -d "$DIR" ] || git clone -q "$REPO" "$DIR"
   (cd "$DIR" && git fetch -q && git checkout -q "$PIN" && git log -1 --format='Terminal-Bench-Local pinned at %h (%cd)')
+  python3 tbench-skill-patch.py "$DIR"
   ;;
 doctor) need_repo; key
   (cd "$DIR" && ./terminal_bench.py doctor --suite core19 --tier smoke \

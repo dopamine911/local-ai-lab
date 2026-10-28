@@ -192,6 +192,9 @@ def main():
     with mlflow.start_run(run_name=f"{machine}/{model}", description=note) as run:
         mlflow.set_tags({"machine": machine, "model": model, "mlflow.note.content": note,
                          "config_commit": os.environ.get("CONFIG_COMMIT", "unknown")})
+        if os.environ.get("SKILL_NAME"):
+            mlflow.log_params({"skill": os.environ["SKILL_NAME"], "skill.sha": os.environ.get("SKILL_SHA", "")})
+            mlflow.set_tag("skill", os.environ["SKILL_NAME"])
         if cmd:
             mlflow.log_params(flags_to_params(cmd))
             mlflow.log_text(cmd, "server_cmd.txt")
