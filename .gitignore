@@ -3,3 +3,4 @@
 !.env.example
 **/data/
 tuning/runs/*.err
+hub/homepage/logs/
