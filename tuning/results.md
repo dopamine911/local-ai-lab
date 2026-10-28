@@ -9,8 +9,12 @@ Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP
 | Setup | Writing speed through llama-swap |
 | --- | ---: |
 | One card, no speculative decoding | 28.2–29.4 tokens/s |
-| Card 1 (`coder`) with MTP | 57.7–60.0 tokens/s |
-| Card 2 (`coder-2`) with MTP | 51.7–53.7 tokens/s |
+| Card 1 (OCuLink, PCIe 3.0 x4) with MTP: `coder` since 2026-10-28 23:58 | 53.8–54.4 tokens/s |
+| Card 2 (x16 slot) with MTP: `coder-2` since 2026-10-28 23:58 | 59.5–59.7 tokens/s |
+
+Until 2026-10-28 23:58 the config had the cards swapped (llama.cpp's `Vulkan0` is card 2), so older rows
+labelled `coder` were measured on card 2 and `coder-2`/`flint`/`north`/`ornith` on card 1.
+llama-bench rows (`./bench 1|2`) were always on the right card.
 
 ## Quality (tool-eval-bench 3.0.0, short suite, temp 0, seed 42)
 
@@ -115,7 +119,7 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 | 2026-10-28 | Same image change, card 2, Ornith | 2441 | 132.3 | No change |
 
 ## Ideas to test next
-1. Why card 2 is ~10% slower with MTP (repeat with `temperature: 0`, several runs).
+1. Answered 2026-10-28: the ~10% slower card with MTP is card 1 (OCuLink, PCIe 3.0 x4), not a model setting; the gap moved with the models when the device mix-up was fixed. Fix would be a faster link for card 1.
 2. MTP draft depth 3, then 4.
 3. `-ub` 512 / 1024 / 2048 (reading speed).
 4. `coder-long` speed (both cards).

@@ -6,6 +6,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 - zaphod (this machine): Ubuntu 26.04 server, Ryzen 9 3900X, Gigabyte B550I AORUS PRO AX (mini-ITX), 2x Radeon AI PRO R9700 (32 GB each).
   - Card 1: PCI 06:00.0, /dev/dri/renderD128, on an OCuLink dock via an M.2 adapter in the back (chipset) M.2 slot, PCIe 3.0 x4.
   - Card 2: PCI 0b:00.0, /dev/dri/renderD129, in the x16 slot (links at x8), drives the screen.
+  - llama.cpp numbers them the other way round: card 1 = `Vulkan1`, card 2 = `Vulkan0`. Check with `llama-server --list-devices` (free memory per card). Card 1 is ~10% slower with MTP (its PCIe 3.0 x4 link).
 - marvin: Bosgame M5, Ryzen AI Max+ 395, 128 GB. Not set up yet. Will join as a llama-swap peer (files in `marvin/llama-swap/`).
 
 ## Layout
@@ -18,7 +19,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 
 ## llama-swap on zaphod
 - Image `llama-swap-zaphod:267-media`: official llama-swap 267 programs (llama.cpp b11870, plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa, built from the Dockerfile. Previous image `:267` (text only) is kept for rollback. Models in /srv/models.
-- Models: `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context. `coder-tb`: card 1, 256K context, q8_0 KV, MTP, for Terminal-Bench; swaps with `coder`. `flint`: Recursive Flint UD-Q4_K_XL, card 2, 256K q8_0 context; swaps with `coder-2`. `coder-long`: both cards, 256K, not yet tested.
+- Models: `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context. `coder-tb`: card 1, 256K context, q8_0 KV, MTP, for Terminal-Bench; swaps with `coder`. Card 2, swapping with `coder-2`, 256K q8_0 context: `ornith` (Ornith-1.5 35B-A3B Q4_K_M + vision; best tool-use score so far), `north`, `flint` (on hold). `embed` + `rerank` (document search) stay loaded on card 1. `coder-long`: both cards, 256K, not yet tested.
 - Listens on 127.0.0.1:8080 only; `tailscale serve --bg --tcp=8080 tcp://localhost:8080` exposes it on the tailnet. Also https://zaphod.ai.dopamine911.com via Caddy.
 - Config edits reload automatically. Check with `cd ~/llama-swap && docker compose logs --tail 20`.
 - Commit every config change: "what · from → to · why". Benchmarks record the last commit that touched `zaphod/llama-swap/`.

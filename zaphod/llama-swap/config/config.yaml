@@ -10,34 +10,36 @@ macros:
   qwen27: /models/Qwen3.8-27B-UD-Q4_K_XL.gguf
   qwen-sampling: --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0 --reasoning-effort medium
   mtp: --model-draft /models/mtp-Qwen3.8-27B-Q4_0.gguf --spec-type draft-mtp --spec-draft-n-max 2
+# Device numbers: llama.cpp calls card 1 (PCI 06:00.0, OCuLink) Vulkan1 and card 2 (PCI 0b:00.0, x16 slot) Vulkan0.
+# Check: llama-server --list-devices; the card with less free memory is the busier one.
 models:
   coder:
     name: "Qwen3.8-27B, card 1"
-    cmd: ${server} --device Vulkan0 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
+    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
   coder-2:
     name: "Qwen3.8-27B, card 2"
-    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
+    cmd: ${server} --device Vulkan0 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
   coder-tb:
     name: "Qwen3.8-27B, card 1, 256K context (benchmarks)"
-    cmd: ${server} --device Vulkan0 -m ${qwen27} -c 262144 -np 1 -ctk q8_0 -ctv q8_0 ${qwen-sampling} ${mtp}
+    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 262144 -np 1 -ctk q8_0 -ctv q8_0 ${qwen-sampling} ${mtp}
   flint:
     name: "Flint 40B-A2.5B (Recursive), card 2, 256K context"
-    cmd: ${server} --device Vulkan1 -m /models/flint-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
+    cmd: ${server} --device Vulkan0 -m /models/flint-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
   north:
     name: "North-Mini-Code-1.0 30B-A3B (Cohere), card 2, 256K context"
-    cmd: ${server} --device Vulkan1 -m /models/North-Mini-Code-1.0-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95
+    cmd: ${server} --device Vulkan0 -m /models/North-Mini-Code-1.0-UD-Q4_K_XL.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 1.0 --top-p 0.95
   ornith:
     name: "Ornith-1.5 35B-A3B, card 2, 256K context, vision"
-    cmd: ${server} --device Vulkan1 -m /models/ornith/Ornith-1.5-35B-Q4_K_M.gguf --mmproj /models/ornith/mmproj-Ornith-1.5-35B-BF16.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
+    cmd: ${server} --device Vulkan0 -m /models/ornith/Ornith-1.5-35B-Q4_K_M.gguf --mmproj /models/ornith/mmproj-Ornith-1.5-35B-BF16.gguf -c 262144 -np 1 -ctk q8_0 -ctv q8_0 --temp 0.6 --top-p 0.95 --top-k 20 --min-p 0.0
   embed:
     name: "Qwen3-Embedding-4B (document search), card 1"
-    cmd: ${server} --device Vulkan0 -m /models/search/Qwen3-Embedding-4B-Q6_K.gguf --embedding --pooling last -c 8192 -b 8192 -ub 8192 -np 1
+    cmd: ${server} --device Vulkan1 -m /models/search/Qwen3-Embedding-4B-Q6_K.gguf --embedding --pooling last -c 8192 -b 8192 -ub 8192 -np 1
   rerank:
     name: "Qwen3-Reranker-0.6B (document search), card 1"
-    cmd: ${server} --device Vulkan0 -m /models/search/qwen3-reranker-0.6b-q8_0.gguf --reranking -c 8192 -b 8192 -ub 8192 -np 1
+    cmd: ${server} --device Vulkan1 -m /models/search/qwen3-reranker-0.6b-q8_0.gguf --reranking -c 8192 -b 8192 -ub 8192 -np 1
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
-    cmd: ${server} --device Vulkan0,Vulkan1 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
+    cmd: ${server} --device Vulkan1,Vulkan0 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
 routing:
   router:
     use: matrix
