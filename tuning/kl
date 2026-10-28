@@ -12,7 +12,7 @@
 # It stops llama-swap while it runs (the reference needs both cards) and starts it after.
 set -e
 cd "$(dirname "$0")"
-IMG=ghcr.io/ggml-org/llama.cpp:full-vulkan-b11913   # same llama.cpp build (b11913) as llama-swap 267
+IMG=ghcr.io/ggml-org/llama.cpp:full-vulkan-b11913   # official image; llama-swap 267 itself runs b11870 (43 commits older)
 REF_FILE=Qwen3.8-27B-Q8_0.gguf
 REF=kld/qwen3.8-27b-q8_0.c512x32.kld                # under /srv/models
 SAMPLE=/tuning/kld/code-sample.txt                  # fixed text; never edit (checksum in kld/code-sample.sha256)

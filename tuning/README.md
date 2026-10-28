@@ -88,7 +88,7 @@ Which test to use depends on what kind of setting it is.
 
 ## Deeper quality tests
 
-**`./kl`: KL-divergence.** How far a smaller model file, or a context-memory setting, drifts from the full-precision original (Q8_0). Lower is closer. Same llama.cpp build as llama-swap (b11913), same fixed code sample every time (`kld/code-sample.txt`; the script refuses to run if it changes).
+**`./kl`: KL-divergence.** How far a smaller model file, or a context-memory setting, drifts from the full-precision original (Q8_0). Lower is closer. Runs llama.cpp b11913 (official image; llama-swap itself runs b11870), same fixed code sample every time (`kld/code-sample.txt`; the script refuses to run if it changes).
 ```bash
 ./kl base                                             # once, after downloading the 29 GB Q8_0 file
 ./kl test "Q4_K_XL as served"

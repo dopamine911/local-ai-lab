@@ -28,7 +28,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 - BIOS: CSM Support must stay Enabled, or Ubuntu won't boot (installed in legacy mode). This is also why Resizable BAR is off.
 
 ## Known issues
-- llama.cpp b11913 rejects Qwen3.8 requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
+- llama.cpp b11870 (the build inside llama-swap 267) rejects Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
 
 ## Results
 `tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `tuning/bench`, `quality`, `kl`, `tbench`, `compare-skill`; see tuning/README.md.
