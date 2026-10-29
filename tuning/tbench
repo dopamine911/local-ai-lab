@@ -12,6 +12,7 @@
 # Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
 #   MODEL=coder-2 ./tbench smoke "card 2"
 #   TARGET=marvin ./tbench smoke "flash-next"     (marvin's model, labelled as marvin)
+#   TARGET=marvin-strata ./tbench full "strata"   (Strata on marvin; start it first: marvin's strata-test.sh start)
 #
 # With a skill (instruction file added to the agent's prompt; frontmatter stripped):
 #   SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"
@@ -27,6 +28,15 @@ if [ "${TARGET:-zaphod}" = marvin ]; then
   PROFILE="${PROFILE:-mtp3-128k-np2}"; PLATFORM=strixhalo; PLATFORM_NAME="marvin, Radeon 8060S (Strix Halo)"
   CONTEXT_LENGTH="${CONTEXT_LENGTH:-131072}"   # peer models don't advertise it through zaphod
 fi
+# TARGET=marvin-strata: Strata on marvin (plans/strix-strata.md), started with marvin's ~/strata-test/strata-test.sh start
+if [ "${TARGET:-zaphod}" = marvin-strata ]; then
+  MODEL="${MODEL:-qwen3.8-flash-next-unsloth-ud-iq4_xs}"; MODEL_NAME="${MODEL_NAME:-Qwen3.8-Flash-Next}"; QUANT="${QUANT:-UD-IQ4_XS}"
+  PROFILE="${PROFILE:-strata0.2.7-mtp-128k-np2}"; PLATFORM=strixhalo; PLATFORM_NAME="marvin, Radeon 8060S (Strix Halo)"
+  CONTEXT_LENGTH="${CONTEXT_LENGTH:-131072}"; ENDPOINT=http://marvin:8099/v1; ENGINE=strata; BACKEND=hip; BACKEND_VERSION=rocm-gfx1151
+  export MACHINE=marvin
+fi
+ENDPOINT="${ENDPOINT:-http://127.0.0.1:8080/v1}"; ENGINE="${ENGINE:-llama.cpp}"; BACKEND="${BACKEND:-vulkan}"
+BACKEND_VERSION="${BACKEND_VERSION:-mesa-26.0}"
 CTX=(); [ -n "$CONTEXT_LENGTH" ] && CTX=(--context-length "$CONTEXT_LENGTH")
 PLATFORM="${PLATFORM:-r9700}"; PLATFORM_NAME="${PLATFORM_NAME:-zaphod, Radeon AI PRO R9700}"
 MODEL="${MODEL:-coder-tb}"       # card 1, 256K context, q8_0 context memory, MTP
@@ -47,7 +57,10 @@ if [ -n "$SKILL" ]; then
 else
   unset TBENCH_EXTRA_INSTRUCTIONS
 fi
-key() { set -a; . ~/llama-swap/.env; set +a; export TBENCH_API_KEY="$ZAPHOD_KEY"; }
+key() {
+  if [ "$ENGINE" = strata ]; then export TBENCH_API_KEY="$(ssh marvin cat strata-test/key)"   # made per Strata start
+  else set -a; . ~/llama-swap/.env; set +a; export TBENCH_API_KEY="$ZAPHOD_KEY"; fi
+}
 
 log_latest() {
   local note="$1" f
@@ -55,7 +68,7 @@ log_latest() {
       | sort -n | tail -1 | cut -d' ' -f2-)
   [ -n "$f" ] || { echo "No finished $PLATFORM result found yet."; exit 1; }
   echo "== logging $f"
-  MACHINE=zaphod ./log zaphod "$MODEL" "$note" "$f"
+  ./log "${MACHINE:-zaphod}" "$MODEL" "$note" "$f"
 }
 
 run_tier() {
@@ -63,9 +76,9 @@ run_tier() {
   need_repo; key
   export RUN_START=$(date +%s)   # ./log reads real-use speed for this window from llama-swap's request log
   (cd "$DIR" && ./terminal_bench.py run --suite core19 --tier "$tier" \
-     --endpoint http://127.0.0.1:8080/v1 --model "$MODEL" "${CTX[@]}" \
+     --endpoint "$ENDPOINT" --model "$MODEL" "${CTX[@]}" \
      --platform "$PLATFORM" --platform-name "$PLATFORM_NAME" \
-     --model-name "$MODEL_NAME" --engine llama.cpp --backend vulkan --backend-version "mesa-26.0" \
+     --model-name "$MODEL_NAME" --engine "$ENGINE" --backend "$BACKEND" --backend-version "$BACKEND_VERSION" \
      --quant "$QUANT" --inference-profile "$PROFILE")
   log_latest "$note"
 }
@@ -78,7 +91,7 @@ setup)
   ;;
 doctor) need_repo; key
   (cd "$DIR" && ./terminal_bench.py doctor --suite core19 --tier smoke \
-     --endpoint http://127.0.0.1:8080/v1 --model "$MODEL" "${CTX[@]}") ;;
+     --endpoint "$ENDPOINT" --model "$MODEL" "${CTX[@]}") ;;
 smoke) [ -n "$2" ] || usage; run_tier smoke "$2" ;;
 full)  [ -n "$2" ] || usage
   [ -n "$TMUX" ] || { echo "A full run takes about 10 hours. Start it inside tmux:"
