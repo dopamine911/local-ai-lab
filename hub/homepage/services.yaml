@@ -1,23 +1,82 @@
+# Start page services. Live widgets call the services from inside Homepage (keys stay on the server).
+# siteMonitor = the green/red dot with response time; checked from zaphod on the local ports.
 - AI:
     - Chat:
+        icon: open-webui.png
         href: https://chat.{{HOMEPAGE_VAR_DOMAIN}}
         description: Open WebUI, every model on both machines
+        siteMonitor: http://127.0.0.1:3000
+    - zaphod models:
+        icon: mdi-expansion-card
+        href: https://zaphod.{{HOMEPAGE_VAR_DOMAIN}}/ui/
+        description: 2x R9700, loaded right now
+        siteMonitor: http://127.0.0.1:8080/health
+        widget:
+          type: customapi
+          url: http://127.0.0.1:8080/running
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_ZAPHOD_KEY}}
+          refreshInterval: 15000
+          display: dynamic-list
+          mappings:
+            items: running
+            name: name
+            label: state
+    - marvin models:
+        icon: mdi-memory
+        href: https://marvin.{{HOMEPAGE_VAR_DOMAIN}}/ui/
+        description: Bosgame M5, 128 GB shared memory, big models (setting up)
+    - Images (ComfyUI):
+        icon: comfyui.png
+        href: https://comfy.{{HOMEPAGE_VAR_DOMAIN}}
+        description: "Only in image mode: ~/homelab/hub/image-mode on"
+        siteMonitor: http://127.0.0.1:8188
     - Models panel:
+        icon: mdi-tune-variant
         href: https://models.{{HOMEPAGE_VAR_DOMAIN}}
         description: Load and unload models on zaphod and marvin
-    - zaphod llama-swap:
-        href: https://zaphod.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: 2x R9700 (coder, coder-2, ornith, chat, search, speech)
-    - Images (ComfyUI):
-        href: https://comfy.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Only while image mode is on (~/homelab/hub/image-mode on); Z-Image Turbo, Qwen-Image 2.1
-    - marvin llama-swap:
-        href: https://marvin.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: Bosgame M5, big models
-- System:
-    - Tuning results:
+
+- Results:
+    - Latest benchmark runs:
+        icon: mdi-chart-line
         href: https://mlflow.{{HOMEPAGE_VAR_DOMAIN}}
-        description: MLflow, every benchmark with its settings
+        description: MLflow, newest first
+        siteMonitor: http://127.0.0.1:5000/health
+        widget:
+          type: customapi
+          url: http://127.0.0.1:5000/api/2.0/mlflow/runs/search
+          method: POST
+          headers:
+            Content-Type: application/json
+          requestBody:
+            experiment_ids: ["1"]
+            max_results: 6
+            order_by: ["attributes.start_time DESC"]
+          refreshInterval: 60000
+          display: dynamic-list
+          mappings:
+            items: runs
+            name: info.run_name
+            label: info.start_time
+            format: relativeDate
+
+- System:
     - Monitoring:
+        icon: beszel.png
         href: https://monitor.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Beszel, CPU, RAM, GPU, temperatures
+        description: Beszel, both machines
+        siteMonitor: http://127.0.0.1:8090
+        widget:
+          type: beszel
+          url: http://127.0.0.1:8090
+          username: "{{HOMEPAGE_VAR_BESZEL_USER}}"
+          password: "{{HOMEPAGE_VAR_BESZEL_PASSWORD}}"
+          version: 2
+    - Web search (SearXNG):
+        icon: searxng.png
+        description: Used by Open WebUI's web search (local only)
+        siteMonitor: http://127.0.0.1:8888
+    - Open Terminal:
+        icon: mdi-console
+        description: Code runner for Open WebUI (local only)
+        siteMonitor: http://127.0.0.1:8000

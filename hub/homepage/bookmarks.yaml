@@ -1,1 +1,28 @@
----
+# Links that are not services of this lab.
+- Lab:
+    - Repo (local-ai-lab):
+        - icon: github.png
+          href: https://github.com/dopamine911/local-ai-lab
+    - Tailscale admin:
+        - icon: tailscale.png
+          href: https://login.tailscale.com/admin/machines
+    - Cloudflare DNS:
+        - icon: cloudflare.png
+          href: https://dash.cloudflare.com/
+- Upstream releases:
+    - llama.cpp:
+        - icon: mdi-github
+          href: https://github.com/ggml-org/llama.cpp/releases
+    - llama-swap:
+        - icon: mdi-github
+          href: https://github.com/mostlygeek/llama-swap/releases
+    - Open WebUI:
+        - icon: open-webui.png
+          href: https://github.com/open-webui/open-webui/releases
+- Models:
+    - Hugging Face (unsloth):
+        - icon: hugging-face.png
+          href: https://huggingface.co/unsloth
+    - Hugging Face (trending GGUF):
+        - icon: hugging-face.png
+          href: https://huggingface.co/models?library=gguf&sort=trending

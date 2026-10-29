@@ -69,7 +69,7 @@ Restore the `.env` files from your password manager (or make new ones; each `.en
 | --- | --- | --- |
 | `zaphod/llama-swap/.env` | `ZAPHOD_KEY` | New one: `printf 'ZAPHOD_KEY=%s\n' "$(openssl rand -hex 24)"`; then update hub/.env and every app that uses it |
 | `marvin/llama-swap/.env` | `MARVIN_KEY`, `BESZEL_KEY`, `TAILSCALE_IP` | New `MARVIN_KEY` as above; `BESZEL_KEY` = same as hub/.env; `TAILSCALE_IP` = `tailscale ip -4` |
-| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
+| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
 
 Then build and start (each `compose.yaml` has its `build:` lines):
 

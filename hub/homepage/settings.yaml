@@ -1,3 +1,16 @@
 title: Homelab
 theme: dark
+color: slate
 headerStyle: clean
+statusStyle: dot
+hideVersion: true
+layout:
+  AI:
+    style: row
+    columns: 3
+  Results:
+    style: row
+    columns: 1
+  System:
+    style: row
+    columns: 3

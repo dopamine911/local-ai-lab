@@ -1,1 +1,17 @@
----
+# Top bar. "resources" reads zaphod's own CPU, memory and disk (Homepage runs on zaphod).
+- greeting:
+    text_size: xl
+    text: zaphod + marvin
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+    cputemp: true
+    uptime: true
+    units: metric
+- datetime:
+    text_size: l
+    format:
+      dateStyle: medium
+      timeStyle: short
+      hour12: false
