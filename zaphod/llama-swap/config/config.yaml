@@ -59,6 +59,16 @@ models:
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan1,Vulkan0 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
+profiles:
+  image-mode:
+    description: "Card 2 lent to ComfyUI (hub/image-mode on): coder-2 answered by coder; other card-2 chat models off"
+    pins:
+      coder-2: coder
+      ornith: ~
+      chat: ~
+      north: ~
+      flint: ~
+      tts-qwen: ~
 routing:
   router:
     use: matrix
