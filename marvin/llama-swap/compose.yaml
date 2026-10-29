@@ -1,9 +1,9 @@
 # llama-swap on marvin (Bosgame M5, Strix Halo, 128 GB shared memory).
-# Build: docker build -t llama-swap-zaphod:267 ~/llama-swap   (same image as zaphod)
+# Build: docker build -t llama-swap-marvin:267 ~/llama-swap   (same Dockerfile as zaphod's text-only image)
 # Start: docker compose up -d     Logs: docker compose logs -f
 services:
   llama-swap:
-    image: llama-swap-zaphod:267
+    image: llama-swap-marvin:267
     container_name: llama-swap
     restart: unless-stopped
     # Only marvin itself can reach 8080; `tailscale serve` exposes it to the tailnet.

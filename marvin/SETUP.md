@@ -11,3 +11,5 @@ One step at a time; each step records what was checked and the result.
 | 4 | 2026-10-29 | Tailscale (plain `tailscale up`, no `--ssh`); GitHub keys via `ssh-import-id gh:dopamine911` | zaphod logs in with `ssh marvin`, no password |
 | 5 | 2026-10-29 | Checked GPU memory limit (GTT) before any change | **62,814 MB** (default: about half of RAM). Docker not installed yet. |
 | 6 | 2026-10-29 | Boot settings `amdgpu.gttsize=122880 ttm.pages_limit=31457280` in `/etc/default/grub.d/90-gpu-memory.cfg` | GPU limit 62,814 → **122,880 MB**; both settings in `/proc/cmdline`. Not yet tested with a real model load. `amd_iommu=off` not set (separate test later). |
+| 7 | 2026-10-29 | Docker 29.1.3 (Ubuntu `docker.io`, same as zaphod); user in docker, render, video | `docker` works without sudo |
+| 8 | 2026-10-29 | Repo cloned to `~/homelab`, `~/llama-swap` → `~/homelab/marvin/llama-swap`; image `llama-swap-marvin:267` built | llama.cpp sees `Vulkan0: Radeon 8060S (RADV STRIX_HALO)`, **123,392 MiB** |
