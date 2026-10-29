@@ -5,12 +5,15 @@ headerStyle: clean
 statusStyle: dot
 hideVersion: true
 layout:
-  AI:
+  zaphod:
     style: row
-    columns: 3
-  Results:
+    columns: 4
+  marvin:
     style: row
-    columns: 1
-  System:
+    columns: 4
+  Apps:
     style: row
-    columns: 3
+    columns: 4
+  Background services:
+    style: row
+    columns: 4

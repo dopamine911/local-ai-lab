@@ -163,7 +163,8 @@ services:
       PORT: 3001
       HOMEPAGE_ALLOWED_HOSTS: ${DOMAIN},homepage.${DOMAIN}
       HOMEPAGE_VAR_DOMAIN: ${DOMAIN}
-      HOMEPAGE_VAR_ZAPHOD_KEY: ${ZAPHOD_KEY}            # loaded-models widget
+      HOMEPAGE_VAR_ZAPHOD_KEY: ${ZAPHOD_KEY}            # loaded-models widgets
+      HOMEPAGE_VAR_MARVIN_KEY: ${MARVIN_KEY}
       HOMEPAGE_VAR_BESZEL_USER: ${BESZEL_USER:-}        # Beszel widget: your Beszel login (email)
       HOMEPAGE_VAR_BESZEL_PASSWORD: ${BESZEL_PASSWORD:-}
     volumes:

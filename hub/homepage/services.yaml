@@ -1,15 +1,13 @@
-# Start page services. Live widgets call the services from inside Homepage (keys stay on the server).
-# siteMonitor = the green/red dot with response time; checked from zaphod on the local ports.
-- AI:
-    - Chat:
-        icon: open-webui.png
-        href: https://chat.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Open WebUI, every model on both machines
-        siteMonitor: http://127.0.0.1:3000
-    - zaphod models:
-        icon: mdi-expansion-card
+# Start page. One row per machine (models loaded, system stats, GPU), then apps and background services.
+# Live widgets are fetched by Homepage on zaphod (keys stay on the server).
+# siteMonitor = the green/red dot with response time.
+# GPU tiles read gpu-stats (hub/gpu-stats): zaphod 127.0.0.1:9101, marvin marvin:9101 (Tailscale).
+
+- zaphod:
+    - Models loaded:
+        icon: mdi-brain
         href: https://zaphod.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: 2x R9700, loaded right now
+        description: llama-swap
         siteMonitor: http://127.0.0.1:8080/health
         widget:
           type: customapi
@@ -22,10 +20,127 @@
             items: running
             name: name
             label: state
-    - marvin models:
-        icon: mdi-memory
+    - System:
+        icon: beszel.png
+        href: https://monitor.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Ryzen 9 3900X, 60 GB
+        widget:
+          type: beszel
+          url: http://127.0.0.1:8090
+          username: "{{HOMEPAGE_VAR_BESZEL_USER}}"
+          password: "{{HOMEPAGE_VAR_BESZEL_PASSWORD}}"
+          version: 2
+          systemId: zaphod
+          fields: ["status", "cpu", "memory", "disk", "network"]
+    - Card 1 (OCuLink):
+        icon: mdi-expansion-card
+        description: R9700 32 GB, PCI 06:00.0, llama.cpp Vulkan1
+        widget:
+          type: customapi
+          url: http://127.0.0.1:9101/
+          refreshInterval: 5000
+          mappings:
+            - field: cards.0.busy_pct
+              label: Load
+              format: number
+              suffix: "%"
+            - field: cards.0.mem_used_gb
+              label: Memory
+              format: float
+              suffix: " GB"
+            - field: cards.0.temp_c
+              label: Temp
+              format: number
+              suffix: " °C"
+            - field: cards.0.power_w
+              label: Power
+              format: number
+              suffix: " W"
+    - Card 2 (x16):
+        icon: mdi-expansion-card
+        description: R9700 32 GB, PCI 0b:00.0, llama.cpp Vulkan0
+        widget:
+          type: customapi
+          url: http://127.0.0.1:9101/
+          refreshInterval: 5000
+          mappings:
+            - field: cards.1.busy_pct
+              label: Load
+              format: number
+              suffix: "%"
+            - field: cards.1.mem_used_gb
+              label: Memory
+              format: float
+              suffix: " GB"
+            - field: cards.1.temp_c
+              label: Temp
+              format: number
+              suffix: " °C"
+            - field: cards.1.power_w
+              label: Power
+              format: number
+              suffix: " W"
+
+- marvin:
+    - Models loaded:
+        icon: mdi-brain
         href: https://marvin.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: Bosgame M5, 128 GB shared memory, big models (setting up)
+        description: llama-swap (setting up)
+        siteMonitor: http://marvin:8080/health
+        widget:
+          type: customapi
+          url: http://marvin:8080/running
+          headers:
+            Authorization: Bearer {{HOMEPAGE_VAR_MARVIN_KEY}}
+          refreshInterval: 15000
+          display: dynamic-list
+          mappings:
+            items: running
+            name: name
+            label: state
+    - System:
+        icon: beszel.png
+        href: https://monitor.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Ryzen AI Max+ 395, 128 GB
+        widget:
+          type: beszel
+          url: http://127.0.0.1:8090
+          username: "{{HOMEPAGE_VAR_BESZEL_USER}}"
+          password: "{{HOMEPAGE_VAR_BESZEL_PASSWORD}}"
+          version: 2
+          systemId: marvin
+          fields: ["status", "cpu", "memory", "disk", "network"]
+    - GPU (Radeon 8060S):
+        icon: mdi-chip
+        description: Shared memory, 120 GB usable by the GPU
+        widget:
+          type: customapi
+          url: http://marvin:9101/
+          refreshInterval: 5000
+          mappings:
+            - field: cards.0.busy_pct
+              label: Load
+              format: number
+              suffix: "%"
+            - field: cards.0.mem_used_gb
+              label: Memory
+              format: float
+              suffix: " GB"
+            - field: cards.0.temp_c
+              label: Temp
+              format: number
+              suffix: " °C"
+            - field: cards.0.power_w
+              label: Power
+              format: number
+              suffix: " W"
+
+- Apps:
+    - Chat:
+        icon: open-webui.png
+        href: https://chat.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Open WebUI, every model on both machines
+        siteMonitor: http://127.0.0.1:3000
     - Images (ComfyUI):
         icon: comfyui.png
         href: https://comfy.{{HOMEPAGE_VAR_DOMAIN}}
@@ -35,8 +150,6 @@
         icon: mdi-tune-variant
         href: https://models.{{HOMEPAGE_VAR_DOMAIN}}
         description: Load and unload models on zaphod and marvin
-
-- Results:
     - Latest benchmark runs:
         icon: mdi-chart-line
         href: https://mlflow.{{HOMEPAGE_VAR_DOMAIN}}
@@ -60,18 +173,12 @@
             label: info.start_time
             format: relativeDate
 
-- System:
-    - Monitoring:
+- Background services:
+    - Monitoring (Beszel):
         icon: beszel.png
         href: https://monitor.{{HOMEPAGE_VAR_DOMAIN}}
-        description: Beszel, both machines
+        description: History, alerts, containers, disk health
         siteMonitor: http://127.0.0.1:8090
-        widget:
-          type: beszel
-          url: http://127.0.0.1:8090
-          username: "{{HOMEPAGE_VAR_BESZEL_USER}}"
-          password: "{{HOMEPAGE_VAR_BESZEL_PASSWORD}}"
-          version: 2
     - Web search (SearXNG):
         icon: searxng.png
         description: Used by Open WebUI's web search (local only)
@@ -80,3 +187,7 @@
         icon: mdi-console
         description: Code runner for Open WebUI (local only)
         siteMonitor: http://127.0.0.1:8000
+    - GPU stats:
+        icon: mdi-gauge
+        description: Feeds the card tiles (hub/gpu-stats)
+        siteMonitor: http://127.0.0.1:9101
