@@ -1,7 +1,22 @@
 # Plan: test Strata (Qwen3.8-Flash-Next) on zaphod
 
-Status: waiting. Files: /srv/models/strata/qwen3.8-flash-next-gsq-rco/IQ3_XXS (done), IQ3_S (downloading).
-Image: ghcr.io/niko1221/strata:0.2.7-rocm-gfx120x (pulled). Needs both cards: llama-swap paused while it runs.
+Status: first test done 2026-10-29 (results: tuning/results.md, "Strata" section). Files:
+/srv/models/strata/qwen3.8-flash-next-gsq-rco/IQ3_XXS (71 GB, tested), IQ3_S (downloaded, not tested).
+Image: ghcr.io/niko1221/strata:0.2.7-rocm-gfx120x. Needs both cards: llama-swap paused while it runs.
+
+## Results 2026-10-29 (IQ3_XXS, free VRAM before each start: 57 MB used on both cards)
+| Setting | Cards used | Writing tok/s | Tool-use score | Full suite |
+| --- | --- | ---: | --- | ---: |
+| `GPUS=all` | card 1 only (engine's choice) | 65 | 86 / 92 / 86 (temp 0; 1.0 s1; 1.0 s2) | 33 min |
+| `GPUS=0,1` | both, main = card 2 | 85 | 90 (temp 0) | 12 min |
+Always set `GPUS=0,1`; `GPUS=all` silently uses one card. Strata rejects the JSON-schema request format (about 4 points
+per run). Test scripts: copies kept in plans/strata-test/ (they stop llama-swap and always restart it at the end).
+
+## Possible next tests (one at a time)
+1. Two cards, two more seeds at temp 1.0 (is 90 steady?).
+2. `GPUS=1,0` (main card = card 1) to split the speed gain between "second card" and "main card on x16".
+3. IQ3_S (bigger, better quality) on two cards.
+4. A long-prompt reading-speed test.
 
 ## Test rules
 - Record free memory on both cards before every Strata start. UnbiasedStrata (an NVIDIA-only rewrite,
