@@ -45,6 +45,14 @@ models:
     name: "Whisper large-v3-turbo speech-to-text (99 languages), card 2"
     cmd: whisper-server --host 127.0.0.1 --port ${PORT} --device 0 -m /models/speech/ggml-large-v3-turbo-q8_0.bin -l auto --inference-path /v1/audio/transcriptions
     checkEndpoint: /
+  tts:
+    name: "Kokoro-82M text-to-speech (default, 54 voices), card 2"
+    cmd: audiocpp_server --config /etc/llama-swap/config/tts.json --port ${PORT} --no-ui
+    checkEndpoint: /health
+  tts-qwen:
+    name: "Qwen3-TTS-1.7B text-to-speech (10 languages, style instructions), card 2; runs with coder-2, not ornith"
+    cmd: audiocpp_server --config /etc/llama-swap/config/tts-qwen.json --port ${PORT} --no-ui
+    checkEndpoint: /health
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan1,Vulkan0 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
@@ -54,9 +62,10 @@ routing:
     settings:
       matrix:
         sets:
-          helpers: "embed & rerank & stt & stt-whisper"   # small models that stay loaded next to everything below
+          helpers: "embed & rerank & stt & stt-whisper & tts"   # small models that stay loaded next to everything below
           one_per_card: "+helpers & (coder | coder-tb) & (coder-2 | flint | north | ornith)"
+          voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
 hooks:
   on_startup:
-    preload: [coder, coder-2, embed, rerank, stt, stt-whisper]
+    preload: [coder, coder-2, embed, rerank, stt, stt-whisper, tts]

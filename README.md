@@ -39,6 +39,10 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
 - **Speech-to-text (on zaphod):** Admin Panel → Settings → Audio → Speech-to-Text Engine: **OpenAI**,
   URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `stt` (Qwen3-ASR, ~30 languages).
   For other languages use model `stt-whisper` (Whisper, 99 languages).
+- **Text-to-speech (on zaphod):** Admin Panel → Settings → Audio → Text-to-Speech Engine: **OpenAI**,
+  URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `tts`, voice `af_heart` (Kokoro; other voices such as
+  `bf_emma`, `am_michael`, `bm_george`). For a more expressive voice or other languages: model `tts-qwen`,
+  voice `Ryan` or `Vivian` (unloads `ornith` if it is loaded).
 - Built in already (no setup): read a web page, current time, run code, memory, knowledge bases.
 - Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
 - `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.

@@ -50,3 +50,7 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
   (also Cohere Transcribe) transcribed jfk.wav exactly in 0.16-0.33 s; picked by Open ASR leaderboard accuracy.
   Helpers (embed, rerank, stt, stt-whisper) now preload at startup. Memory with all loaded: card 1 29.7 GB, card 2 25.5 GB.
   Open WebUI connection: set by hand (README.md, Open WebUI tools).
+- 2026-10-29 Step 5 done: `tts` = Kokoro-82M Q8_0 (always loaded, 10 s of speech in 0.4 s) and `tts-qwen` = Qwen3-TTS-12Hz-1.7B
+  CustomVoice Q8_0 (2.2 s per 10 s; runs only next to coder-2, set `voice`). Both on card 2, audio.cpp packages pinned to
+  rev 874fcb41. Round-trip through stt: Kokoro said "4.5" as "four, five"; Qwen-TTS's "Zaphod" was heard as "Zefot".
+  Memory: card 2 28.5 GB with coder-2 + all helpers + tts-qwen; 28.4 GB with ornith + helpers.
