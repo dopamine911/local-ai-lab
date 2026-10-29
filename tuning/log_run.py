@@ -11,6 +11,8 @@ Examples:
 What it records:
   - settings: every flag of the command llama-swap is running for <model>
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
+  - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
+  - model.* tags: the exact model file, Hugging Face repo, revision and sha256 (from setup/models-<machine>.txt)
   - settings + results from any llama-bench .jsonl file you attach
   - each name=value you give as a result, your note, and the files themselves
 """
@@ -48,6 +50,49 @@ def server_cmd(machine, model):
         if m.get("model") == model:
             return m.get("cmd", "")
     return None
+
+
+def manifest_tags():
+    """env.<key> tags from the MANIFEST lines that ./log collected with manifest.sh."""
+    tags = {}
+    for line in os.environ.get("MANIFEST", "").splitlines():
+        if "=" in line:
+            k, v = line.split("=", 1)
+            tags[f"env.{k.strip()}"] = v.strip()[:500]
+    return tags
+
+
+def model_tags(machine, cmd):
+    """model.* tags: which exact file was served, looked up in the pinned list setup/models-<machine>.txt."""
+    tags = {}
+    args = shlex.split(cmd)
+    files = {"model": None, "draft": None}
+    for i, a in enumerate(args[:-1]):
+        if a in ("-m", "--model"):
+            files["model"] = args[i + 1]
+        elif a in ("-md", "--model-draft"):
+            files["draft"] = args[i + 1]
+    pinned = {}
+    try:
+        with open(f"/setup/models-{machine}.txt") as f:
+            for line in f:
+                p = line.split()
+                if len(p) == 6 and not line.startswith("#"):
+                    pinned[p[3]] = {"repo": p[0], "rev": p[1][:10], "sha256": p[5][:16]}
+    except OSError:
+        pass
+    for kind, path in files.items():
+        if not path:
+            continue
+        rel = path.removeprefix("/models/")
+        prefix = "model" if kind == "model" else "model.draft"
+        tags[f"{prefix}.file"] = rel
+        info = pinned.get(rel)
+        if info:
+            tags.update({f"{prefix}.repo": info["repo"], f"{prefix}.rev": info["rev"], f"{prefix}.sha256": info["sha256"]})
+        else:
+            tags[f"{prefix}.pinned"] = "no (not in setup/models-%s.txt)" % machine
+    return tags
 
 
 def is_flag(token):
@@ -198,7 +243,9 @@ def main():
         if os.environ.get("SKILL_NAME"):
             mlflow.log_params({"skill": os.environ["SKILL_NAME"], "skill.sha": os.environ.get("SKILL_SHA", "")})
             mlflow.set_tag("skill", os.environ["SKILL_NAME"])
+        mlflow.set_tags(manifest_tags())
         if cmd:
+            mlflow.set_tags(model_tags(machine, cmd))
             mlflow.log_params(flags_to_params(cmd))
             mlflow.log_text(cmd, "server_cmd.txt")
         for item in rest:

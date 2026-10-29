@@ -5,8 +5,12 @@ set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 M="$1"; case "$2" in marvin/*) M=marvin ;; esac   # peer models ("marvin/big") belong to that machine
 CONFIG_COMMIT=$(cd "$HOME/homelab/$M/llama-swap" && git log -1 --format="%h %s" -- . 2>/dev/null || echo unknown)  # last change to that machine's llama-swap folder
+# Machine and software facts from the machine that served the model (tuning/manifest.sh)
+if [ "$M" = "$(hostname)" ]; then MANIFEST=$("$HERE/manifest.sh")
+else MANIFEST=$(ssh -o ConnectTimeout=10 "$M" bash -s < "$HERE/manifest.sh" 2>/dev/null || echo "host=$M (unreachable)"); fi
 docker run --rm --network host \
-  -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA \
+  -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA -e MANIFEST="$MANIFEST" \
+  -v "$HERE/../setup:/setup:ro" \
   --env-file "$HOME/homelab/hub/.env" \
   -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \
   ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@" 2>&1 | grep -vE "View (run|experiment) "

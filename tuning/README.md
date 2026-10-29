@@ -64,6 +64,15 @@ Use the middle of the three numbers in `./log`.
 
 Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. Settings that differ are shown side by side, and you can chart any setting against any result. Your note is on each run's page.
 
+**What each run records** (since 2026-10-29), on the run page under Tags:
+- `env.*`: the machine that served the model: board and BIOS, CPU, RAM, GPUs (PCI address + VBIOS), `vulkan_devices`
+  (llama.cpp's names and numbering), kernel, Mesa, image, `llama_cpp_commit`, `llama_swap_version`. Collected by
+  `manifest.sh` on that machine (marvin over SSH). Filter example: `tags.env.llama_cpp_commit = "74bca39"`.
+- `model.*` and `model.draft.*`: the exact model and MTP draft files, with Hugging Face repo, revision and sha256 from
+  `setup/models-<machine>.txt`. `model.pinned = no` means the file is missing from that list: add it.
+- Settings: every flag of the server command, one field each (context `c`, slots `np`, `spec-draft-n-max`, `temp`, ...).
+Runs before 2026-10-29 afternoon have no `env.*`/`model.*` tags; their settings commit (`config_commit`) still applies.
+
 **Is a difference real?** Run each test 3 times. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
 
 **Things that skew results:** a second model busy on the same card, a chat in progress, heat (watch Beszel), and llama.cpp updates (re-test after updating the image).
