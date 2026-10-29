@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Summarize repeated runs of one setup (MLflow tag "series"): count, average, lowest, highest.
+#   ./series            every series
+#   ./series marvin     only series whose name contains "marvin"
+# Start a series:  SERIES=<name> ./quality <model> "<note>" --full --seed 1   (same name for every repeat)
+# In the MLflow page: runs table > "Group by" > tag series, to see the same numbers there.
+docker run --rm --network host -e GIT_PYTHON_REFRESH=quiet -e FILTER="${1:-}" ghcr.io/mlflow/mlflow:v3.17.2 python -c '
+import mlflow, os, statistics as st, collections
+mlflow.set_tracking_uri("http://127.0.0.1:5000"); c = mlflow.MlflowClient()
+groups = collections.defaultdict(list)
+for r in c.search_runs(["1"], "tags.series != \"\"", max_results=1000):
+    if os.environ["FILTER"] in r.data.tags["series"]:
+        groups[r.data.tags["series"]].append(r)
+keys = [("tooleval_score_common", "score"), ("sort_wrong", "wrong"), ("sort_honest_stop", "honest stop"), ("sort_fabrication", "made up")]
+for name, runs in sorted(groups.items()):
+    print(f"== {name}  ({len(runs)} runs)")
+    for k, label in keys:
+        v = [r.data.metrics[k] for r in runs if k in r.data.metrics]
+        if v:
+            print(f"   {label:12} average {st.mean(v):5.1f}   lowest {min(v):4.0f}   highest {max(v):4.0f}   spread {max(v)-min(v):3.0f}")
+' 2>&1 | grep -v -i warn

@@ -11,6 +11,7 @@ Examples:
 What it records:
   - settings: every flag of the command llama-swap is running for <model>
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
+  - series tag (SERIES=name ./quality ...): repeats of one setup, grouped in MLflow
   - benchmark tag: speed, tool-use, terminal-bench, kl-divergence, history or manual
   - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
   - model.* tags: the exact model file, Hugging Face repo, revision and sha256 (from setup/models-<machine>.txt)
@@ -208,7 +209,24 @@ def read_tool_eval(path):
     }
     for c in s.get("category_scores", []):
         metrics[f"tooleval_cat_{c['category']}"] = c["percent"]
+    common = common_score(s)
+    if common is not None:
+        metrics["tooleval_score_common"] = common
     return params, metrics
+
+
+# The 4 JSON-format scenarios. tool-eval leaves them out when the server rejects them (llama.cpp's grammar bug) but
+# scores them when it doesn't (Strata), so raw scores aren't comparable. The common score always leaves them out.
+COMMON_EXCLUDE = {"TC-65", "TC-66", "TC-67", "TC-69"}
+
+
+def common_score(scores):
+    """Score out of 100 without the JSON scenarios: pass = 2 points, partial = 1, fail = 0 (tool-eval's scale)."""
+    pts = {"pass": 2, "partial": 1, "fail": 0}
+    keep = [r for r in scores.get("scenario_results", []) if r.get("scenario_id") not in COMMON_EXCLUDE]
+    if not keep:
+        return None
+    return int(100 * sum(pts.get(r["status"], 0) for r in keep) / (2 * len(keep)) + 0.5)
 
 
 KLD_LINES = {  # llama-perplexity --kl-divergence output label -> MLflow metric name
@@ -258,6 +276,8 @@ def main():
     with mlflow.start_run(run_name=f"{machine}/{model}", description=note) as run:
         mlflow.set_tags({"machine": machine, "model": model, "mlflow.note.content": note,
                          "config_commit": os.environ.get("CONFIG_COMMIT", "unknown")})
+        if os.environ.get("SERIES"):  # repeats of one setup (seeds, temperatures): group by this tag in MLflow
+            mlflow.set_tag("series", os.environ["SERIES"])
         if os.environ.get("SKILL_NAME"):
             mlflow.log_params({"skill": os.environ["SKILL_NAME"], "skill.sha": os.environ.get("SKILL_SHA", "")})
             mlflow.set_tag("skill", os.environ["SKILL_NAME"])

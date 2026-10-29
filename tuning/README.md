@@ -73,9 +73,14 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
 - `model.*` and `model.draft.*`: the exact model and MTP draft files, with Hugging Face repo, revision and sha256 from
   `setup/models-<machine>.txt`. `model.pinned = no` means the file is missing from that list: add it.
 - Settings: every flag of the server command, one field each (context `c`, slots `np`, `spec-draft-n-max`, `temp`, ...).
+- `series`: repeats of one setup (different seeds or temperatures). Start one with `SERIES=<name> ./quality ...`;
+  `./series` prints average, lowest, highest and spread per series; in MLflow use the runs table's **Group by > series**.
+- `tooleval_score_common` (tool-use): the score **without the 4 JSON scenarios** (TC-65/66/67/69). Use this one to
+  compare models: llama.cpp's grammar bug removes those scenarios for some models but not others, so the raw
+  `tooleval_score` is on different bases (out of 130 or 138 points). Added to all older tool-use runs too.
 Runs before 2026-10-29 afternoon have no `env.*`/`model.*` tags; their settings commit (`config_commit`) still applies.
 
-**Is a difference real?** Run each test 3 times. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
+**Is a difference real?** Run each test 3 times as one series (`SERIES=...`), then `./series`. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
 
 **Things that skew results:** a second model busy on the same card, a chat in progress, heat (watch Beszel), and llama.cpp updates (re-test after updating the image).
 

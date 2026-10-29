@@ -8,6 +8,8 @@
 #   ./quality coder "temp 0.6" --temperature 0.6
 #   SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full
 #     (SKILL adds an instruction file after the built-in system prompt; frontmatter is stripped)
+#   SERIES=ornith-temp0.6 ./quality ornith "seed 2" --full --temperature 0.6 --seed 2
+#     (SERIES groups repeats of one setup; ./series shows average, lowest, highest)
 #   BASE_URL=http://127.0.0.1:8099/v1 API_KEY=... ./quality strata "..." --full
 #     (another OpenAI-compatible server instead of llama-swap)
 #
