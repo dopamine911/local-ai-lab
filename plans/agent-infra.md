@@ -86,6 +86,20 @@ the private repo's contents are inside it.
 
 Good result: an agent asked "how did we fix the slow card?" finds `problems/2026-10-28-slow-gpu-card.md`.
 
+### 4b. Memory from conversations: mem0 (candidate, Daniel 2026-10-29)
+github.com/mem0ai/mem0 (Apache 2.0). Different job from LocalRecall: an LLM reads conversations and keeps facts and
+decisions ("Daniel prefers...", "we decided..."), so every agent knows them next session. LocalRecall searches documents.
+Checked 2026-10-29, conditions before use:
+1. Telemetry is ON by default (PostHog, us.i.posthog.com: OS version, processor, model and store names; start/reset
+   events always, others sampled 10%). Set `MEM0_TELEMETRY=false` AND run it on an internal Docker network with no
+   route out (like plans/strix-strata.md), so a missed setting fails closed.
+2. Default LLM and embedder are OpenAI (`gpt-5-mini`, `text-embedding-3-small`): point both at llama-swap (`embed` +
+   a chat model); the sealed network stops a fallback to OpenAI.
+3. No official MCP server in its README; community ones (e.g. elvismdev/mem0-mcp-selfhosted) need a code review first.
+   No GitHub releases shown: pin a commit or a PyPI version at least 2 weeks old.
+4. Every memory write is a model call: measure load on zaphod and how well the local model picks what to keep.
+Good result: tell one agent a rule; a different agent, new session, follows it without being told.
+
 ### 5. Reading the web: page fetch and a browser
 Clean page text for agents (candidate *(check)*: Crawl4AI) and a browser they can drive (Playwright MCP *(check)*),
 both behind the gateway.
