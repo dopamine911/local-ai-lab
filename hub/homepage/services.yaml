@@ -85,7 +85,7 @@
     - Models loaded:
         icon: mdi-brain
         href: https://marvin.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: llama-swap (setting up)
+        description: llama-swap, Qwen3.8-Flash-Next + MTP (~40 tok/s)
         siteMonitor: http://marvin:8080/health
         widget:
           type: customapi
