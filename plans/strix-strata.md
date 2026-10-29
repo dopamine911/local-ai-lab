@@ -65,9 +65,22 @@ always restarted at the end (script `trap`, like plans/strata-test/). `marvin/bi
 Go on to the port if Strata on marvin clearly wins, e.g. **reading at least 2x llama.cpp** in the 32K test and real use,
 with tool-use and Terminal-Bench at least as good. If not: write down why and stop; the llama.cpp setup stays.
 
-## Phase 3: port UnbiasedStrata to AMD gfx1151 (estimate 1-2 days, some risk)
+## Phase 3: port UnbiasedStrata to AMD gfx1151 (now likely hours: others did the HIP build part)
 
-Work in Daniel's fork (github.com/dopamine911/UnbiasedStrata), branch `hip-gfx1151`; one change per commit.
+Existing work (checked 2026-10-29, both open, no maintainer reply yet):
+- **PR #19** (firetussin, 2026-10-21, commit 115af49): `make build BACKEND=hip` (Makefile + README only), CUDA stays
+  default. Tested on RX 6700 XT (gfx1031): full HIP build, `make test` passes, chat/streaming/tool calls work.
+  https://github.com/robertkarl/UnbiasedStrata/pull/19
+- **Issue #6** (axelgenus, 2026-10-14): built on RX 6900 XT (gfx1030) with ROCm 7.0 in Docker using 3 patches (stub
+  files for missing HIP test/tool targets, `unbiased-strata` target enabled for HIP, a `__shared__ alignas(16)` fix
+  clang-HIP rejects in src/kernels/cuda/iq_kernels.cu). Runs Flash-Next daily.
+  https://github.com/robertkarl/UnbiasedStrata/issues/6
+So: start from PR #19's commit (+ issue #6 patches only if our build needs them). Our part is the gfx1151-specific
+work: architecture flag, hipBLASLt tuning table for ROCm 7.14.1, unified-memory behavior, container recipe, tests.
+
+
+Work in Daniel's fork (github.com/dopamine911/UnbiasedStrata), branch `hip-gfx1151` based on PR #19's commit;
+one change per commit.
 1. **Read first**: how `make build` drives CMake for CUDA; upstream's HIP CMake (`cmake/hip_backend.cmake`, flags
    `STRATA_ENABLE_HIP=ON`, `CMAKE_HIP_ARCHITECTURES=gfx1151`, `STRATA_PREFILL_MMQ=ON`) and the hipBLASLt tuning table
    (`tools/hip/gfx1151-hipblaslt-100401.txt`, needs ROCm 7.14.1 = hipBLASLt 100401).
@@ -82,13 +95,16 @@ Work in Daniel's fork (github.com/dopamine911/UnbiasedStrata), branch `hip-gfx11
 5. **Run it like llama.cpp**: if it wins, a `big-strata` entry in marvin's llama-swap (llama-swap starts the binary;
    one engine loaded at a time), so Open WebUI, agents and zaphod see it like any other model.
 
-## Phase 4: pull request to UnbiasedStrata
+## Phase 4: contribute upstream (results first, PR only for what is new)
 
-1. Read the project's contributing notes and open issues first; ask in an issue whether AMD support is wanted and in
-   what shape, before a big PR.
-2. PR content: the HIP build option, the container build recipe, measurements (Phase 1 vs Phase 3 vs llama.cpp, one
+1. Don't open a competing AMD PR. Post the Strix Halo (gfx1151) results as a comment on PR #19 and issue #6: first
+   validation on a third AMD family, with the measurements table. That supports getting #19 merged.
+2. Only gfx1151-specific fixes (tuning table, unified-memory notes, any build fix #19 lacks) go in a small follow-up PR
+   on top of #19, after asking in issue #6 whether the maintainer wants it.
+3. Expect a wait: neither #6 nor #19 had a maintainer reply after 1-2 weeks. marvin runs our own pinned build anyway.
+4. Content of results/PR: the container build recipe, measurements (Phase 1 vs Phase 3 vs llama.cpp, one
    table, machine details from `tuning/manifest.sh`), and what was NOT validated (Windows, other AMD chips).
-3. Small, reviewable commits; CUDA path untouched; no secrets or machine names beyond hardware in the PR.
+5. Small, reviewable commits; CUDA path untouched; no secrets or machine names beyond hardware in the PR.
 
 ## Risks
 
