@@ -89,7 +89,8 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
 - `tooleval_score_common` (tool-use): the score **without the 4 JSON scenarios** (TC-65/66/67/69). Use this one to
   compare models: llama.cpp's grammar bug removes those scenarios for some models but not others, so the raw
   `tooleval_score` is on different bases (out of 130 or 138 points). Added to all older tool-use runs too.
-Runs before 2026-10-29 afternoon have no `env.*`/`model.*` tags; their settings commit (`config_commit`) still applies.
+Older runs: `model.*` was added afterwards from each run's saved server command (tag `model.backfilled`); 25 runs, all
+files found in the pinned lists. Runs before 2026-10-29 afternoon have no `env.*` tags; their settings commit (`config_commit`) still applies.
 
 **Is a difference real?** Run each test 3 times as one series (`SERIES=...`), then `./series`. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
 
