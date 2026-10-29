@@ -137,6 +137,22 @@ services:
       - ./data/comfyui/user:/home/comfy/ComfyUI/user
       - ./data/comfyui/custom_nodes:/home/comfy/ComfyUI/custom_nodes
 
+  # GPU load, memory, temperature and power for the Homepage start page (read-only, from /sys).
+  gpu-stats:
+    image: python:3.13-slim-trixie
+    container_name: gpu-stats
+    restart: unless-stopped
+    network_mode: host
+    read_only: true
+    user: "65534:65534"
+    volumes:
+      - ./gpu-stats/gpu_stats.py:/app/gpu_stats.py:ro
+    environment:
+      LISTEN: 127.0.0.1:9101
+      MEMORY: vram
+      CARD_NAMES: "0000:06:00.0=card 1 (OCuLink),0000:0b:00.0=card 2 (x16)"
+    command: ["python3", "/app/gpu_stats.py"]
+
   homepage:
     image: ghcr.io/gethomepage/homepage:v2.7.0
     container_name: homepage
