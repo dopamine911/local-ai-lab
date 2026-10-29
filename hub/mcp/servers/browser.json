@@ -1,0 +1,6 @@
+{
+  "name": "browser",
+  "transport": "streamable_http",
+  "description": "Headless Chromium browser (Playwright MCP 0.0.83): open pages, click, type, read, screenshot. Public internet only: home network, Tailscale and internal addresses are refused by browser-proxy.",
+  "url": "http://playwright-mcp:8931/mcp"
+}

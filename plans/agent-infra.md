@@ -53,8 +53,10 @@ Good result: one number per model, "local handled N of 20 of my tasks", repeated
 Chosen: **MCPJungle 0.4.6** (free, MPL-2.0; "enterprise mode" is just its locked-down mode): no Docker socket, one
 token + allowed-server list per agent, SQLite in hub/data (backed up). Each tool in its own container. First tool:
 `search` (mcp-searxng 2.6.0, token-protected, blocks private URLs). Rejected: Docker MCP Gateway (needs Docker
-control), MetaMCP (Postgres, maintenance delays), ContextForge (too heavy). Next: Playwright in its own container
-behind a proxy that refuses home-network/Tailscale addresses (it is "not a security boundary" per Microsoft).
+control), MetaMCP (Postgres, maintenance delays), ContextForge (too heavy). Playwright added 2026-10-29: own container on an internal network (no route out), Squid egress proxy refusing
+private/home/Tailscale/Docker/zaphod addresses, profile in memory, read-only. Tested: public pages load; router,
+marvin, SearXNG, Open WebUI refused (403). Chromium itself also refused a public->private redirect. Not yet seen:
+the proxy catching a followed redirect (needs our own public test server). Chromium contacts Google in the background.
 
 Tools (search, files, memory, browser) are defined once; every agent connects to the gateway: Open WebUI, the step-1
 agent, Claude Code. Candidates *(check)*: Docker MCP Gateway, MetaMCP.

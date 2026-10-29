@@ -177,6 +177,7 @@ services:
       OTEL_ENABLED: "false"
     volumes:
       - ./data/mcpjungle:/data           # SQLite database (nightly backup copies it)
+    networks: [default, browser-internal]   # browser-internal: to reach playwright-mcp
 
   # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
   mcp-searxng:
@@ -192,6 +193,34 @@ services:
       MCP_HTTP_AUTH_TOKEN: ${MCP_SEARXNG_TOKEN:?set MCP_SEARXNG_TOKEN in .env}
       MCP_HTTP_ALLOWED_HOSTS: mcp-searxng,mcp-searxng:3000   # MCPJungle sends the port in the Host header
       MCP_HTTP_ALLOWED_ORIGINS: http://mcp-searxng:3000   # no browser calls it; only mcpjungle (no Origin header)
+
+  # Tool: a web browser for agents (Playwright MCP, headless Chromium). Lives ONLY on the internal browser network:
+  # no route out except browser-proxy, which refuses home-network/Tailscale/internal addresses. No published port,
+  # no files from the host, profile in memory (--isolated), read-only filesystem. Reached only through mcpjungle.
+  playwright-mcp:
+    image: mcr.microsoft.com/playwright/mcp:v0.0.83@sha256:690763cbb437ee7233f538a953bb5390bf03791eb5c965b471e59d17a6132fcb
+    container_name: playwright-mcp
+    restart: unless-stopped
+    init: false                        # the image already runs tini
+    read_only: true
+    tmpfs: [/tmp, "/home/node:mode=1777"]   # in memory; the browser user (node) must be able to write its home
+    shm_size: 1gb                      # Chromium needs shared memory
+    networks: [browser-internal]
+    command: >-
+      --isolated --host 0.0.0.0 --port 8931
+      --allowed-hosts playwright-mcp:8931,playwright-mcp
+      --proxy-server http://browser-proxy:3128
+      --blocked-origins http://localhost:*;http://127.0.0.1:*
+      --output-dir /tmp/playwright-output
+
+  # The browser's only way out (hub/browser-proxy/squid.conf): web ports only, private destinations refused.
+  browser-proxy:
+    image: ubuntu/squid:6.6-24.04_edge@sha256:8a3baed477e2c282ab8aa5edad442f69873246964f225c5c2ae8364b6610963c
+    container_name: browser-proxy
+    restart: unless-stopped
+    networks: [default, browser-internal]
+    volumes:
+      - ./browser-proxy/squid.conf:/etc/squid/squid.conf:ro
 
   # A sandboxed Linux shell + files for the models (connected in Open WebUI as a terminal).
   # The AI works inside this container only: own home folder, no Docker socket, no host files.
@@ -261,3 +290,11 @@ services:
     volumes:
       - ./homepage:/app/config
       - ../assets:/app/public/images:ro   # background picture etc. (repo folder assets/)
+
+networks:
+  # Internal: no route to the internet or the host's networks. Fixed subnet so the proxy can allow only this network.
+  browser-internal:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.31.250.0/24
