@@ -105,6 +105,18 @@ Same as temp 0 (88, 7 wrong): temperature is not why Flint misses. The spread be
 
 "Server bug": llama.cpp b11870 (inside llama-swap 267) rejects Qwen3.8 requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Details: `tool-eval/compare/`.
 
+## marvin (Strix Halo, Qwen3.8-Flash-Next UD-IQ4_XS, 2026-10-29)
+
+| Setting | Writing tok/s | Reading tok/s | Note |
+| --- | ---: | ---: | --- |
+| llama-bench, no MTP (-p 512 -n 128 -r 3) | 24.9 ± 0.1 | 463 ± 28 | `runs/2026-10-29-1352-marvin.jsonl` |
+| llama-swap, no MTP | 24.7 | | 3 requests, code prompt, temp 0 |
+| MTP draft 2 | 37.6 | | 84% of guesses accepted |
+| **MTP draft 3 (kept)** | **39.6** | | 78-82% accepted, +60% |
+| MTP draft 4 | 36.5 | | 67-69% accepted |
+
+Whole 93 GB model in GPU memory (120 GB limit). Details: `marvin/SETUP.md`.
+
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
 | Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |
