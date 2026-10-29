@@ -12,6 +12,7 @@ What it records:
   - settings: every flag of the command llama-swap is running for <model>
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
   - series tag (SERIES=name ./quality ...): repeats of one setup, grouped in MLflow
+  - behavior_* (tool-use): automatic checks for problems the grader misses (tool-eval/behavior.py)
   - benchmark tag: speed, tool-use, terminal-bench, kl-divergence, history or manual
   - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
   - model.* tags: the exact model file, Hugging Face repo, revision and sha256 (from setup/models-<machine>.txt)
@@ -212,6 +213,12 @@ def read_tool_eval(path):
     common = common_score(s)
     if common is not None:
         metrics["tooleval_score_common"] = common
+    try:  # automatic behavior checks (tool-eval/behavior.py): problems the grader misses
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "tool-eval"))
+        import behavior
+        metrics.update(behavior.metrics(d))
+    except Exception as e:
+        print(f"note: behavior checks skipped ({e})")
     return params, metrics
 
 

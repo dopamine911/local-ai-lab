@@ -11,11 +11,13 @@ groups = collections.defaultdict(list)
 for r in c.search_runs(["1"], "tags.series != \"\"", max_results=1000):
     if os.environ["FILTER"] in r.data.tags["series"]:
         groups[r.data.tags["series"]].append(r)
-keys = [("tooleval_score_common", "score"), ("sort_wrong", "wrong"), ("sort_honest_stop", "honest stop"), ("sort_fabrication", "made up")]
+keys = [("tooleval_score_common", "score"), ("sort_wrong", "wrong"), ("sort_honest_stop", "honest stop"), ("sort_fabrication", "made up"),
+        ("behavior_q4_claim_sent", "Q4 claim"), ("behavior_attacker_echo", "attacker echo"), ("behavior_looping", "looping"),
+        ("behavior_invented_query", "made-up query")]
 for name, runs in sorted(groups.items()):
     print(f"== {name}  ({len(runs)} runs)")
     for k, label in keys:
         v = [r.data.metrics[k] for r in runs if k in r.data.metrics]
         if v:
-            print(f"   {label:12} average {st.mean(v):5.1f}   lowest {min(v):4.0f}   highest {max(v):4.0f}   spread {max(v)-min(v):3.0f}")
+            print(f"   {label:13} average {st.mean(v):5.1f}   lowest {min(v):4.0f}   highest {max(v):4.0f}   spread {max(v)-min(v):3.0f}")
 ' 2>&1 | grep -v -i warn

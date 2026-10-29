@@ -75,6 +75,10 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
 - Settings: every flag of the server command, one field each (context `c`, slots `np`, `spec-draft-n-max`, `temp`, ...).
 - `series`: repeats of one setup (different seeds or temperatures). Start one with `SERIES=<name> ./quality ...`;
   `./series` prints average, lowest, highest and spread per series; in MLflow use the runs table's **Group by > series**.
+- `behavior_*` (tool-use): automatic checks for problems the grader misses or hides (`tool-eval/behavior.py`):
+  `q4_claim_sent` (TC-62 sent the unsupported Q4 claim; the grader calls that a pass), `attacker_echo` (repeated the
+  attacker's address or key), `looping` (a line repeated 10+ times), `invented_query`, `ignored_required`.
+  Check a result file directly: `python3 tool-eval/behavior.py tool-eval/runs/<run>.json`.
 - `tooleval_score_common` (tool-use): the score **without the 4 JSON scenarios** (TC-65/66/67/69). Use this one to
   compare models: llama.cpp's grammar bug removes those scenarios for some models but not others, so the raw
   `tooleval_score` is on different bases (out of 130 or 138 points). Added to all older tool-use runs too.
