@@ -96,4 +96,5 @@ Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the pre
 4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
-MLflow (`hub/data/mlflow`). Backups: not set up yet (to-do).
+MLflow (`hub/data/mlflow`). Backups: not set up yet. Decided 2026-10-29: they go to the NAS, after the NAS rebuild
+(next project after marvin). Until then there is no copy of this data.
