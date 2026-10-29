@@ -47,6 +47,7 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | SearXNG: private web search (Bing, Yahoo, Brave, Google CSE + developer sources) | working | [hub/searxng/settings.yml](hub/searxng/settings.yml) |
 | Open Terminal: sandboxed code runner for Open WebUI | working | [README.md](README.md) |
 | Homepage start page: a row per machine (models loaded, system, GPU load/memory/temp/power), apps, NAS placeholder | working | [hub/homepage/](hub/homepage/), [hub/gpu-stats/gpu_stats.py](hub/gpu-stats/gpu_stats.py) |
+| Agent stats on the start page, per machine: 24 h requests, tokens in/out, average/top speed; now: active, pending, slots, context per slot | working (pending: after `--metrics`) | [hub/agent-stats/agent_stats.py](hub/agent-stats/agent_stats.py) |
 | Beszel monitoring: both machines, containers, disk health, systemd services, network monitors | working | [hub/compose.yaml](hub/compose.yaml), [hub/beszel-monitors.sh](hub/beszel-monitors.sh) |
 | MLflow: every benchmark run with its full settings | working | section 5 below |
 | Models panel (load/unload models from a page) | planned (file to copy in) | [hub/models-panel/README.txt](hub/models-panel/README.txt) |

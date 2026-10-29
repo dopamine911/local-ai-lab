@@ -81,6 +81,65 @@
               format: number
               suffix: " W"
 
+    - Agents (last 24 h):
+        icon: mdi-robot-outline
+        description: Requests and tokens through llama-swap; writing speed = average and top of real requests (replies of 50+ tokens)
+        widget:
+          type: customapi
+          url: http://127.0.0.1:9102/
+          refreshInterval: 30000
+          mappings:
+            - field: totals.requests
+              label: Requests
+              format: number
+            - field: totals.tokens_in
+              label: Tokens in
+              format: number
+            - field: totals.tokens_out
+              label: Tokens out
+              format: number
+            - field: totals.avg_write_tps
+              label: Avg tok/s
+              format: float
+            - field: totals.top_write_tps
+              label: Top tok/s
+              format: float
+    - Agents (now):
+        icon: mdi-pulse
+        description: Busy slots = active requests. Pending needs --metrics (after the benchmark)
+        widget:
+          type: customapi
+          url: http://127.0.0.1:9102/
+          refreshInterval: 5000
+          mappings:
+            - field: now.active
+              label: Active
+              format: number
+            - field: now.pending
+              label: Pending
+              format: number
+            - field: now.slots_busy
+              label: Slots busy
+              format: number
+            - field: now.slots_total
+              label: Slots
+              format: number
+            - field: now.max_context_pct
+              label: Context max
+              format: number
+              suffix: "%"
+    - Context per slot:
+        icon: mdi-text-box-outline
+        description: Busy slots only; tokens used of the slot's context
+        widget:
+          type: customapi
+          url: http://127.0.0.1:9102/
+          refreshInterval: 5000
+          display: dynamic-list
+          mappings:
+            items: slots
+            name: slot
+            label: context
 - marvin:
     - Models loaded:
         icon: mdi-brain
@@ -135,6 +194,65 @@
               format: number
               suffix: " W"
 
+    - Agents (last 24 h):
+        icon: mdi-robot-outline
+        description: Requests and tokens through llama-swap; writing speed = average and top of real requests (replies of 50+ tokens)
+        widget:
+          type: customapi
+          url: http://marvin:9102/
+          refreshInterval: 30000
+          mappings:
+            - field: totals.requests
+              label: Requests
+              format: number
+            - field: totals.tokens_in
+              label: Tokens in
+              format: number
+            - field: totals.tokens_out
+              label: Tokens out
+              format: number
+            - field: totals.avg_write_tps
+              label: Avg tok/s
+              format: float
+            - field: totals.top_write_tps
+              label: Top tok/s
+              format: float
+    - Agents (now):
+        icon: mdi-pulse
+        description: Busy slots = active requests. Pending needs --metrics (after the benchmark)
+        widget:
+          type: customapi
+          url: http://marvin:9102/
+          refreshInterval: 5000
+          mappings:
+            - field: now.active
+              label: Active
+              format: number
+            - field: now.pending
+              label: Pending
+              format: number
+            - field: now.slots_busy
+              label: Slots busy
+              format: number
+            - field: now.slots_total
+              label: Slots
+              format: number
+            - field: now.max_context_pct
+              label: Context max
+              format: number
+              suffix: "%"
+    - Context per slot:
+        icon: mdi-text-box-outline
+        description: Busy slots only; tokens used of the slot's context
+        widget:
+          type: customapi
+          url: http://marvin:9102/
+          refreshInterval: 5000
+          display: dynamic-list
+          mappings:
+            items: slots
+            name: slot
+            label: context
 - NAS:
     - Unraid:
         icon: unraid.png

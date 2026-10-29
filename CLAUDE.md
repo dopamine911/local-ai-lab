@@ -45,6 +45,8 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 ## Next steps
 1. Terminal-Bench full run of `coder-tb`, with and without the-craft (overnight, in tmux).
 2. marvin: MTP speed-up for `big` (baseline 24.7 tok/s writing), then quality tests.
+2b. After the marvin Terminal-Bench run: add `--metrics` to llama-server on both machines (Homepage "pending" count),
+    and try `big` at 256K context (plans: measured before/after; ~+3 GB).
 3. Tuning ideas in tuning/results.md.
 4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.
 5. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
