@@ -46,6 +46,9 @@ services:
       SEARXNG_QUERY_URL: http://127.0.0.1:8888/search?q=<query>
       WEB_SEARCH_RESULT_COUNT: "3"
       ENABLE_WEB_SEARCH_CONFIRMATION: "true"
+      # Page loading after a search: plain HTTP from zaphod. Never local/home/Tailscale addresses (the default; set
+      # explicitly so an upgrade can't change it). Tested 2026-10-29: example.com loads; router, 127.0.0.1, marvin refused.
+      ENABLE_LOCAL_WEB_FETCH: "false"
       # Documents: embeddings and re-ranking from llama-swap (models embed + rerank, card 1)
       RAG_EMBEDDING_ENGINE: openai
       RAG_EMBEDDING_MODEL: embed
