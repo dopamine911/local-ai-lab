@@ -1,0 +1,7 @@
+{
+  "name": "search",
+  "transport": "streamable_http",
+  "description": "Web search through zaphod's private SearXNG (mcp-searxng 2.6.0): search the web and read result pages",
+  "url": "http://mcp-searxng:3000/mcp",
+  "bearer_token": "${MCP_SEARXNG_TOKEN}"
+}

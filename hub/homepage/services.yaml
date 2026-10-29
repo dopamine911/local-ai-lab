@@ -202,6 +202,10 @@
         icon: mdi-console
         description: Code runner for Open WebUI (local only)
         siteMonitor: http://127.0.0.1:8000
+    - Agent tools (MCPJungle):
+        icon: mdi-tools
+        description: MCP gateway; each agent has its own token and tool list (hub/mcp/)
+        siteMonitor: http://127.0.0.1:8085/health
     - GPU stats:
         icon: mdi-gauge
         description: Feeds the card tiles (hub/gpu-stats)

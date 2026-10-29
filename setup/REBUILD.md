@@ -69,7 +69,7 @@ Restore the `.env` files from your password manager (or make new ones; each `.en
 | --- | --- | --- |
 | `zaphod/llama-swap/.env` | `ZAPHOD_KEY`, `MARVIN_KEY` (same as marvin's) | New one: `printf 'ZAPHOD_KEY=%s\n' "$(openssl rand -hex 24)"`; then update hub/.env and every app that uses it |
 | `marvin/llama-swap/.env` | `MARVIN_KEY`, `BESZEL_KEY`, `TAILSCALE_IP` | New `MARVIN_KEY` as above; `BESZEL_KEY` = same as hub/.env; `TAILSCALE_IP` = `tailscale ip -4` |
-| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
+| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `MCP_TOKEN_*` (one per agent), `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
 
 Then build and start (each `compose.yaml` has its `build:` lines):
 
@@ -83,8 +83,11 @@ docker compose --profile agent up -d beszel-agent
 cd ~/llama-swap && docker compose build && docker compose up -d
 cd ~/homelab/hub && docker compose --profile images build && docker compose up -d
 docker compose --profile agent up -d beszel-agent
+~/homelab/hub/mcp/setup.sh     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
 ```
-Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models.
+Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `mcp/setup.sh` ends with
+`== client ...: Servers accessible: ...` for each agent. Restoring `hub/data/mcpjungle/` from backup also brings back
+the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJungle admin") or re-run `mcp/setup.sh`.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 

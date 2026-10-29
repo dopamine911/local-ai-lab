@@ -49,6 +49,24 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
   Alternative, better at text inside images: `hub/comfyui/workflows/qwen-image-2.1-turbo-api.json`, nodes:
   prompt → `5` (field `prompt`), model → `1`, width/height → `6`, seed → `7` (`noise_seed`). Steps are fixed (8).
 
+## Agent tools: MCP gateway (MCPJungle)
+
+One place for the tools agents use (plans/agent-infra.md, step 3). Runs on zaphod at `http://127.0.0.1:8085/mcp`.
+Every agent has its own token and list of allowed tool servers; no token or a wrong one gets 401.
+
+| Tool server | What | Allowed for |
+| --- | --- | --- |
+| `search` | Web search via our SearXNG, and reading public web pages (`web_url_read` refuses home-network and Tailscale addresses) | openwebui, claude-code |
+
+Setup and rebuild: `hub/mcp/setup.sh` (servers in `hub/mcp/servers/`, agent logins in `hub/mcp/clients/`,
+tokens in `hub/.env` as `MCP_TOKEN_<NAME>`). Admin: `mcpjungle list tools`, `mcpjungle list mcp-clients`.
+
+Connect an agent:
+- **Open WebUI** (Admin Panel → Settings → External Tools / Integrations, add a connection): type **MCP (Streamable HTTP)**,
+  URL `http://127.0.0.1:8085/mcp`, auth **Bearer**, key: `grep MCP_TOKEN_OPENWEBUI ~/homelab/hub/.env`.
+- **Claude Code** on zaphod (one command; reads the token from the file, never typed):
+  `claude mcp add --transport http --scope user homelab-tools http://127.0.0.1:8085/mcp --header "Authorization: Bearer $(grep ^MCP_TOKEN_CLAUDE_CODE= ~/homelab/hub/.env | cut -d= -f2)"`
+
 ## Images: ComfyUI on card 2
 
 `hub/image-mode on` lends card 2 to ComfyUI (https://comfy.<DOMAIN>): it switches llama-swap to the `image-mode`

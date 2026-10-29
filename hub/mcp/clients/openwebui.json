@@ -1,0 +1,5 @@
+{
+  "name": "openwebui",
+  "allowed_servers": ["search"],
+  "access_token_ref": { "env": "MCP_TOKEN_OPENWEBUI" }
+}

@@ -104,6 +104,39 @@ services:
       - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
       - ./data/searxng-cache:/var/cache/searxng
 
+  # MCP gateway: one place for agent tools (plans/agent-infra.md step 3). Enterprise mode = every agent needs its
+  # own token and only reaches the tool servers it is allowed. Admin with the mcpjungle CLI on zaphod.
+  # Free and open source (MPL-2.0); "enterprise" is only the locked-down mode. Tools run in their OWN containers below,
+  # never inside this one (its database holds every agent's token).
+  mcpjungle:
+    image: ghcr.io/mcpjungle/mcpjungle:0.4.6@sha256:59940d2e3a586ab9a063cf24fa37460bc993686fa056729fd1ada25436123dd9
+    container_name: mcpjungle
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    command: ["start", "--enterprise", "--sqlite-db-path", "/data/mcpjungle.db"]
+    ports:
+      - "127.0.0.1:8085:8080"            # zaphod only; marvin will reach it through Caddy over Tailscale
+    environment:
+      OTEL_ENABLED: "false"
+    volumes:
+      - ./data/mcpjungle:/data           # SQLite database (nightly backup copies it)
+
+  # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
+  mcp-searxng:
+    image: isokoliuk/mcp-searxng:2.6.0@sha256:9389eed474a62bc35aafbf4d819b77ee54ecc25b5a1d1310ad0d45db2a056e0f
+    container_name: mcp-searxng
+    restart: unless-stopped
+    read_only: true
+    environment:
+      SEARXNG_URL: http://searxng:8080
+      MCP_HTTP_PORT: "3000"
+      MCP_HTTP_HOST: 0.0.0.0             # inside its container; nothing is published to the host
+      MCP_HTTP_HARDEN: "true"            # other hub containers share this network: require a token
+      MCP_HTTP_AUTH_TOKEN: ${MCP_SEARXNG_TOKEN:?set MCP_SEARXNG_TOKEN in .env}
+      MCP_HTTP_ALLOWED_HOSTS: mcp-searxng,mcp-searxng:3000   # MCPJungle sends the port in the Host header
+      MCP_HTTP_ALLOWED_ORIGINS: http://mcp-searxng:3000   # no browser calls it; only mcpjungle (no Origin header)
+
   # A sandboxed Linux shell + files for the models (connected in Open WebUI as a terminal).
   # The AI works inside this container only: own home folder, no Docker socket, no host files.
   open-terminal:
