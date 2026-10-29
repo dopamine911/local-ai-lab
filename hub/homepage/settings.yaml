@@ -1,9 +1,10 @@
 title: Homelab
 theme: dark
 color: slate
-# Background: NASA SVS wallpaper "CW Leo from GALEX" (svs.gsfc.nasa.gov/14866, public domain), stored in assets/.
+# Background: NASA SVS wallpaper "NGC 1929 from Spitzer, Chandra, ESO" (svs.gsfc.nasa.gov/14866, public domain), in assets/.
+# Other pictures in assets/ can go here too (e.g. CW_Leo_From_GALEX_desktop.jpg).
 background:
-  image: /images/CW_Leo_From_GALEX_desktop.jpg
+  image: /images/NGC_1929_from_Spitzer_Chandra_ESO_desktop.png
   blur: sm           # sm, md, xl
   brightness: 75     # darker, so tile text stays readable
 cardBlur: md         # frosted tiles over the image
