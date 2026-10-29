@@ -120,6 +120,14 @@ one change per commit.
 
 ## Decisions for Daniel
 
-1. Phase 1 exception to the 2-weeks version rule for upstream's gfx1151 image (test only)?
-2. OK to copy zaphod's already-downloaded MTP pieces to marvin (avoids any download by Strata on marvin)?
-3. Phase 2 bar: is "reading at least 2x, quality same" the right threshold?
+1. Decided 2026-10-29: yes, `0.2.7-rocm-gfx1151` (built 2026-10-27; same Strata version as the zaphod test), test only,
+   pinned by digest `sha256:29ecd5cf8b0e…`.
+2. Decided 2026-10-29: yes. zaphod's MTP folder copied into marvin's `strata-data` volume (no lock file, no keys or
+   state); 31 of 31 pieces match mtp-manifest.json, built draft files identical on both machines.
+3. Phase 2 bar: is "reading at least 2x, quality same" the right threshold? (open)
+
+## Phase 1 log
+
+Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs on marvin, copy at ~/strata-test/).
+1. Dry run (`plan`): model family is `unsloth` (not `qwen`: Strata 0.2.7's qwen family only has the ISTA files).
+   Strata recognises marvin's 3 UD-IQ4_XS shards (94 GB), "Nothing to download", drafting MTP, 128K, 2 parallel.
