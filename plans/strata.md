@@ -10,5 +10,10 @@ Image: ghcr.io/niko1221/strata:0.2.7-rocm-gfx120x (pulled). Needs both cards: ll
 - Same tests as the other models: speed, tool-use full suite + hand sort, Terminal-Bench smoke (user runs it).
 - Write the plan steps out for approval before pausing llama-swap.
 
-## Not usable here
-- UnbiasedStrata: CUDA only (Pascal or newer); no AMD/ROCm/Vulkan. Self-reported 10-18% faster on an RTX 3090.
+## UnbiasedStrata (github.com/robertkarl/UnbiasedStrata)
+- README covers NVIDIA only, but the code is a PolyStrata fork and keeps its AMD HIP backend: docs/AMD_HIP.md names
+  the Radeon AI PRO R9700 (gfx1201) and multi-card splits (`--gpus 1,0`). Its own `make build` is CUDA-only, so using
+  it here means wiring cmake/hip_backend.cmake into that build and testing on gfx1201 (estimate: a day or two).
+- A Vulkan port would mean rewriting ~93 CUDA kernel files as Vulkan shaders: weeks, and no gain over HIP on R9700.
+- Self-reported 10-18% faster than upstream on an RTX 3090 (Flash-Next). Try only after the upstream Strata test,
+  with the same seeded tests.
