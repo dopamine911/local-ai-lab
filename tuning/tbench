@@ -61,6 +61,7 @@ log_latest() {
 run_tier() {
   local tier="$1" note="$2"
   need_repo; key
+  export RUN_START=$(date +%s)   # ./log reads real-use speed for this window from llama-swap's request log
   (cd "$DIR" && ./terminal_bench.py run --suite core19 --tier "$tier" \
      --endpoint http://127.0.0.1:8080/v1 --model "$MODEL" "${CTX[@]}" \
      --platform "$PLATFORM" --platform-name "$PLATFORM_NAME" \
