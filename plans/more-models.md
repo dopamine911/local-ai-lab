@@ -54,3 +54,6 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
   CustomVoice Q8_0 (2.2 s per 10 s; runs only next to coder-2, set `voice`). Both on card 2, audio.cpp packages pinned to
   rev 874fcb41. Round-trip through stt: Kokoro said "4.5" as "four, five"; Qwen-TTS's "Zaphod" was heard as "Zefot".
   Memory: card 2 28.5 GB with coder-2 + all helpers + tts-qwen; 28.4 GB with ornith + helpers.
+- 2026-10-29 Step 6 done: `chat` = Gemma 4 31B (google/gemma-4-31B-it-qat-q4_0-gguf rev 59dde245, + mmproj), card 2, 128K q8_0,
+  Google's sampling (temp 1.0, top-p 0.95, top-k 64). 28.8 tok/s writing. Described the test image correctly.
+  Card 2 with chat + stt + stt-whisper + tts: 29.2 GB. Gemma 4 is still Google's newest family (no 4.5 found).
