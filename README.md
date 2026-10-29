@@ -46,6 +46,8 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
 - **Image generation (ComfyUI, only while image mode is on):** Admin Panel → Settings → Images: engine **ComfyUI**,
   URL `http://127.0.0.1:8188`, workflow: upload `hub/comfyui/workflows/z-image-turbo-api.json`, then map the nodes:
   prompt → node `5` (text), model → `1`, width/height → `7`, steps and seed → `8`. Default size 1024x1024, steps 8.
+  Alternative, better at text inside images: `hub/comfyui/workflows/qwen-image-2.1-turbo-api.json`, nodes:
+  prompt → `5` (field `prompt`), model → `1`, width/height → `6`, seed → `7` (`noise_seed`). Steps are fixed (8).
 
 ## Images: ComfyUI on card 2
 

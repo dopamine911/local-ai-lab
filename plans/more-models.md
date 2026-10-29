@@ -63,3 +63,6 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
   test images matched their prompts, except "watercolor" came out photographic. 35 TFLOPS fp16 in a PyTorch test.
   Not yet: Qwen-Image-2.1 (newer, also edits images), Homepage button for image mode.
 - Step 8 (routing rules) was done along the way: helpers set + preload, `voice` set, `image-mode` profile.
+- 2026-10-29 Qwen-Image-2.1 Turbo added (Comfy-Org rev 0217efd1: turbo int8_convrot, qwen3vl_8b int8_convrot, VAE bf16;
+  17.3 GB; checksums OK). The int8 files run on the R9700 through comfy_kitchen's HIP backend. 1024x1024 in 6.0 s
+  (20 s with load). Wrote "ZAPHOD LAB" on a poster exactly. "Watercolor" became a watercolor picture inside a photo.
