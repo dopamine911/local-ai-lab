@@ -141,6 +141,8 @@ answer in a loop. MLflow: a957f4cb, 37ac5695, fe7f05a3.
 
 ## Terminal-Bench (Core-19, terminus-2 agent, pass@2)
 
+Note 2026-10-29: every marvin speed before 23:28 that day was measured with the BIOS in **Quiet** mode (GPU capped at 55 W); now Performance (marvin/SETUP.md row 17). Scores are unaffected; speeds and durations are not comparable across the change.
+
 | Date | Machine / model | Tier | Result | Note |
 | --- | --- | --- | --- | --- |
 | 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots | smoke (1 task) | 1/1, first attempt, ~3 min | MLflow 57214956 |

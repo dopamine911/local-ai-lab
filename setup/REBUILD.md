@@ -17,6 +17,7 @@ What you need besides this repo:
 | zaphod | CSM Support | **Enabled** | Ubuntu was installed in legacy mode; it won't boot without CSM |
 | zaphod | Resizable BAR | Off (forced by CSM) | Why `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` is needed |
 | marvin | UMA frame buffer (GPU memory) | **512 MB** | Linux gives the GPU shared memory instead (set in `host.sh`) |
+| marvin | Power mode (Quiet / Balanced / Performance) | **Performance** | Shipped on Quiet: GPU held at 54-55 W, reading long prompts at half speed (2026-10-29, plans/strix-strata.md). Check: GPU power above 55 W during a long prompt |
 
 BIOS versions seen: zaphod board Gigabyte B550I AORUS PRO AX; cards 113-APM107573-101 (card 1), 113-R9700AT-F40 (card 2).
 marvin board AXB35-02, BIOS 1.07.

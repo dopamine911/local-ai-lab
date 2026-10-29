@@ -149,3 +149,11 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    scales with power; writing is memory-bound, so it matches upstream. llama.cpp's reading on marvin is capped the same way.
    Next, one change at a time on the same test: (1) BIOS power mode (Daniel), (2) `tuned` accelerator-performance
    (setup/host.sh step 8), (3) `amd_iommu=off` (+5-12% elsewhere). Tool-use x3 and Terminal-Bench wait until then.
+5. BIOS power mode Quiet → **Performance** (Daniel, 2026-10-29 23:28; marvin shipped on Quiet). Same 32K test, power sampled:
+   | Engine | Quiet (GPU 54-55 W) | Performance (GPU 130-139 W, 2,850 MHz) |
+   | --- | ---: | ---: |
+   | Strata reading / writing | 599 / 50.9 | **758 / 55.7** (MLflow c5b6b5da) |
+   | llama.cpp reading / writing | not measured | **315 / 44.0** (MLflow 0e1b8a5d) |
+   Strata reads **2.4x** llama.cpp on the same test and power. Upstream's ~1,250 is still higher; their prompt length
+   per row is not stated, so not directly comparable. Left to try, one at a time: prompt chunk 16384 (+8% in Quiet),
+   `tuned`, `amd_iommu=off`. Heat: GPU peaked at 93-97 C in Performance (64 C in Quiet); limit is ~100 C, watch it.
