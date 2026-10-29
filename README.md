@@ -62,8 +62,10 @@ Setup and rebuild: `hub/mcp/setup.sh` (servers in `hub/mcp/servers/`, agent logi
 tokens in `hub/.env` as `MCP_TOKEN_<NAME>`). Admin: `mcpjungle list tools`, `mcpjungle list mcp-clients`.
 
 Connect an agent:
-- **Open WebUI** (Admin Panel → Settings → External Tools / Integrations, add a connection): type **MCP (Streamable HTTP)**,
-  URL `http://127.0.0.1:8085/mcp`, auth **Bearer**, key: `grep MCP_TOKEN_OPENWEBUI ~/homelab/hub/.env`.
+- **Open WebUI:** `~/homelab/hub/mcp/openwebui-connect.sh` (adds or updates the connection through Open WebUI's admin
+  API; needs `OPENWEBUI_API_KEY` in `hub/.env`, an API key of your admin account). By hand instead: Admin Panel →
+  Settings → External Tools, type **MCP (Streamable HTTP)**, URL `http://127.0.0.1:8085/mcp`, auth **Bearer**, key
+  `MCP_TOKEN_OPENWEBUI` from `hub/.env`.
 - **Claude Code** on zaphod (one command; reads the token from the file, never typed):
   `claude mcp add --transport http --scope user homelab-tools http://127.0.0.1:8085/mcp --header "Authorization: Bearer $(grep ^MCP_TOKEN_CLAUDE_CODE= ~/homelab/hub/.env | cut -d= -f2)"`
 
