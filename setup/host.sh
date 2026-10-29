@@ -46,6 +46,14 @@ if [ "$H" = marvin ]; then
   if [ "$(cat $f 2>/dev/null)" != "$want" ]; then
     echo "$want" > $f; update-grub; echo ">>> reboot needed for this setting"
   else echo "already set"; fi
+
+  step "8. marvin: tuned profile accelerator-performance (CPU cores stay out of deep sleep; strix-halo-toolboxes.com).
+  #    Measured 2026-10-29 (Strata, 32K prompt): 758 → 757 tok/s reading, no change; kept as harmless."
+  dpkg -s tuned >/dev/null 2>&1 || { apt-get update -q; apt-get install -y tuned; }
+  systemctl enable --now tuned
+  if [ "$(tuned-adm active 2>/dev/null | sed 's/.*: //')" != accelerator-performance ]; then
+    tuned-adm profile accelerator-performance; fi
+  tuned-adm active
 fi
 
 step "done. Log out and back in (new groups), then continue with setup/REBUILD.md"
