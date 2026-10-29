@@ -85,6 +85,7 @@ cd ~/homelab/hub && docker compose --profile images build && docker compose up -
 docker compose --profile agent up -d beszel-agent
 ~/homelab/hub/mcp/setup.sh     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
 ~/homelab/hub/openwebui/drift.sh   # Open WebUI settings come from compose.yaml; good result: 0 setting(s) differ
+~/homelab/hub/openwebui/models.sh --apply   # per-model settings (needs OPENWEBUI_API_KEY); good result: then 0 model(s) differ
 ```
 Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `mcp/setup.sh` ends with
 `== client ...: Servers accessible: ...` for each agent. Restoring `hub/data/mcpjungle/` from backup also brings back

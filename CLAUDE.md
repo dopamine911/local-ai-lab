@@ -28,7 +28,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 ## Rebuild
 `setup/REBUILD.md` + `setup/host.sh` + `setup/models.sh` rebuild either machine. Every change to a machine (package, boot setting, Tailscale, web-UI setting, model) goes into a script or REBUILD.md in the same commit.
 
-Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Never tell Daniel to change Open WebUI in the web page: edit compose, then `hub/openwebui/drift.sh --sync`; `drift.sh` alone checks for hand changes.
+Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Never tell Daniel to change Open WebUI in the web page: edit compose, then `hub/openwebui/drift.sh --sync`; `drift.sh` alone checks for hand changes. Per-model settings: `hub/openwebui/models.yaml` + `models.sh --apply`.
 
 ## Do not undo
 - `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` in compose.yaml. Resizable BAR is off, and without this switch llama.cpp puts part of the model in system RAM: 3-10x slower.

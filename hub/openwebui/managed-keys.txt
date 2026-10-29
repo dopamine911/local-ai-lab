@@ -27,3 +27,12 @@ audio.tts.openai.api_base_url
 audio.tts.openai.api_key
 tool_server.connections
 terminal_server.connections
+image_generation.enable
+image_generation.engine
+image_generation.model
+image_generation.size
+image_generation.steps
+image_generation.comfyui.base_url
+image_generation.comfyui.workflow
+image_generation.comfyui.nodes
+models.default_params

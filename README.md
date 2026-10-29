@@ -48,10 +48,13 @@ What is set (2026-10-29, checked working end to end):
 - **Tools:** the MCP gateway (`homelab-tools`, next section) and Context7 (public library docs, hosted by Upstash:
   queries leave zaphod, no key).
 - **Code runner:** Open Terminal (own container, own home folder `hub/data/open-terminal`, no Docker socket, no host files).
-- **Not set up:** image generation. ComfyUI (only in image mode) would be engine **ComfyUI**, URL `http://127.0.0.1:8188`,
-  workflow `hub/comfyui/workflows/z-image-turbo-api.json` (nodes: prompt `5` text, model `1`, size `7`, steps/seed `8`)
-  or `qwen-image-2.1-turbo-api.json` (prompt `5` field `prompt`, model `1`, size `6`, seed `7` `noise_seed`).
-  To use it, add the COMFYUI_* settings to compose.yaml rather than the web page.
+- **Images:** ComfyUI, Z-Image Turbo, 1024x1024, 8 steps (first image ~26 s incl. loading). **Only while image mode is
+  on** (`~/homelab/hub/image-mode on`, then `off`): it borrows card 2. Workflow + node map are generated from the
+  workflow file: `hub/openwebui/make-comfyui-env.sh` (or `... qwen` for Qwen-Image, better at text in images), then
+  `drift.sh --sync`.
+- **Models** (`hub/openwebui/models.yaml`, apply with `hub/openwebui/models.sh --apply`; without `--apply` it only checks):
+  native function calling for all (also the default for new models), vision only for `ornith` and `chat`, helper models
+  (embed, rerank, stt, tts, coder-tb) hidden from the model picker. Names come from the llama-swap configs.
 
 ## Agent tools: MCP gateway (MCPJungle)
 
