@@ -11,6 +11,7 @@ Examples:
 What it records:
   - settings: every flag of the command llama-swap is running for <model>
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
+  - benchmark tag: speed, tool-use, terminal-bench, kl-divergence, history or manual
   - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
   - model.* tags: the exact model file, Hugging Face repo, revision and sha256 (from setup/models-<machine>.txt)
   - settings + results from any llama-bench .jsonl file you attach
@@ -50,6 +51,23 @@ def server_cmd(machine, model):
         if m.get("model") == model:
             return m.get("cmd", "")
     return None
+
+
+def benchmark_kind(model, run_id):
+    """Which kind of test a run is, from what was logged. Filter in MLflow: tags.benchmark = "tool-use"."""
+    if model.startswith("history"):
+        return "history"
+    r = mlflow.get_run(run_id)
+    tool, metrics = r.data.params.get("quality.tool", ""), r.data.metrics
+    if tool == "tool-eval-bench":
+        return "tool-use"
+    if tool == "terminal-bench-local":
+        return "terminal-bench"
+    if tool == "kl-divergence":
+        return "kl-divergence"
+    if any(k.endswith("_tps") for k in metrics):
+        return "speed"
+    return "manual"
 
 
 def manifest_tags():
@@ -282,6 +300,7 @@ def main():
                 mlflow.log_metric(name, float(value))
             else:
                 sys.exit(f"Not a file or name=value: {item}")
+        mlflow.set_tag("benchmark", benchmark_kind(model, run.info.run_id))
         print(f"Logged run {run.info.run_id}  ->  https://mlflow.ai.dopamine911.com"
               f"  (config: {os.environ.get('CONFIG_COMMIT', 'unknown')})")
 

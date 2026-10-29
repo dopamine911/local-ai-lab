@@ -65,6 +65,8 @@ Use the middle of the three numbers in `./log`.
 Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. Settings that differ are shown side by side, and you can chart any setting against any result. Your note is on each run's page.
 
 **What each run records** (since 2026-10-29), on the run page under Tags:
+- `benchmark`: `speed`, `tool-use`, `terminal-bench`, `kl-divergence`, `history` or `manual` (all older runs tagged too).
+  Show one kind: search box `tags.benchmark = "tool-use"`.
 - `env.*`: the machine that served the model: board and BIOS, CPU, RAM, GPUs (PCI address + VBIOS), `vulkan_devices`
   (llama.cpp's names and numbering), kernel, Mesa, image, `llama_cpp_commit`, `llama_swap_version`. Collected by
   `manifest.sh` on that machine (marvin over SSH). Filter example: `tags.env.llama_cpp_commit = "74bca39"`.
