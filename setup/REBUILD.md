@@ -49,8 +49,8 @@ logs in to Tailscale (open the link it prints), shares port 8080 on the tailnet,
 
 Good: from zaphod, `ssh marvin` (or the other way) works without a password; `docker ps` works without sudo.
 
-zaphod only, not yet in the script: the firewall (ufw) is on, with rules that were never written down.
-To do: run `sudo ufw status numbered` on zaphod and add the rules to `host.sh`.
+Firewall: ufw is installed but inactive (zaphod checked 2026-10-29; marvin is a fresh install, where Ubuntu leaves it inactive), so there are no rules to restore.
+Protection comes from where services listen: 127.0.0.1, or the Tailscale IP. Keep it that way in every compose file.
 
 ## 4. Models (script, takes hours)
 
