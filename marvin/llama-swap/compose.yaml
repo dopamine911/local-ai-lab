@@ -29,7 +29,7 @@ services:
     read_only: true
     user: "65534:65534"
     volumes:
-      - ../../hub/gpu-stats/gpu_stats.py:/app/gpu_stats.py:ro
+      - ${HOME}/homelab/hub/gpu-stats/gpu_stats.py:/app/gpu_stats.py:ro   # full path: ~/llama-swap is a link
     environment:
       LISTEN: ${TAILSCALE_IP:?set TAILSCALE_IP in .env}:9101   # Tailscale only; zaphod's Homepage reads it
       MEMORY: gtt                        # shared memory: GTT is what the GPU can use
