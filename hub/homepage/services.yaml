@@ -7,7 +7,10 @@
         description: Load and unload models on zaphod and marvin
     - zaphod llama-swap:
         href: https://zaphod.{{HOMEPAGE_VAR_DOMAIN}}/ui/
-        description: 2x R9700 (coder, coder-2, coder-long)
+        description: 2x R9700 (coder, coder-2, ornith, chat, search, speech)
+    - Images (ComfyUI):
+        href: https://comfy.{{HOMEPAGE_VAR_DOMAIN}}
+        description: Only while image mode is on (~/homelab/hub/image-mode on); Z-Image Turbo, Qwen-Image 2.1
     - marvin llama-swap:
         href: https://marvin.{{HOMEPAGE_VAR_DOMAIN}}/ui/
         description: Bosgame M5, big models
