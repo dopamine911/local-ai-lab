@@ -7,8 +7,9 @@ Image: ghcr.io/niko1221/strata:0.2.7-rocm-gfx120x. Needs both cards: llama-swap 
 ## Results 2026-10-29 (IQ3_XXS, free VRAM before each start: 57 MB used on both cards)
 | Setting | Cards used | Writing tok/s | Tool-use score | Full suite |
 | --- | --- | ---: | --- | ---: |
-| `GPUS=all` | card 1 only (engine's choice) | 65 | 86 / 92 / 86 (temp 0; 1.0 s1; 1.0 s2) | 33 min |
-| `GPUS=0,1` | both, main = card 2 | 85 | 90 (temp 0) | 12 min |
+| `GPUS=all` | card 1 only (engine's choice) | 65 | 86 / 92 / 86 of 138 = **88 / 95 / 87** on the 130-point basis the llama.cpp models use | 33 min |
+| `GPUS=0,1` | both, main = card 2 | 85 | 90 of 138 = **92** on the 130-point basis | 12 min |
+Same model on marvin (llama.cpp, IQ4_XS): 90 / 93 / 92, so quality is the same on both servers.
 Always set `GPUS=0,1`; `GPUS=all` silently uses one card. Strata rejects the JSON-schema request format (about 4 points
 per run). Test scripts: copies kept in plans/strata-test/ (they stop llama-swap and always restart it at the end).
 
