@@ -19,16 +19,27 @@ services:
     # No GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM here: marvin's GPU shares system memory,
     # so the zaphod fix doesn't apply.
 
+  # Monitoring agent. Start with:  docker compose --profile agent up -d
+  # BESZEL_KEY in .env = the hub's public key (same value as hub/.env on zaphod).
   beszel-agent:
-    image: henrygd/beszel-agent:0.21.1
+    image: henrygd/beszel-agent:0.21.1-alpine
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host
     profiles: [agent]
+    security_opt:
+      - apparmor:unconfined   # Docker's AppArmor profile blocks the D-Bus calls for systemd status
+    devices:
+      - /dev/nvme0n1:/dev/nvme0
+    cap_add:
+      - SYS_RAWIO
+      - SYS_ADMIN
     environment:
-      LISTEN: 45876                    # zaphod's Beszel hub connects over Tailscale
+      LISTEN: ${TAILSCALE_IP:?set TAILSCALE_IP in .env}:45876   # Tailscale only; zaphod's Beszel hub connects here
       KEY: ${BESZEL_KEY:-}
       GPU_COLLECTOR: amd_sysfs
+      SERVICE_PATTERNS: "docker*,containerd*,tailscaled*,ssh*"
     volumes:
       - ./data/beszel-agent:/var/lib/beszel-agent
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
