@@ -75,6 +75,10 @@ Strata 0.2.7 (ROCm image, engine 0.1.52), not llama.cpp. With `GPUS=all` the eng
 | **two cards** (`GPUS=0,1`), temp 0, seed 42 | 90 | 0 | 5 | 2 | 4 | 1 | 7.5 |
 | Ornith temp 0 (for comparison) | 93 | 0 | 5 | 2 | 4 | 0 | 5.0 |
 
+**Correction (2026-10-29):** these scores are out of 138 points; the llama.cpp models are scored out of 130, because
+tool-eval leaves out the 4 JSON scenarios (TC-65/66/67/69) when llama.cpp's grammar bug rejects them. On the same
+130-point basis Strata scores **88 / 95 / 87** (one card) and **92** (two cards): the same range as Ornith and marvin
+(see "marvin" below), not below them. Original text:
 Average 88, below Ornith (91.7 at temp 0.6) and coder (92); spread 86-92. "Server limit": Strata rejects the JSON-schema
 request format, so the schema was only in the prompt and the model wrapped correct JSON in a code fence (TC-65/66/67/69).
 That costs about as much as llama.cpp's grammar bug does for coder and Ornith. No fabrication. Same weak spots as
@@ -116,6 +120,22 @@ Same as temp 0 (88, 7 wrong): temperature is not why Flint misses. The spread be
 | MTP draft 4 | 36.5 | | 67-69% accepted |
 
 Whole 93 GB model in GPU memory (120 GB limit). Details: `marvin/SETUP.md`.
+
+### Tool use: marvin vs the same model on Strata vs Ornith (full suite, all on the same 130-point basis)
+
+| Model / server | temp 0, seed 42 | temp 1.0, seed 1 | temp 1.0, seed 2 | Wrong actions | Honest stops | Median s per scenario |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| **marvin**: Flash-Next UD-IQ4_XS + MTP, llama.cpp | 90 | 93 | 92 | 6 / 5 / 5 | 3 / 2 / 3 | 13 |
+| Strata: Flash-Next GSQ IQ3_XXS, one card | 88 | 95 | 87 | 8 / 5 / 8 | 1 / 1 / 1 | 22 |
+| Strata, two cards | 92 | | | 5 | 2 | 7.5 |
+| Ornith 1.5 (zaphod card 2) | 93 | 89 / 93 / 93 at temp 0.6 | | 5-6 | 2 | 5 |
+
+No fabrication anywhere. The same model on two different servers and quantizations scores the same; the differences
+are within the seed spread (about ±4). marvin passed the CFO test (TC-62: refused to add an unsupported "Q4 will
+improve" claim) in all three runs; Ornith failed it in every run. Shared weak spots: invents a search query (TC-43),
+repeats attacker content in security warnings (TC-57/58/60), batches the invite email before the calendar result
+(TC-51), skips the calculator (TC-54/55). Once (temp 0, TC-45) it ignored a required tool call and then repeated its
+answer in a loop. MLflow: a957f4cb, 37ac5695, fe7f05a3.
 
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
