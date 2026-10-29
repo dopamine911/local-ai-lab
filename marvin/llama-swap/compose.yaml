@@ -36,6 +36,23 @@ services:
       CARD_NAMES: "0000:c5:00.0=Radeon 8060S"
     command: ["python3", "/app/gpu_stats.py"]
 
+  # Agent statistics for the Homepage start page (read-only): requests, tokens, speeds (24 h), slots, context use.
+  agent-stats:
+    image: python:3.13-slim-trixie
+    container_name: agent-stats
+    restart: unless-stopped
+    network_mode: host
+    read_only: true
+    user: "0:0"                # data/ belongs to root on marvin; no capabilities, read-only
+    cap_drop: [ALL]
+    volumes:
+      - ${HOME}/homelab/hub/agent-stats/agent_stats.py:/app/agent_stats.py:ro
+      - ./data:/data          # llama-swap's activity.sqlite, opened read-only (writable dir: SQLite's -shm file)
+    environment:
+      LISTEN: ${TAILSCALE_IP:?set TAILSCALE_IP in .env}:9102   # Tailscale only; zaphod's Homepage reads it
+      API_KEY: ${MARVIN_KEY}
+    command: ["python3", "/app/agent_stats.py"]
+
   # Monitoring agent. Start with:  docker compose --profile agent up -d
   # BESZEL_KEY in .env = the hub's public key (same value as hub/.env on zaphod).
   beszel-agent:

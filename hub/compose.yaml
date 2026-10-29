@@ -274,6 +274,23 @@ services:
       CARD_NAMES: "0000:06:00.0=card 1 (OCuLink),0000:0b:00.0=card 2 (x16)"
     command: ["python3", "/app/gpu_stats.py"]
 
+  # Agent statistics for the Homepage start page (read-only): requests, tokens, speeds (24 h), slots, context use.
+  agent-stats:
+    image: python:3.13-slim-trixie
+    container_name: agent-stats
+    restart: unless-stopped
+    network_mode: host
+    read_only: true
+    user: "1000:1000"
+    cap_drop: [ALL]
+    volumes:
+      - ./agent-stats/agent_stats.py:/app/agent_stats.py:ro
+      - ../zaphod/llama-swap/data:/data          # llama-swap's activity.sqlite, opened read-only (writable dir: SQLite's -shm file)
+    environment:
+      LISTEN: 127.0.0.1:9102
+      API_KEY: ${ZAPHOD_KEY}
+    command: ["python3", "/app/agent_stats.py"]
+
   homepage:
     image: ghcr.io/gethomepage/homepage:v2.7.0
     container_name: homepage
