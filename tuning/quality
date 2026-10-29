@@ -8,6 +8,8 @@
 #   ./quality coder "temp 0.6" --temperature 0.6
 #   SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full
 #     (SKILL adds an instruction file after the built-in system prompt; frontmatter is stripped)
+#   BASE_URL=http://127.0.0.1:8099/v1 API_KEY=... ./quality strata "..." --full
+#     (another OpenAI-compatible server instead of llama-swap)
 #
 # Defaults: temperature 0 and seed 42, so the same model and settings give the
 # same answers every time and runs compare cleanly. The model runs with its normal
@@ -36,7 +38,7 @@ echo "== tool-eval-bench on $MODEL ${SUITE:-(full)}"
 docker run --rm --network host -u "$(id -u):$(id -g)" \
   -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" -v "$PWD/tool-eval/prompts:/app/tool-eval/prompts:ro" \
   tool-eval-bench:3.0.0 run $SUITE --seed 42 \
-  --base-url http://127.0.0.1:8080/v1 --api-key "$ZAPHOD_KEY" --model "$MODEL" \
+  --base-url "${BASE_URL:-http://127.0.0.1:8080/v1}" --api-key "${API_KEY:-$ZAPHOD_KEY}" --model "$MODEL" \
   --no-live --json-file "/app/runs/$OUT" "${PROMPT_ARGS[@]}" "$@" > "tool-eval/runs/${OUT%.json}.log" 2>&1 \
   || { echo "tool-eval-bench failed:"; tail -5 "tool-eval/runs/${OUT%.json}.log"; exit 1; }
 
