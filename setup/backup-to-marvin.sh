@@ -19,7 +19,9 @@ LOG=$HOME/.cache/backup-to-marvin.log
 case "${1:-run}" in
   install)
     line="17 4 * * * $REPO/setup/backup-to-marvin.sh >> $LOG 2>&1"
-    (crontab -l 2>/dev/null | grep -v 'backup-to-marvin.sh'; echo "$line") | crontab -
+    # "|| true": with no crontab yet, crontab -l and grep both fail, which must not stop the script
+    { crontab -l 2>/dev/null | grep -v 'backup-to-marvin.sh' || true; echo "$line"; } | crontab -
+    crontab -l | grep -q 'backup-to-marvin.sh' || { echo "install FAILED"; exit 1; }
     echo "installed: $line"; exit 0 ;;
   list) ssh $DEST_HOST "du -sh $DEST/* 2>/dev/null; echo; du -sh $DEST"; exit 0 ;;
   run) ;;
