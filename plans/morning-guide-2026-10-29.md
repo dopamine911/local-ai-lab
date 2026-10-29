@@ -63,7 +63,7 @@ In tmux, one at a time (10-30 minutes each):
 ## 7. Decisions waiting for you
 
 - **Strata (Qwen3.8-Flash-Next):** on two cards it scored 92 on the same basis as Ornith (93) (corrected later that day: the first numbers were out of 138, not 130), writes at 85 tok/s, and was the
-  only model besides coder + the-craft to refuse the CFO "Q4 will improve" claim. But it needs BOTH cards, so llama-swap
+  only model besides coder + the-craft (and north + j5-craft) to refuse the CFO "Q4 will improve" claim (on two cards; on one card it sent it). But it needs BOTH cards, so llama-swap
   (coder, coder-2, speech, document search) has to stop while it runs. My view: not worth that as a daily model; Ornith
   gives the same quality on half of one card. Worth more tests only if you want it for a specific job. Next tests if yes:
   `plans/strata.md`, "Possible next tests".
