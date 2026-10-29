@@ -137,6 +137,16 @@ repeats attacker content in security warnings (TC-57/58/60), batches the invite 
 (TC-51), skips the calculator (TC-54/55). Once (temp 0, TC-45) it ignored a required tool call and then repeated its
 answer in a loop. MLflow: a957f4cb, 37ac5695, fe7f05a3.
 
+## Terminal-Bench (Core-19, terminus-2 agent, pass@2)
+
+| Date | Machine / model | Tier | Result | Note |
+| --- | --- | --- | --- | --- |
+| 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots | smoke (1 task) | 1/1, first attempt, ~3 min | MLflow 57214956 |
+
+Published full runs in the benchmark repo (other people's machines, for reference): Flash-Next UD-IQ4_XS on Strix Halo
+(EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
+Qwen3.8-27B UD-Q4_K_XL (our `coder` model) on Strix Halo 18/19. A smoke pass shows the setup works; only full runs compare.
+
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
 | Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |
