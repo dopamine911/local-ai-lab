@@ -135,6 +135,21 @@
               format: number
               suffix: " W"
 
+- NAS:
+    - Unraid:
+        icon: unraid.png
+        description: Storage and backups (rebuild planned; widget off until then)
+        # To switch on after the NAS rebuild (needs Unraid 7.2+):
+        #   1. In Unraid: Settings > Management Access > API keys, new key with the VIEWER role.
+        #   2. In hub/.env: UNRAID_URL=https://<nas address>  and  UNRAID_KEY=<the key>
+        #   3. Add  href: "{{HOMEPAGE_VAR_UNRAID_URL}}"  above, remove the "# " from the widget lines below,
+        #      then: cd ~/homelab/hub && docker compose up -d homepage
+        # widget:
+        #   type: unraid
+        #   url: "{{HOMEPAGE_VAR_UNRAID_URL}}"
+        #   key: "{{HOMEPAGE_VAR_UNRAID_KEY}}"
+        #   fields: ["status", "cpu", "memoryPercent", "arrayFree", "arrayUsedPercent", "notifications"]
+
 - Apps:
     - Chat:
         icon: open-webui.png

@@ -11,6 +11,9 @@ layout:
   marvin:
     style: row
     columns: 4
+  NAS:
+    style: row
+    columns: 4
   Apps:
     style: row
     columns: 4
