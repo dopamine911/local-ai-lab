@@ -27,27 +27,31 @@
 
 Caddy listens only on zaphod's Tailscale address, so none of this is reachable from the home network or the internet.
 
-## Open WebUI tools
+## Open WebUI settings
 
-- **Web search:** SearXNG (`hub/searxng/settings.yml`), private, no API keys. Defaults set in compose; check Admin Panel → Settings → Web Search.
-- **Open Terminal:** a sandboxed Linux shell and file area (own container, own home folder in `hub/data/open-terminal`, no Docker socket, no host files). Key: `OPEN_TERMINAL_API_KEY` in `hub/.env`. Connected in Admin Panel → Settings → Integrations → Open Terminal, URL `http://127.0.0.1:8000`.
-- **Context7 (MCP):** current library documentation for coding questions. Hosted by Upstash (queries leave zaphod), no key. Admin Panel → Settings → Integrations → External Tool Servers, type MCP (Streamable HTTP), URL `https://mcp.context7.com/mcp`, auth None.
-- **Document search (embeddings + reranker on zaphod):** Admin Panel → Settings → Documents.
-  Embedding Model Engine: **OpenAI**, URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `embed`.
-  Hybrid Search: **on**. Reranking Engine: **External**, URL `http://127.0.0.1:8080/v1/rerank`, key: ZAPHOD_KEY, model `rerank`.
-  After changing the embedding model, re-index existing documents (same page, "Reindex Knowledge Base Vectors").
-- **Speech-to-text (on zaphod):** Admin Panel → Settings → Audio → Speech-to-Text Engine: **OpenAI**,
-  URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `stt` (Qwen3-ASR, ~30 languages).
-  For other languages use model `stt-whisper` (Whisper, 99 languages).
-- **Text-to-speech (on zaphod):** Admin Panel → Settings → Audio → Text-to-Speech Engine: **OpenAI**,
-  URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `tts`, voice `af_heart` (Kokoro; other voices such as
-  `bf_emma`, `am_michael`, `bm_george`). For a more expressive voice or other languages: model `tts-qwen`,
-  voice `Ryan` or `Vivian` (unloads `ornith` if it is loaded).
-- **Image generation (ComfyUI, only while image mode is on):** Admin Panel → Settings → Images: engine **ComfyUI**,
-  URL `http://127.0.0.1:8188`, workflow: upload `hub/comfyui/workflows/z-image-turbo-api.json`, then map the nodes:
-  prompt → node `5` (text), model → `1`, width/height → `7`, steps and seed → `8`. Default size 1024x1024, steps 8.
-  Alternative, better at text inside images: `hub/comfyui/workflows/qwen-image-2.1-turbo-api.json`, nodes:
-  prompt → `5` (field `prompt`), model → `1`, width/height → `6`, seed → `7` (`noise_seed`). Steps are fixed (8).
+**All Open WebUI settings are in `hub/compose.yaml`** (the `open-webui` environment block), not in the web page.
+A rebuilt Open WebUI starts with them. Change a setting = edit compose.yaml, then `~/homelab/hub/openwebui/drift.sh --sync`.
+
+- `hub/openwebui/drift.sh`: compares the running Open WebUI with compose.yaml (builds a throwaway copy, no network,
+  about a minute). Good result: `0 setting(s) differ`. "web page only" lines = changed by hand: add them to compose or undo.
+- `hub/openwebui/drift.sh --sync`: copies the compose-managed settings (`hub/openwebui/managed-keys.txt`) into the
+  running Open WebUI; stops it for a few seconds; saves `data/open-webui/webui.db.before-sync-<date>` first.
+
+What is set (2026-10-29, checked working end to end):
+- **Accounts:** sign-up off; API keys on (`OPENWEBUI_API_KEY` in `hub/.env` = an admin key for scripts).
+- **Web search:** SearXNG (`hub/searxng/settings.yml`), private, 3 results, asks before searching.
+- **Documents:** embeddings `embed`, hybrid search on, re-ranking `rerank` (both llama-swap, card 1). After changing
+  the embedding model, re-index (Admin Panel → Settings → Documents → "Reindex Knowledge Base Vectors").
+- **Speech:** speech-to-text `stt` (Qwen3-ASR; `stt-whisper` for other languages), text-to-speech `tts` voice
+  `af_heart` (Kokoro; or `tts-qwen` with `Ryan`/`Vivian`, which unloads `ornith`).
+  Fixed 2026-10-29: before, the models were empty / `tts-1`, so text-to-speech and re-ranking failed (404).
+- **Tools:** the MCP gateway (`homelab-tools`, next section) and Context7 (public library docs, hosted by Upstash:
+  queries leave zaphod, no key).
+- **Code runner:** Open Terminal (own container, own home folder `hub/data/open-terminal`, no Docker socket, no host files).
+- **Not set up:** image generation. ComfyUI (only in image mode) would be engine **ComfyUI**, URL `http://127.0.0.1:8188`,
+  workflow `hub/comfyui/workflows/z-image-turbo-api.json` (nodes: prompt `5` text, model `1`, size `7`, steps/seed `8`)
+  or `qwen-image-2.1-turbo-api.json` (prompt `5` field `prompt`, model `1`, size `6`, seed `7` `noise_seed`).
+  To use it, add the COMFYUI_* settings to compose.yaml rather than the web page.
 
 ## Agent tools: MCP gateway (MCPJungle)
 
@@ -62,10 +66,7 @@ Setup and rebuild: `hub/mcp/setup.sh` (servers in `hub/mcp/servers/`, agent logi
 tokens in `hub/.env` as `MCP_TOKEN_<NAME>`). Admin: `mcpjungle list tools`, `mcpjungle list mcp-clients`.
 
 Connect an agent:
-- **Open WebUI:** `~/homelab/hub/mcp/openwebui-connect.sh` (adds or updates the connection through Open WebUI's admin
-  API; needs `OPENWEBUI_API_KEY` in `hub/.env`, an API key of your admin account). By hand instead: Admin Panel →
-  Settings → External Tools, type **MCP (Streamable HTTP)**, URL `http://127.0.0.1:8085/mcp`, auth **Bearer**, key
-  `MCP_TOKEN_OPENWEBUI` from `hub/.env`.
+- **Open WebUI:** already connected through `hub/compose.yaml` (`TOOL_SERVER_CONNECTIONS`, token `MCP_TOKEN_OPENWEBUI`).
 - **Claude Code** on zaphod (one command; reads the token from the file, never typed):
   `claude mcp add --transport http --scope user homelab-tools http://127.0.0.1:8085/mcp --header "Authorization: Bearer $(grep ^MCP_TOKEN_CLAUDE_CODE= ~/homelab/hub/.env | cut -d= -f2)"`
 

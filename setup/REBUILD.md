@@ -84,7 +84,7 @@ cd ~/llama-swap && docker compose build && docker compose up -d
 cd ~/homelab/hub && docker compose --profile images build && docker compose up -d
 docker compose --profile agent up -d beszel-agent
 ~/homelab/hub/mcp/setup.sh     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
-~/homelab/hub/mcp/openwebui-connect.sh   # after Open WebUI's admin account exists (needs OPENWEBUI_API_KEY)
+~/homelab/hub/openwebui/drift.sh   # Open WebUI settings come from compose.yaml; good result: 0 setting(s) differ
 ```
 Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `mcp/setup.sh` ends with
 `== client ...: Servers accessible: ...` for each agent. Restoring `hub/data/mcpjungle/` from backup also brings back
@@ -93,7 +93,9 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 
 1. **Cloudflare DNS:** `A` records `ai.dopamine911.com` and `*.ai.dopamine911.com` → zaphod's Tailscale IP, DNS only (grey cloud).
-2. **Open WebUI** (`https://chat.<DOMAIN>`): first account becomes admin. Settings: see README.md, "Open WebUI tools".
+2. **Open WebUI** (`https://chat.<DOMAIN>`): first account becomes admin (always allowed, even with ENABLE_SIGNUP=false; sign-up is closed
+   for everyone after it, checked in the v0.12.4 source). All other settings come from `hub/compose.yaml`. Then create an admin API key
+   (Settings > Account > API keys) for scripts: `OPENWEBUI_API_KEY` in `hub/.env` and Proton Pass.
 3. **Beszel** (`https://monitor.<DOMAIN>`): create the account; **Add system** for each machine:
    zaphod = host `127.0.0.1`, port `45876`; marvin = host `100.101.162.9` (its Tailscale IP), port `45876`.
    Then `~/homelab/hub/beszel-monitors.sh` (asks for the Beszel login) adds the network monitors.

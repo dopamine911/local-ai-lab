@@ -1,0 +1,29 @@
+# Open WebUI settings that compose.yaml manages (environment variable -> stored setting).
+# drift.sh --sync copies exactly these from a fresh build of compose.yaml into the live Open WebUI.
+ui.enable_signup
+auth.enable_api_keys
+web.search.enable
+web.search.engine
+web.search.searxng_query_url
+web.search.result_count
+web.search.confirmation.enable
+rag.embedding_engine
+rag.embedding_model
+rag.openai.api_base_url
+rag.openai.api_key
+rag.enable_hybrid_search
+rag.reranking_engine
+rag.external_reranker_url
+rag.external_reranker_api_key
+rag.reranking_model
+audio.stt.engine
+audio.stt.model
+audio.stt.openai.api_base_url
+audio.stt.openai.api_key
+audio.tts.engine
+audio.tts.model
+audio.tts.voice
+audio.tts.openai.api_base_url
+audio.tts.openai.api_key
+tool_server.connections
+terminal_server.connections

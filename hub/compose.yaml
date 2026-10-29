@@ -33,12 +33,56 @@ services:
       # Fixed key: otherwise a new one is made on every container recreate (logs you out,
       # breaks saved tool logins). Copied from the key Open WebUI generated on first start.
       WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY}
-      # Web search through the private SearXNG below. These are defaults: once changed in
-      # Admin Panel -> Settings -> Web Search, the saved values there win.
+      # ---- All Open WebUI settings live HERE, not in the web page. ----
+      # These fill an EMPTY Open WebUI (a rebuild). On the running one, the database wins, so after changing a value
+      # here run hub/openwebui/sync.sh; hub/openwebui/drift.sh shows anything changed in the web page instead.
+      # Names checked against Open WebUI v0.12.4 (backend/open_webui/config.py); re-check after upgrading.
+      # Accounts
+      ENABLE_SIGNUP: "false"                       # only the admin account; nobody can sign up
+      ENABLE_API_KEYS: "true"                      # for scripts (OPENWEBUI_API_KEY in .env)
+      # Web search through the private SearXNG below
       ENABLE_WEB_SEARCH: "true"
       WEB_SEARCH_ENGINE: searxng
       SEARXNG_QUERY_URL: http://127.0.0.1:8888/search?q=<query>
-      WEB_SEARCH_RESULT_COUNT: "5"
+      WEB_SEARCH_RESULT_COUNT: "3"
+      ENABLE_WEB_SEARCH_CONFIRMATION: "true"
+      # Documents: embeddings and re-ranking from llama-swap (models embed + rerank, card 1)
+      RAG_EMBEDDING_ENGINE: openai
+      RAG_EMBEDDING_MODEL: embed
+      RAG_OPENAI_API_BASE_URL: http://127.0.0.1:8080/v1
+      RAG_OPENAI_API_KEY: ${ZAPHOD_KEY}
+      ENABLE_RAG_HYBRID_SEARCH: "true"
+      RAG_RERANKING_ENGINE: external
+      RAG_EXTERNAL_RERANKER_URL: http://127.0.0.1:8080/v1/rerank
+      RAG_EXTERNAL_RERANKER_API_KEY: ${ZAPHOD_KEY}
+      RAG_RERANKING_MODEL: rerank
+      # Speech from llama-swap: stt (Qwen3-ASR), tts (Kokoro, voice af_heart)
+      AUDIO_STT_ENGINE: openai
+      AUDIO_STT_MODEL: stt
+      AUDIO_STT_OPENAI_API_BASE_URL: http://127.0.0.1:8080/v1
+      AUDIO_STT_OPENAI_API_KEY: ${ZAPHOD_KEY}
+      AUDIO_TTS_ENGINE: openai
+      AUDIO_TTS_MODEL: tts
+      AUDIO_TTS_VOICE: af_heart
+      AUDIO_TTS_OPENAI_API_BASE_URL: http://127.0.0.1:8080/v1
+      AUDIO_TTS_OPENAI_API_KEY: ${ZAPHOD_KEY}
+      # Tools: the MCP gateway (hub/mcp) and Context7 (public docs lookup, no login). The long ids are the ones Open
+      # WebUI gave the connections when they were added by hand; kept so nothing that refers to them breaks.
+      TOOL_SERVER_CONNECTIONS: >-
+        [{"type": "mcp", "url": "http://127.0.0.1:8085/mcp", "spec_type": "url", "spec": "", "path": "openapi.json",
+          "auth_type": "bearer", "key": "${MCP_TOKEN_OPENWEBUI}",
+          "config": {"enable": true, "function_name_filter_list": "", "access_grants": []},
+          "info": {"id": "homelab-tools", "name": "Homelab tools (MCPJungle)", "description": "Agent tools from zaphod's MCP gateway"}},
+         {"type": "mcp", "url": "https://mcp.context7.com/mcp", "spec_type": "url", "spec": "", "path": "openapi.json",
+          "auth_type": "none", "forward_cookies": false, "headers": null, "key": "",
+          "config": {"enable": true, "function_name_filter_list": "", "access_grants": []},
+          "info": {"id": "f9062e23-d37d-4e7a-95d9-60753c999f1c", "name": "Context7", "description": "Up-to-date library documentation"}}]
+      # Code runner: Open Terminal (service below)
+      TERMINAL_SERVER_CONNECTIONS: >-
+        [{"id": "c1426adc-e62a-4344-a937-7aa94537de8c", "name": "Open Terminal", "enabled": true, "url": "http://127.0.0.1:8000",
+          "path": "/openapi.json", "key": "${OPEN_TERMINAL_API_KEY}", "auth_type": "bearer", "forward_cookies": false,
+          "config": {"access_grants": [], "working_directory_context": true, "user_shell_tools": "auto"},
+          "server_type": null, "policy_id": null}]
     volumes:
       - ./data/open-webui:/app/backend/data
 
