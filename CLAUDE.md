@@ -2,6 +2,8 @@
 
 This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never commit .env files or keys.
 
+Overview of every feature with links: `FEATURES.md` (keep it updated when adding or changing a feature).
+
 ## Machines
 - zaphod (this machine): Ubuntu 26.04 server, Ryzen 9 3900X, Gigabyte B550I AORUS PRO AX (mini-ITX), 2x Radeon AI PRO R9700 (32 GB each).
   - Card 1: PCI 06:00.0, /dev/dri/renderD128, on an OCuLink dock via an M.2 adapter in the back (chipset) M.2 slot, PCIe 3.0 x4.

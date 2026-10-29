@@ -32,19 +32,32 @@ What follows from that:
 
 ## Steps (in order; each one finished and measured before the next)
 
-### 1. A coding agent that runs on the local models
-Pick one open-source coding agent that speaks the OpenAI API and works well with llama-swap.
-Candidates *(check)*: OpenCode, Aider, Qwen Code, Goose, Crush, Codex CLI with a local endpoint.
-1. Research: which handle tool calling with Qwen3.8 / Ornith / Flash-Next well, which are maintained, how each
-   handles context limits (marvin 128K shared by 2 slots, coder 64K, coder-tb 256K).
-2. Try the top 2 on the same 3 real tasks from Daniel's repos; keep the one that finishes them.
-3. Config in the repo (no keys: `ZAPHOD_KEY` from `~/llama-swap/.env`), install steps in `setup/`.
+### 1. A coding agent on the local models: Enso  (decided 2026-10-29)
+The coding agent is Daniel's own **Enso** (github.com/dopamine911/enso-harness): a debugging and control layer around
+a coding agent, built on **pi** (TypeScript/Bun). It already has guards (bash policy, writes confined to the workspace,
+read gating, read-before-write), guarded `web_fetch`/`web_search`, and a daily JSONL log ("receipts"). Not a sandbox,
+by its own README. No other agent will be evaluated unless Enso can't do something needed.
 
-Good result: Daniel can open a terminal and do a real coding task with `coder`, `ornith` or `marvin/big`.
+How it meets the lab (checked in pi's docs, not tried yet):
+1. **Models**: pi reads custom OpenAI-compatible providers from `models.json` (`"api": "openai-completions"`,
+   `baseUrl`, `apiKey` from an environment variable such as `${ZAPHOD_KEY}`, per model `"reasoning": true` and
+   `"input": ["text", "image"]`). One provider entry for zaphod's llama-swap (`http://127.0.0.1:8080/v1`) covers
+   `coder`, `ornith`, `chat` and `marvin/big` (marvin through zaphod). The key never goes in the file.
+2. **Web search**: Enso's `web_search` uses the model's own search API, else Tavily (paid, cloud). Local models have
+   no search API. Option (Daniel's code, his call): a SearXNG backend for Enso's `web_search`, keeping search local.
+3. **Tools**: pi's docs don't mention MCP (it extends through its own extensions; check before relying on it), so the
+   MCP gateway (step 3) may reach Enso only through an extension; Enso's guarded tools stay the primary path.
+4. **Evidence**: Enso's logs (`~/.enso/logs/enso-*.jsonl`) can feed MLflow later (step 6, profiling).
+
+Steps, one at a time, each with a good result:
+1. pi `models.json` with the llama-swap provider (no key in the file). Good: `/model` lists coder, ornith, chat, marvin/big.
+2. One small real task with `coder` (fast, zaphod) and the same with `marvin/big`. Good: finished, receipts in the log.
+3. Note what breaks or is missing for local models (tool-call format, reasoning output, context limits, speed).
+4. Then the own-task test (step 2) runs through Enso.
 
 ### 2. A test made of Daniel's own tasks
 10-20 tasks he would normally give a frontier model (code changes, debugging, writing, research), each with a short
-"what a good answer looks like". Run on each local model through the step-1 agent; Daniel scores them (pass / partly / fail).
+"what a good answer looks like". Run on each local model through Enso; Daniel scores them (pass / partly / fail).
 Results in MLflow (`benchmark = own-tasks`), with the same manifest, series and real-use speed as other runs.
 
 Good result: one number per model, "local handled N of 20 of my tasks", repeated after every model change.
@@ -111,6 +124,6 @@ local handles reliably.
 
 ## Decisions for Daniel
 
-1. Step 1 first? (Recommended: yes; everything else is measured through it.)
+1. Step 1 = Enso on local models (decided). First change: pi `models.json` provider for llama-swap.
 2. Which 10-20 tasks go into the own-task test (step 2)?
 3. Who else will ever be on the tailnet? Decides how urgent step 9.1 is.

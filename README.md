@@ -1,5 +1,7 @@
 # Homelab
 
+What this lab does, feature by feature, with links to every detail: [FEATURES.md](FEATURES.md).
+
 ```
 ~/homelab/
   CLAUDE.md                  notes for Claude (link to ~/llama-swap/CLAUDE.md)
