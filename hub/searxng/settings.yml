@@ -1,5 +1,10 @@
-# SearXNG for Open WebUI on zaphod. Private: reachable only from zaphod itself (127.0.0.1:8888).
-use_default_settings: true
+# SearXNG for Open WebUI and the MCP gateway on zaphod. Private: reachable only from zaphod itself (127.0.0.1:8888).
+# Engine changes are measured with a fixed set of queries (results per query, which engines answer, which fail).
+use_default_settings:
+  engines:
+    remove:
+      - torch        # Tor-only engines: fail to load here (no Tor), only log noise
+      - ahmia
 server:
   secret_key: "set-by-SEARXNG_SECRET"   # overridden by the SEARXNG_SECRET env var
   limiter: false                        # private instance, one user: no rate limiting needed
@@ -10,3 +15,38 @@ search:
   formats:
     - html
     - json                              # required by Open WebUI
+engines:
+  # More web engines, so one engine blocking us (DuckDuckGo shows CAPTCHAs) doesn't empty the results.
+  # 2026-10-29 before: only brave + google cse returned results (37 per query, 8.4 s); duckduckgo CAPTCHA on 5/5.
+  # After: google cse + bing + yahoo answer (33 per query, 3.4 s, no failures except brave "too many requests",
+  # caused by my back-to-back test runs; it should recover). IT tab: github, hackernews, stackoverflow, microsoft learn.
+  - name: bing
+    disabled: false
+  - name: yahoo
+    disabled: false
+  # Tried 2026-10-29 and switched off: they refuse zaphod on every query, which only adds delay and log noise.
+  - name: duckduckgo
+    disabled: true       # CAPTCHA on 5/5 queries
+  - name: google
+    disabled: true       # "access denied" on 5/5 (google cse, which works, stays on)
+  - name: qwant
+    disabled: true       # "access denied" on 5/5
+  # Developer sources (category "it"; also used by "!it" or the IT tab)
+  - name: huggingface
+    disabled: false
+  - name: ollama
+    disabled: false
+  - name: npm
+    disabled: false
+  - name: crates.io
+    disabled: false
+  - name: gitlab
+    disabled: false
+  - name: codeberg
+    disabled: false
+  - name: hackernews
+    disabled: false
+  - name: microsoft learn
+    disabled: false
+  - name: national vulnerability database
+    disabled: false
