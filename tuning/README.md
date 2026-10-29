@@ -84,6 +84,8 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
   with 500+ new tokens), `live_draft_acceptance_pct` (MTP), `live_cached_pct` (prompt reused from cache), tokens, busy
   minutes. Any chat with the same model during the run is counted too. Not available for Strata (not llama-swap).
   One old run (coder short suite) shows `live_reading_tps` 0: it had no long prompt, not a slow one.
+- Terminal-Bench runs: `tasks.json` with one row per task (passed, attempts, minutes, agent steps, tokens, peak
+  context, error) and `tbench_peak_context_max` (closest any task came to the context limit; marvin has 128K).
 - `tooleval_score_common` (tool-use): the score **without the 4 JSON scenarios** (TC-65/66/67/69). Use this one to
   compare models: llama.cpp's grammar bug removes those scenarios for some models but not others, so the raw
   `tooleval_score` is on different bases (out of 130 or 138 points). Added to all older tool-use runs too.

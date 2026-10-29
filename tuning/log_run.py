@@ -13,6 +13,7 @@ What it records:
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
   - series tag (SERIES=name ./quality ...): repeats of one setup, grouped in MLflow
   - behavior_* (tool-use): automatic checks for problems the grader misses (tool-eval/behavior.py)
+  - tasks.json (Terminal-Bench): one row per task (passed, attempts, minutes, steps, tokens, peak context, error)
   - live_* (quality, tbench): real-use speed during the run from llama-swap's request log (activity.sh)
   - benchmark tag: speed, tool-use, terminal-bench, kl-divergence, history or manual
   - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
@@ -178,6 +179,31 @@ def read_terminal_bench(d):
     return params, metrics
 
 
+def terminal_bench_table(summary_path):
+    """One row per task from the results-<task>.json files next to a Terminal-Bench summary.json."""
+    import glob
+    cols = ["task", "passed", "attempts", "passed_at_attempt", "minutes", "agent_steps",
+            "input_tokens", "cached_tokens", "output_tokens", "peak_context", "error"]
+    table = {c: [] for c in cols}
+    for f in sorted(glob.glob(os.path.join(os.path.dirname(summary_path), "results-*.json"))):
+        try:
+            r = json.load(open(f))
+        except (ValueError, OSError):
+            continue
+        att = r.get("attempts") or []
+        tok = r.get("tokens") or {}
+        errs = [str(a.get("exception"))[:120] for a in att if a.get("exception")]
+        row = {"task": r.get("task"), "passed": bool(r.get("passed")), "attempts": len(att),
+               "passed_at_attempt": r.get("succeeded_at_attempt") or 0,
+               "minutes": round((r.get("duration_ms") or 0) / 60000, 1), "agent_steps": r.get("agent_steps") or 0,
+               "input_tokens": tok.get("input", 0), "cached_tokens": tok.get("cached", 0), "output_tokens": tok.get("output", 0),
+               "peak_context": max([(a.get("tokens") or {}).get("peak_context", 0) for a in att] or [0]),
+               "error": "; ".join(errs)}
+        for c in cols:
+            table[c].append(row[c])
+    return table if table["task"] else None
+
+
 def read_tool_eval(path):
     """Settings and results from a tool-eval-bench --json-file result,
     or a Terminal-Bench-Local summary.json."""
@@ -312,6 +338,10 @@ def main():
                         mlflow.log_params(p)
                         mlflow.log_metrics(m)
                         if "tbench_passed" in m:
+                            t = terminal_bench_table(item)
+                            if t:
+                                mlflow.log_table(t, "tasks.json")
+                                mlflow.log_metric("tbench_peak_context_max", max(t["peak_context"]))
                             print(f"  Terminal-Bench: {m['tbench_passed']}/{m['tbench_total']} tasks "
                                   f"({m['tbench_pass_rate_pct']}%) in {m['tbench_hours']} h")
                         else:
