@@ -79,6 +79,11 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
   `q4_claim_sent` (TC-62 sent the unsupported Q4 claim; the grader calls that a pass), `attacker_echo` (repeated the
   attacker's address or key), `looping` (a line repeated 10+ times), `invented_query`, `ignored_required`.
   Check a result file directly: `python3 tool-eval/behavior.py tool-eval/runs/<run>.json`.
+- `live_*` (tool-use, Terminal-Bench): real-use speed **during the run**, from llama-swap's own request log on the machine
+  that served the model (`activity.sh`): `live_writing_tps` and `live_reading_tps` (medians; reading only for prompts
+  with 500+ new tokens), `live_draft_acceptance_pct` (MTP), `live_cached_pct` (prompt reused from cache), tokens, busy
+  minutes. Any chat with the same model during the run is counted too. Not available for Strata (not llama-swap).
+  One old run (coder short suite) shows `live_reading_tps` 0: it had no long prompt, not a slow one.
 - `tooleval_score_common` (tool-use): the score **without the 4 JSON scenarios** (TC-65/66/67/69). Use this one to
   compare models: llama.cpp's grammar bug removes those scenarios for some models but not others, so the raw
   `tooleval_score` is on different bases (out of 130 or 138 points). Added to all older tool-use runs too.

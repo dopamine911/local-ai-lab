@@ -13,6 +13,7 @@ What it records:
     (skipped if the model isn't loaded, e.g. a llama-bench run with llama-swap stopped)
   - series tag (SERIES=name ./quality ...): repeats of one setup, grouped in MLflow
   - behavior_* (tool-use): automatic checks for problems the grader misses (tool-eval/behavior.py)
+  - live_* (quality, tbench): real-use speed during the run from llama-swap's request log (activity.sh)
   - benchmark tag: speed, tool-use, terminal-bench, kl-divergence, history or manual
   - env.* tags: machine, kernel, Mesa, GPUs, image, llama.cpp commit (from manifest.sh, via ./log)
   - model.* tags: the exact model file, Hugging Face repo, revision and sha256 (from setup/models-<machine>.txt)
@@ -289,6 +290,15 @@ def main():
             mlflow.log_params({"skill": os.environ["SKILL_NAME"], "skill.sha": os.environ.get("SKILL_SHA", "")})
             mlflow.set_tag("skill", os.environ["SKILL_NAME"])
         mlflow.set_tags(manifest_tags())
+        live = {}
+        for line in os.environ.get("ACTIVITY", "").splitlines():  # real-use speed during the run (activity.sh)
+            k, _, v = line.partition("=")
+            try:
+                live[k.strip()] = float(v)
+            except ValueError:
+                pass
+        if live:
+            mlflow.log_metrics(live)
         if cmd:
             mlflow.set_tags(model_tags(machine, cmd))
             mlflow.log_params(flags_to_params(cmd))

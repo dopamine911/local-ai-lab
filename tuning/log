@@ -8,8 +8,15 @@ CONFIG_COMMIT=$(cd "$HOME/homelab/$M/llama-swap" && git log -1 --format="%h %s" 
 # Machine and software facts from the machine that served the model (tuning/manifest.sh)
 if [ "$M" = "$(hostname)" ]; then MANIFEST=$("$HERE/manifest.sh")
 else MANIFEST=$(ssh -o ConnectTimeout=10 "$M" bash -s < "$HERE/manifest.sh" 2>/dev/null || echo "host=$M (unreachable)"); fi
+# Real-use speed during the run (tuning/activity.sh), when the caller recorded RUN_START (quality, tbench)
+ACTIVITY=""
+if [ -n "${RUN_START:-}" ]; then
+  LM="${2#*/}"   # model id on the serving machine ("marvin/big" -> "big")
+  if [ "$M" = "$(hostname)" ]; then ACTIVITY=$("$HERE/activity.sh" "$LM" "$RUN_START" "$(date +%s)")
+  else ACTIVITY=$(ssh -o ConnectTimeout=10 "$M" bash -s -- "$LM" "$RUN_START" "$(date +%s)" < "$HERE/activity.sh" 2>/dev/null); fi
+fi
 docker run --rm --network host \
-  -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA -e SERIES -e MANIFEST="$MANIFEST" \
+  -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA -e SERIES -e MANIFEST="$MANIFEST" -e ACTIVITY="$ACTIVITY" \
   -v "$HERE/../setup:/setup:ro" \
   --env-file "$HOME/homelab/hub/.env" \
   -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \

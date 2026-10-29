@@ -36,6 +36,7 @@ if [ -n "$SKILL" ]; then
   echo "== with instructions: $SKILL_NAME ($SKILL_SHA, $(wc -c < "$PF") bytes of system prompt)"
 fi
 
+export RUN_START=$(date +%s)   # ./log reads real-use speed for this window from llama-swap's request log
 echo "== tool-eval-bench on $MODEL ${SUITE:-(full)}"
 docker run --rm --network host -u "$(id -u):$(id -g)" \
   -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" -v "$PWD/tool-eval/prompts:/app/tool-eval/prompts:ro" \
