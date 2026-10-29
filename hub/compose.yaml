@@ -171,3 +171,4 @@ services:
       HOMEPAGE_VAR_BESZEL_PASSWORD: ${BESZEL_PASSWORD:-}
     volumes:
       - ./homepage:/app/config
+      - ../assets:/app/public/images:ro   # background picture etc. (repo folder assets/)
