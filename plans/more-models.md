@@ -66,3 +66,6 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
 - 2026-10-29 Qwen-Image-2.1 Turbo added (Comfy-Org rev 0217efd1: turbo int8_convrot, qwen3vl_8b int8_convrot, VAE bf16;
   17.3 GB; checksums OK). The int8 files run on the R9700 through comfy_kitchen's HIP backend. 1024x1024 in 6.0 s
   (20 s with load). Wrote "ZAPHOD LAB" on a poster exactly. "Watercolor" became a watercolor picture inside a photo.
+- 2026-10-29 audio.cpp v0.9.3 (2026-10-26) checked against our build 4efa395 (2026-10-24, 29 commits behind):
+  changes are other TTS families (Drama 3, Ming3, BreezeTTS, Irodori), CUDA speed-ups and build fixes; nothing for
+  qwen3_asr, kokoro_tts or qwen3_tts on Vulkan. Not updating; it comes with the next llama-swap image anyway.
