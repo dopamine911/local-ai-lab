@@ -98,6 +98,10 @@ Checked 2026-10-29, conditions before use:
 3. No official MCP server in its README; community ones (e.g. elvismdev/mem0-mcp-selfhosted) need a code review first.
    No GitHub releases shown: pin a commit or a PyPI version at least 2 weeks old.
 4. Every memory write is a model call: measure load on zaphod and how well the local model picks what to keep.
+Not this: docs.mem0.ai/platform/mem0-mcp is the hosted Platform's MCP (`https://mcp.mem0.ai/mcp`, memories in a Mem0
+account, not on our machines). Useful only as the tool list a self-hosted memory server should offer: add_memory,
+search_memories, get_memories, get_memory, update_memory, delete_memory, delete_all_memories, list_entities,
+delete_entities, list_events, get_event_status.
 Good result: tell one agent a rule; a different agent, new session, follows it without being told.
 
 ### 5. Reading the web: page fetch and a browser
