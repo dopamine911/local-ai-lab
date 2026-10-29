@@ -12,7 +12,7 @@ macros:
   # -lm dio: direct I/O loading; loads a 93 GB model in about 33 s on Strix Halo.
   server: llama-server --port ${PORT} -ngl 999 -fa on -lm dio
   qwen-sampling: --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0 --reasoning-effort medium
-  # Speculative decoding. Add ${mtp} to big's cmd once the plain model works.
+  # Speculative decoding (MTP draft head). Baseline without it: 24.7 tok/s writing (marvin/SETUP.md step 12).
   mtp: --model-draft /models/mtp-Qwen3.8-Flash-Next-Q8_0.gguf --spec-type draft-mtp --spec-draft-n-max 3
 
 models:
@@ -24,6 +24,7 @@ models:
       -m /models/Qwen3.8-Flash-Next-UD-IQ4_XS-00001-of-00003.gguf
       -c 131072 -np 2 -kvu
       ${qwen-sampling}
+      ${mtp}
 
 hooks:
   on_startup:
