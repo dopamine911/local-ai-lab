@@ -67,8 +67,8 @@ Image: `comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14`, built from hub/comfyui/Doc
 Follow `setup/REBUILD.md`: BIOS and installer choices, then `setup/host.sh` (host settings), `setup/models.sh`
 (pinned model downloads), secrets, and `docker compose`. marvin's first setup is logged step by step in `marvin/SETUP.md`.
 
-Still to do on marvin: speed test, start llama-swap, then add it to zaphod as a peer (remove the `#` from the `peers:`
-block in `zaphod/llama-swap/config/config.yaml` and put `MARVIN_KEY` in `~/llama-swap/.env` on zaphod).
+marvin is linked to zaphod as a llama-swap peer (`peers:` at the end of `zaphod/llama-swap/config/config.yaml`), so its
+models show on zaphod as `marvin/<name>`, in Open WebUI too. Its key is `MARVIN_KEY` in zaphod's `~/llama-swap/.env`.
 
 ## Hub (after marvin, or any time)
 

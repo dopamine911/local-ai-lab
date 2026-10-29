@@ -82,3 +82,14 @@ routing:
 hooks:
   on_startup:
     preload: [coder, coder-2, embed, rerank, stt, stt-whisper, tts]
+
+# marvin (Bosgame M5, 128 GB shared memory) over Tailscale. Its models appear here under their own names,
+# so Open WebUI sees them too. MARVIN_KEY is in .env (same value as on marvin).
+peers:
+  marvin:
+    proxy: http://marvin:8080
+    apiKey: ${env.MARVIN_KEY}
+    models:
+      - big                    # Qwen3.8-Flash-Next UD-IQ4_XS, 128K
+    timeouts:
+      responseHeader: 900      # first load ~1 min, long prompts read at ~460 tok/s
