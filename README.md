@@ -43,6 +43,19 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
   URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `tts`, voice `af_heart` (Kokoro; other voices such as
   `bf_emma`, `am_michael`, `bm_george`). For a more expressive voice or other languages: model `tts-qwen`,
   voice `Ryan` or `Vivian` (unloads `ornith` if it is loaded).
+- **Image generation (ComfyUI, only while image mode is on):** Admin Panel → Settings → Images: engine **ComfyUI**,
+  URL `http://127.0.0.1:8188`, workflow: upload `hub/comfyui/workflows/z-image-turbo-api.json`, then map the nodes:
+  prompt → node `5` (text), model → `1`, width/height → `7`, steps and seed → `8`. Default size 1024x1024, steps 8.
+
+## Images: ComfyUI on card 2
+
+`hub/image-mode on` lends card 2 to ComfyUI (https://comfy.<DOMAIN>): it switches llama-swap to the `image-mode`
+profile (coder-2 requests answered by coder on card 1; ornith, chat, north, flint, tts-qwen blocked), unloads card 2's
+chat model and starts ComfyUI. `hub/image-mode off` stops ComfyUI and gives card 2 back. `hub/image-mode status` shows
+the state. Document search and speech keep working throughout. ComfyUI has no login: anyone on the tailnet can use it
+while it runs. Models live in /srv/models/comfyui; outputs in hub/data/comfyui/output.
+Image: `comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14`, built from hub/comfyui/Dockerfile (30.6 GB; PyTorch ROCm wheels).
+
 - Built in already (no setup): read a web page, current time, run code, memory, knowledge bases.
 - Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
 - `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.

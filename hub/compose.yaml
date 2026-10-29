@@ -117,6 +117,25 @@ services:
     volumes:
       - ./data/open-terminal:/home/user
 
+  # ComfyUI on card 2. Not started with the rest: `./image-mode on` frees card 2 and starts it,
+  # `./image-mode off` stops it and gives card 2 back to llama-swap.
+  comfyui:
+    image: comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14   # built from comfyui/Dockerfile
+    container_name: comfyui
+    profiles: [images]
+    restart: "no"
+    network_mode: host                  # listens on 127.0.0.1:8188 only; Caddy serves comfy.<DOMAIN>
+    devices:
+      - /dev/kfd
+      - /dev/dri/renderD129             # card 2 only (PCI 0b:00.0)
+    group_add: ["991", "44"]            # render, video
+    volumes:
+      - /srv/models/comfyui:/home/comfy/ComfyUI/models
+      - ./data/comfyui/input:/home/comfy/ComfyUI/input
+      - ./data/comfyui/output:/home/comfy/ComfyUI/output
+      - ./data/comfyui/user:/home/comfy/ComfyUI/user
+      - ./data/comfyui/custom_nodes:/home/comfy/ComfyUI/custom_nodes
+
   homepage:
     image: ghcr.io/gethomepage/homepage:v2.7.0
     container_name: homepage

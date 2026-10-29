@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Lend card 2 to ComfyUI, or give it back to llama-swap.
+#
+#   ./image-mode on       card 2's chat models off (coder-2 requests go to coder), start ComfyUI
+#   ./image-mode off      stop ComfyUI (frees all its memory), card 2 back to llama-swap
+#   ./image-mode status   what is on card 2 right now
+#
+# Card 1 (coder, document search) and the speech helpers on card 2 keep running throughout.
+# Note: a llama-swap config reload switches the profile off; run `./image-mode on` again if that happens.
+set -euo pipefail
+cd "$(dirname "$0")"
+set -a; . ~/llama-swap/.env; set +a
+U=http://127.0.0.1:8080
+api() { curl -sf -H "Authorization: Bearer $ZAPHOD_KEY" -H 'Content-Type: application/json' "$@"; }
+CARD2_MODELS="coder-2 ornith chat north flint tts-qwen"
+card2_mb() { echo $(( $(cat /sys/bus/pci/devices/0000:0b:00.0/mem_info_vram_used) / 1048576 )); }
+domain() { grep -m1 '^DOMAIN=' .env | cut -d= -f2; }
+
+case "${1:-status}" in
+  on)
+    api -X PUT $U/api/profiles/active -d '{"name":"image-mode"}' >/dev/null
+    for m in $CARD2_MODELS; do api -X POST $U/api/models/unload/$m >/dev/null || true; done
+    echo "llama-swap: profile image-mode on, card 2 chat models unloaded (card 2 now $(card2_mb) MB used)"
+    docker compose --profile images up -d comfyui
+    printf "waiting for ComfyUI"; for i in $(seq 1 120); do curl -sf -o /dev/null http://127.0.0.1:8188/ && break; printf .; sleep 2; done; echo
+    curl -sf -o /dev/null http://127.0.0.1:8188/ && echo "ComfyUI ready: https://comfy.$(domain)" \
+      || { echo "ComfyUI did not start; see: docker logs --tail 30 comfyui"; exit 1; }
+    ;;
+  off)
+    docker compose --profile images stop comfyui >/dev/null 2>&1 || true
+    docker compose --profile images rm -f comfyui >/dev/null 2>&1 || true
+    api -X PUT $U/api/profiles/active -d '{"name":null}' >/dev/null
+    echo "ComfyUI stopped, profile off, card 2 now $(card2_mb) MB used."
+    echo "coder-2, ornith and chat load again on their next request."
+    ;;
+  status)
+    echo "llama-swap profile: $(api $U/api/profiles | python3 -c 'import json,sys;print(json.load(sys.stdin)["active"] or "none")')"
+    echo "ComfyUI: $(docker ps --filter name=^comfyui$ --format '{{.Status}}' | grep . || echo stopped)"
+    echo "card 2: $(card2_mb) MB used"
+    ;;
+  *) sed -n '2,9p' "$0"; exit 1 ;;
+esac

@@ -14,6 +14,7 @@
 	@monitor host monitor.{$DOMAIN}
 	@models  host models.{$DOMAIN}
 	@mlflow  host mlflow.{$DOMAIN}
+	@comfy   host comfy.{$DOMAIN}
 
 	# llama-swap UIs (each still asks for its own API key)
 	handle @zaphod {
@@ -28,6 +29,10 @@
 	}
 	handle @mlflow {
 		reverse_proxy 127.0.0.1:5000
+	}
+	# ComfyUI has no login: anyone on your tailnet can use it while image mode is on.
+	handle @comfy {
+		reverse_proxy 127.0.0.1:8188
 	}
 	handle @monitor {
 		reverse_proxy 127.0.0.1:8090

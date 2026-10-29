@@ -57,3 +57,9 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
 - 2026-10-29 Step 6 done: `chat` = Gemma 4 31B (google/gemma-4-31B-it-qat-q4_0-gguf rev 59dde245, + mmproj), card 2, 128K q8_0,
   Google's sampling (temp 1.0, top-p 0.95, top-k 64). 28.8 tok/s writing. Described the test image correctly.
   Card 2 with chat + stt + stt-whisper + tts: 29.2 GB. Gemma 4 is still Google's newest family (no 4.5 found).
+- 2026-10-29 Step 7 done: ComfyUI v0.43.0 + PyTorch 2.15.0 + ROCm 7.14 (newest of each), own image, card 2 only,
+  started by `hub/image-mode on` (llama-swap profile `image-mode` + unload), stopped by `off`. comfy.<DOMAIN> via Caddy.
+  Z-Image Turbo (Comfy-Org rev 6fc90a3b: bf16 model, qwen_3_4b, ae) makes a 1024x1024 image in 5.0 s (15.8 s with load);
+  test images matched their prompts, except "watercolor" came out photographic. 35 TFLOPS fp16 in a PyTorch test.
+  Not yet: Qwen-Image-2.1 (newer, also edits images), Homepage button for image mode.
+- Step 8 (routing rules) was done along the way: helpers set + preload, `voice` set, `image-mode` profile.
