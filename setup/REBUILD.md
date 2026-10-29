@@ -96,5 +96,18 @@ Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the pre
 4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
-MLflow (`hub/data/mlflow`). Backups: not set up yet. Decided 2026-10-29: they go to the NAS, after the NAS rebuild
-(next project after marvin). Until then there is no copy of this data.
+MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 to marvin by `setup/backup-to-marvin.sh`
+(last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild.
+On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly backup back on.
+
+### Restore from marvin (after section 5, before starting the hub)
+1. See the snapshots: `~/homelab/setup/backup-to-marvin.sh list`. Pick the newest, e.g. `2026-10-29_0417`.
+2. Stop the hub: `cd ~/homelab/hub && docker compose down`.
+3. Copy back (sudo, because the containers' files belong to root):
+   ```
+   S=backups/zaphod/2026-10-29_0417
+   sudo rsync -a -e "ssh -i /home/daniel/.ssh/id_ed25519" daniel@marvin:$S/hub-data/ ~/homelab/hub/data/
+   rsync -a marvin:$S/llama-swap-data/ ~/homelab/zaphod/llama-swap/data/
+   ```
+   The `.env` files are in `marvin:$S/env/` too (and in Proton Pass).
+4. Start: `docker compose up -d`. Good: your old chats are in Open WebUI; Beszel shows its history.
