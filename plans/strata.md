@@ -27,6 +27,9 @@ per run). Test scripts: copies kept in plans/strata-test/ (they stop llama-swap 
 - Write the plan steps out for approval before pausing llama-swap.
 
 ## UnbiasedStrata (github.com/robertkarl/UnbiasedStrata)
+Next: plans/strix-strata.md (Strata on marvin sealed off, then port UnbiasedStrata to AMD gfx1151, PR upstream).
+Correction 2026-10-29: its AMD/Strix Halo docs are inherited from upstream, not wired into its build; its README
+is NVIDIA-only, and it does not claim a determinism fix (output can still depend on free VRAM at start).
 - README covers NVIDIA only, but the code is a PolyStrata fork and keeps its AMD HIP backend: docs/AMD_HIP.md names
   the Radeon AI PRO R9700 (gfx1201) and multi-card splits (`--gpus 1,0`). Its own `make build` is CUDA-only, so using
   it here means wiring cmake/hip_backend.cmake into that build and testing on gfx1201 (estimate: a day or two).
