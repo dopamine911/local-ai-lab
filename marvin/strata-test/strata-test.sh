@@ -29,7 +29,8 @@ mem() { echo "GPU memory used $(( $(cat /sys/class/drm/card*/device/mem_info_gtt
 
 SETTINGS=(-e MODEL=ud-iq4_xs -e FAMILY=unsloth -e MODEL_PATH=/models -e CONTEXT=128k -e PARALLEL="${PARALLEL:-2}" -e VISION=off
           -e TUNE=skip -e PRESET="${PRESET:-docker}")
-[ -n "${STRATA_SET:-}" ] && SETTINGS+=(-e STRATA_SET="$STRATA_SET")
+STRATA_SET="${STRATA_SET-prefill=16384}"   # default: 16K prompt chunks (+8% reading on a 32K prompt, measured; STRATA_SET= turns it off)
+[ -n "$STRATA_SET" ] && SETTINGS+=(-e STRATA_SET="$STRATA_SET")
 GPU=(--device /dev/kfd --device /dev/dri --group-add video --group-add "$(getent group render | cut -d: -f3)"
      --ulimit memlock=-1:-1 --shm-size 2g)
 MODELS=(); for n in 1 2 3; do MODELS+=(-v "$M/$F-0000$n-of-00003.gguf:/models/$F-0000$n-of-00003.gguf:ro"); done
@@ -73,7 +74,7 @@ start|restart)
   else
     log "restart: stopping Strata"; docker stop -t 120 strata >/dev/null 2>&1; docker rm -f strata strata-relay >/dev/null 2>&1; sleep 5
   fi
-  log "settings: preset ${PRESET:-docker}, parallel ${PARALLEL:-2}, STRATA_SET '${STRATA_SET:-}'"
+  log "settings: preset ${PRESET:-docker}, parallel ${PARALLEL:-2}, STRATA_SET '$STRATA_SET'"
   log "before Strata start: $(mem)"
   ( umask 077; openssl rand -hex 24 > "$KEYF" )
   docker rm -f strata >/dev/null 2>&1

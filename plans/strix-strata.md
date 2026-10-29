@@ -158,3 +158,4 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    per row is not stated, so not directly comparable. Left to try, one at a time: prompt chunk 16384 (+8% in Quiet),
    `tuned`, `amd_iommu=off`. Heat: GPU peaked at 93-97 C in Performance (64 C in Quiet); limit is ~100 C, watch it.
 6. `tuned` accelerator-performance (setup/host.sh step 8): Strata 32K reading 758 → 757, writing 55.7 → 55.1: no change (MLflow d7875016). Kept, harmless.
+7. Prompt chunk 16384 (`STRATA_SET=prefill=16384`, now the script's default): 32K reading 757 → **817** (+8%), writing 55.5 (MLflow f807b742). **Settings for the quality tests:** Performance mode, tuned, Strata defaults + prefill 16384, preset `p16`. Strata reads 2.6x llama.cpp (315) on the same test.
