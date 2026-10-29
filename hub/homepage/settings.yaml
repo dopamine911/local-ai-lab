@@ -2,7 +2,8 @@ title: Homelab
 theme: dark
 color: slate
 # Background: NASA SVS wallpaper "NGC 1929 from Spitzer, Chandra, ESO" (svs.gsfc.nasa.gov/14866, public domain), in assets/.
-# Other pictures in assets/ can go here too (e.g. CW_Leo_From_GALEX_desktop.jpg).
+# Other pictures in assets/ can go here too (e.g. CW_Leo_From_GALEX_desktop.jpg). After adding a NEW file to
+# assets/, restart Homepage once (cd ~/homelab/hub && docker compose restart homepage); it only sees files present at start.
 background:
   image: /images/NGC_1929_from_Spitzer_Chandra_ESO_desktop.png
   blur: sm           # sm, md, xl
