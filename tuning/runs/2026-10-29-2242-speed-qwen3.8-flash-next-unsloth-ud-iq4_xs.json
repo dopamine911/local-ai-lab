@@ -1,0 +1,60 @@
+{
+ "model": "qwen3.8-flash-next-unsloth-ud-iq4_xs",
+ "base_url": "http://marvin:8099/v1",
+ "short": [
+  {
+   "writing_tps": 46.3,
+   "tokens": 400,
+   "ttft_s": 1.03,
+   "server_reported_tps": 45.3
+  },
+  {
+   "writing_tps": 50.9,
+   "tokens": 400,
+   "ttft_s": 0.16,
+   "server_reported_tps": 50.9
+  },
+  {
+   "writing_tps": 51.1,
+   "tokens": 400,
+   "ttft_s": 0.17,
+   "server_reported_tps": 50.9
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 32540,
+   "reading_tps": 603.2,
+   "ttft_s": 53.9,
+   "server_reported_tps": 604.6
+  },
+  {
+   "prompt_tokens": 32543,
+   "reading_tps": 599.0,
+   "ttft_s": 54.3,
+   "server_reported_tps": 600.1
+  },
+  {
+   "prompt_tokens": 32541,
+   "reading_tps": 596.8,
+   "ttft_s": 54.5,
+   "server_reported_tps": 598.1
+  }
+ ],
+ "speed_write_tps": 50.9,
+ "speed_read_32k_tps": 599.0,
+ "speed_ttft_32k_s": 54.3,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}

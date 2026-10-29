@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Speed test any OpenAI-compatible server the same way (llama.cpp, Strata, ...): fixed prompts, medians of 3 runs.
+#   ./speed <model> "<note>"                         zaphod's llama-swap (127.0.0.1:8080, ZAPHOD_KEY)
+#   MACHINE=marvin BASE_URL=http://marvin:8099/v1 API_KEY=... ./speed <model> "<note>"   (MACHINE: who served it)
+# Tests:
+#   short: code prompt (~40 tokens in), 400 tokens out, temp 0: writing tok/s (best case for MTP)
+#   long:  ~32K-token prompt (Python standard library source, fixed list of files), 32 tokens out: reading tok/s
+#          = prompt tokens / time to first token. Each run starts with a unique line, so no prompt cache helps.
+# Writes tuning/runs/<date>-speed-<model>.json and logs speed_* metrics to MLflow (./log). Set NOLOG=1 to skip logging.
+set -euo pipefail
+cd "$(dirname "$0")"
+MODEL="${1:?model}"; NOTE="${2:?note}"
+[ -n "${API_KEY:-}" ] || { set -a; . ~/llama-swap/.env; set +a; API_KEY="$ZAPHOD_KEY"; }
+OUT="runs/$(date +%F-%H%M)-speed-${MODEL//\//-}.json"
+BASE_URL="${BASE_URL:-http://127.0.0.1:8080/v1}" API_KEY="$API_KEY" MODEL="$MODEL" OUT="$OUT" python3 -I - <<'EOF'
+import json, os, statistics, sysconfig, time, urllib.request, uuid
+from pathlib import Path
+URL, KEY, MODEL = os.environ["BASE_URL"] + "/chat/completions", os.environ["API_KEY"], os.environ["MODEL"]
+H = {"Authorization": "Bearer " + KEY, "Content-Type": "application/json"}
+
+def stream(messages, max_tokens, temperature=0):
+    body = {"model": MODEL, "messages": messages, "max_tokens": max_tokens, "temperature": temperature, "seed": 1,
+            "stream": True, "stream_options": {"include_usage": True}}
+    t0 = time.time(); first = None; usage = {}; n_chunks = 0; timings = {}
+    req = urllib.request.Request(URL, data=json.dumps(body).encode(), headers=H)
+    with urllib.request.urlopen(req, timeout=1800) as r:
+        for line in r:
+            line = line.decode().strip()
+            if not line.startswith("data:") or line == "data: [DONE]":
+                continue
+            d = json.loads(line[5:])
+            ch = (d.get("choices") or [{}])[0].get("delta") or {}
+            if (ch.get("content") or ch.get("reasoning_content")) and first is None:
+                first = time.time()
+            if ch.get("content") or ch.get("reasoning_content"):
+                n_chunks += 1
+            usage = d.get("usage") or usage; timings = d.get("timings") or timings
+    end = time.time()
+    return {"ttft": (first or end) - t0, "gen_s": end - (first or end), "usage": usage, "timings": timings, "chunks": n_chunks}
+
+res = {"model": MODEL, "base_url": os.environ["BASE_URL"], "short": [], "long": []}
+p = "Write a Python function that parses an Apache access log line into a dict, with a docstring and three test cases."
+for i in range(3):
+    r = stream([{"role": "user", "content": p}], 400)
+    out = r["usage"].get("completion_tokens") or r["chunks"]
+    tps = (out - 1) / r["gen_s"] if r["gen_s"] else 0   # measured here, the same way for every engine
+    res["short"].append({"writing_tps": round(tps, 1), "tokens": out, "ttft_s": round(r["ttft"], 2),
+                         "server_reported_tps": r["timings"].get("predicted_per_second")})
+    print(f"short {i+1}: writing {tps:.1f} tok/s ({out} tokens)", flush=True)
+
+lib = Path(sysconfig.get_paths()["stdlib"])
+files = ["argparse.py", "inspect.py", "typing.py", "dataclasses.py", "pathlib/__init__.py", "subprocess.py",
+         "tarfile.py", "zipfile/__init__.py", "logging/__init__.py", "json/decoder.py"]
+text = ""
+for f in files:
+    if (lib / f).exists():
+        text += f"\n# ==== {f}\n" + (lib / f).read_text(errors="replace")
+text = text[:148_000]  # about 32K tokens of Python (4.6 characters per token, measured)
+for i in range(3):
+    msg = f"Run id {uuid.uuid4()}.\n{text}\n\nIn one sentence: what does the last function above do?"
+    r = stream([{"role": "user", "content": msg}], 32)
+    n = r["usage"].get("prompt_tokens") or 0
+    tps = n / r["ttft"] if r["ttft"] else 0   # measured here (includes the network, ~ms), same for every engine
+    res["long"].append({"prompt_tokens": n, "reading_tps": round(tps, 1), "ttft_s": round(r["ttft"], 1),
+                        "server_reported_tps": r["timings"].get("prompt_per_second")})
+    print(f"long {i+1}: {n} prompt tokens, reading {tps:.1f} tok/s, first token after {r['ttft']:.1f} s", flush=True)
+res["speed_write_tps"] = statistics.median(x["writing_tps"] for x in res["short"])
+res["speed_read_32k_tps"] = statistics.median(x["reading_tps"] for x in res["long"])
+res["speed_ttft_32k_s"] = statistics.median(x["ttft_s"] for x in res["long"])
+res["prompt_files"] = files; res["python_stdlib"] = str(lib)
+json.dump(res, open(os.environ["OUT"], "w"), indent=1)
+print(f"median: writing {res['speed_write_tps']} tok/s; 32K reading {res['speed_read_32k_tps']} tok/s "
+      f"(first token after {res['speed_ttft_32k_s']} s)")
+EOF
+echo "saved $OUT"
+[ "${NOLOG:-0}" = 1 ] && exit 0
+m() { python3 -c "import json;print(json.load(open('$OUT'))['$1'])"; }
+./log "${MACHINE:-zaphod}" "$MODEL" "$NOTE" speed_write_tps=$(m speed_write_tps) speed_read_32k_tps=$(m speed_read_32k_tps) \
+  speed_ttft_32k_s=$(m speed_ttft_32k_s) "$OUT"
