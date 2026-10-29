@@ -182,6 +182,9 @@ def main():
     if len(sys.argv) < 4:
         sys.exit(__doc__)
     machine, model, note, *rest = sys.argv[1:]
+    # A peer model called through zaphod ("marvin/big") belongs to that machine: log it there.
+    if "/" in model and model.split("/", 1)[0] in LLAMA_SWAP:
+        machine, model = model.split("/", 1)
     if machine not in LLAMA_SWAP:
         sys.exit(f"Unknown machine {machine}. Known: {', '.join(LLAMA_SWAP)}")
     # kld:/history:/card labels are not llama-swap models, so there are no server settings to read

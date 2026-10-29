@@ -3,7 +3,8 @@
 # Usage: ./log <machine> <model> "<note>" [name=value ...] [files ...]
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_COMMIT=$(cd "$HOME/llama-swap" && git log -1 --format="%h %s" -- . 2>/dev/null || echo unknown)  # last change to the llama-swap folder
+M="$1"; case "$2" in marvin/*) M=marvin ;; esac   # peer models ("marvin/big") belong to that machine
+CONFIG_COMMIT=$(cd "$HOME/homelab/$M/llama-swap" && git log -1 --format="%h %s" -- . 2>/dev/null || echo unknown)  # last change to that machine's llama-swap folder
 docker run --rm --network host \
   -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA \
   --env-file "$HOME/homelab/hub/.env" \
