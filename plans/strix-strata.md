@@ -75,7 +75,11 @@ Existing work (checked 2026-10-29, both open, no maintainer reply yet):
   files for missing HIP test/tool targets, `unbiased-strata` target enabled for HIP, a `__shared__ alignas(16)` fix
   clang-HIP rejects in src/kernels/cuda/iq_kernels.cu). Runs Flash-Next daily.
   https://github.com/robertkarl/UnbiasedStrata/issues/6
-So: start from PR #19's commit (+ issue #6 patches only if our build needs them). Our part is the gfx1151-specific
+So: start from PR #19's commit (+ issue #6 patches only if our build needs them).
+**Set up 2026-10-29:** fork github.com/dopamine911/UnbiasedStrata, clone at `~/src/UnbiasedStrata` on zaphod (remote
+`upstream` = robertkarl), branch `hip-gfx1151` = PR #19 commit 115af49 (pushed to the fork). Upstream main is 8 commits
+ahead of PR #19's base (2049dd2) and merging conflicts (Makefile, README; upstream also changed CMakeLists.txt by
++93 lines): first a working gfx1151 build on 115af49, then rebase onto upstream main with the build as reference. Our part is the gfx1151-specific
 work: architecture flag, hipBLASLt tuning table for ROCm 7.14.1, unified-memory behavior, container recipe, tests.
 
 
