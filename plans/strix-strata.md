@@ -131,3 +131,21 @@ one change per commit.
 Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs on marvin, copy at ~/strata-test/).
 1. Dry run (`plan`): model family is `unsloth` (not `qwen`: Strata 0.2.7's qwen family only has the ISTA files).
    Strata recognises marvin's 3 UD-IQ4_XS shards (94 GB), "Nothing to download", drafting MTP, 128K, 2 parallel.
+2. Start (2026-10-29 22:38): ready in 3 min (pack built locally), internet from inside Strata blocked. Memory: 65 GB GPU,
+   106 GB RAM used. Setup chose the RAM-budget mode for Strix Halo (`--expert-cache 16806 --resident-budget-gib 55`,
+   on purpose: Strata issue #1715, an out-of-memory kill on a 128 GB box); the engine still holds 98% of experts on the GPU.
+3. Speed (`tuning/speed`, MLflow 9930e51a): writing **50.9** tok/s (upstream 50-54: same), 32K reading **599** tok/s
+   (upstream ~1,200-1,300: half). Strata's own timer agrees with ours (604.6 vs 603.2).
+4. Why reading is half (one change per experiment, 32K reading test, files in tuning/runs + scratch):
+   | Exp | Change | 32K reading tok/s |
+   | --- | --- | ---: |
+   | E0 | none (fresh restart) | 590 |
+   | E1 | `prefill=16384` (upstream's chunk) | **639 (+8%)** |
+   | E2 | parallel 1 | 601 |
+   | E3 | `kv-resident=off` (all context memory on the GPU) | 606 |
+   | E4 | `resident-budget-gib=off` | does not start: out of memory allocating 47.5 GiB of expert cache |
+   **Main cause found:** during a 32K read the GPU sits at **54-55 W** for the whole read, clock ~2,030 MHz (max
+   2,900), 64 C max: a firmware power limit (marvin's BIOS power mode), not heat. Reading is compute-bound, so it
+   scales with power; writing is memory-bound, so it matches upstream. llama.cpp's reading on marvin is capped the same way.
+   Next, one change at a time on the same test: (1) BIOS power mode (Daniel), (2) `tuned` accelerator-performance
+   (setup/host.sh step 8), (3) `amd_iommu=off` (+5-12% elsewhere). Tool-use x3 and Terminal-Bench wait until then.

@@ -6,6 +6,9 @@
 #   ./strata-test.sh start    stop llama-swap, start Strata sealed, wait until it answers (first start builds its pack)
 #   ./strata-test.sh status   is it up; memory; can it reach the internet (must say NO)
 #   ./strata-test.sh stop     stop Strata, start llama-swap again, wait for its health check   <- always end with this
+#   PRESET=x PARALLEL=1 STRATA_SET="prefill=16384" ./strata-test.sh restart
+#                             swap Strata for one with changed settings (llama-swap stays stopped). One change per
+#                             experiment; each experiment gets its own PRESET name so nothing carries over from the last.
 #
 # Sealed: Strata sits only on an internal Docker network (no route out). A small relay (python, already on marvin) sits on
 # that network and a normal one, and publishes Strata's API on marvin's Tailscale address :8099 only.
@@ -24,7 +27,9 @@ mkdir -p "$DIR"; chmod 700 "$DIR"
 log() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$DIR/log.txt"; }
 mem() { echo "GPU memory used $(( $(cat /sys/class/drm/card*/device/mem_info_gtt_used | head -1) / 1073741824 )) GB (GTT); RAM: $(free -g | awk 'NR==2{print $3" GB used, "$7" GB available"}')"; }
 
-SETTINGS=(-e MODEL=ud-iq4_xs -e FAMILY=unsloth -e MODEL_PATH=/models -e CONTEXT=128k -e PARALLEL=2 -e VISION=off -e TUNE=skip)
+SETTINGS=(-e MODEL=ud-iq4_xs -e FAMILY=unsloth -e MODEL_PATH=/models -e CONTEXT=128k -e PARALLEL="${PARALLEL:-2}" -e VISION=off
+          -e TUNE=skip -e PRESET="${PRESET:-docker}")
+[ -n "${STRATA_SET:-}" ] && SETTINGS+=(-e STRATA_SET="$STRATA_SET")
 GPU=(--device /dev/kfd --device /dev/dri --group-add video --group-add "$(getent group render | cut -d: -f3)"
      --ulimit memlock=-1:-1 --shm-size 2g)
 MODELS=(); for n in 1 2 3; do MODELS+=(-v "$M/$F-0000$n-of-00003.gguf:/models/$F-0000$n-of-00003.gguf:ro"); done
@@ -60,10 +65,15 @@ plan)
   docker run --rm --network none "${GPU[@]}" -v strata-data:/data "${MODELS[@]}" --entrypoint /opt/strata/terminal/bin/strata "$IMG" \
     launch --no-tui --plan --model ud-iq4_xs --family unsloth --model-path /models --context 128k --parallel 2 --vision off \
     --data-dir /data/Strata-data 2>&1 | tee "$DIR/plan.txt" ;;
-start)
+start|restart)
   docker network inspect "$NET" >/dev/null 2>&1 || docker network create --internal "$NET" >/dev/null
-  log "stopping marvin's llama-swap (marvin/big is offline until ./strata-test.sh stop)"
-  (cd "$LS" && docker compose stop -t 30 llama-swap >/dev/null 2>&1); sleep 5
+  if [ "$1" = start ]; then
+    log "stopping marvin's llama-swap (marvin/big is offline until ./strata-test.sh stop)"
+    (cd "$LS" && docker compose stop -t 30 llama-swap >/dev/null 2>&1); sleep 5
+  else
+    log "restart: stopping Strata"; docker stop -t 120 strata >/dev/null 2>&1; docker rm -f strata strata-relay >/dev/null 2>&1; sleep 5
+  fi
+  log "settings: preset ${PRESET:-docker}, parallel ${PARALLEL:-2}, STRATA_SET '${STRATA_SET:-}'"
   log "before Strata start: $(mem)"
   ( umask 077; openssl rand -hex 24 > "$KEYF" )
   docker rm -f strata >/dev/null 2>&1
