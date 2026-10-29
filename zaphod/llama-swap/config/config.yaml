@@ -37,6 +37,14 @@ models:
   rerank:
     name: "Qwen3-Reranker-0.6B (document search), card 1"
     cmd: ${server} --device Vulkan1 -m /models/search/qwen3-reranker-0.6b-q8_0.gguf --reranking -c 8192 -b 8192 -ub 8192 -np 1
+  stt:
+    name: "Qwen3-ASR-1.7B speech-to-text (default), card 2"
+    cmd: audiocpp_server --config /etc/llama-swap/config/stt.json --port ${PORT} --no-ui
+    checkEndpoint: /health
+  stt-whisper:
+    name: "Whisper large-v3-turbo speech-to-text (99 languages), card 2"
+    cmd: whisper-server --host 127.0.0.1 --port ${PORT} --device 0 -m /models/speech/ggml-large-v3-turbo-q8_0.bin -l auto --inference-path /v1/audio/transcriptions
+    checkEndpoint: /
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
     cmd: ${server} --device Vulkan1,Vulkan0 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
@@ -46,9 +54,9 @@ routing:
     settings:
       matrix:
         sets:
-          helpers: "embed & rerank"   # small models that stay loaded next to everything below
+          helpers: "embed & rerank & stt & stt-whisper"   # small models that stay loaded next to everything below
           one_per_card: "+helpers & (coder | coder-tb) & (coder-2 | flint | north | ornith)"
           both_cards: "coder-long"
 hooks:
   on_startup:
-    preload: [coder, coder-2]
+    preload: [coder, coder-2, embed, rerank, stt, stt-whisper]
