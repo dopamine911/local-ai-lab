@@ -1,6 +1,12 @@
 title: Homelab
 theme: dark
 color: slate
+# Background: NASA SVS wallpaper "CW Leo from GALEX" (svs.gsfc.nasa.gov/14866), loaded by your browser from NASA.
+background:
+  image: https://svs.gsfc.nasa.gov/vis/a010000/a014800/a014866/CW%20Leo%20From%20GALEX_desktop.png
+  blur: sm           # sm, md, xl
+  brightness: 75     # darker, so tile text stays readable
+cardBlur: md         # frosted tiles over the image
 headerStyle: clean
 statusStyle: dot
 hideVersion: true
