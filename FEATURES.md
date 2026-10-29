@@ -83,7 +83,7 @@ How-to for all tools: [tuning/README.md](tuning/README.md). Every result: [tunin
 
 Main results so far (details in [tuning/results.md](tuning/results.md)):
 - Tool use (common score): Ornith 92.0, marvin Flash-Next 91.7, Strata Flash-Next 90.0, Flint 86.0. No model made anything up.
-- Terminal-Bench on marvin: smoke 1/1; full run in progress (13/13 passed at 19:20 on 2026-10-29).
+- Terminal-Bench on marvin (Flash-Next, no skill): **19/19** full run, 18 on the first attempt, 5.5 h (2026-10-29).
 - Strata (another inference engine) tested on zaphod: same quality, needs both cards: [plans/strata.md](plans/strata.md).
 
 ## 6. Rebuild, backup, safety

@@ -9,7 +9,7 @@ Overview of every feature with links: `FEATURES.md` (keep it updated when adding
   - Card 1: PCI 06:00.0, /dev/dri/renderD128, on an OCuLink dock via an M.2 adapter in the back (chipset) M.2 slot, PCIe 3.0 x4.
   - Card 2: PCI 0b:00.0, /dev/dri/renderD129, in the x16 slot (links at x8), drives the screen.
   - llama.cpp numbers them the other way round: card 1 = `Vulkan1`, card 2 = `Vulkan0`. Check with `llama-server --list-devices` (free memory per card). Card 1 is ~10% slower with MTP (its PCIe 3.0 x4 link).
-- marvin: Bosgame M5, Ryzen AI Max+ 395, 128 GB (120 GB usable by the GPU). Ubuntu 26.04, llama-swap image `llama-swap-marvin:267`. Model `big` = Qwen3.8-Flash-Next UD-IQ4_XS, 128K, ~25 tok/s writing. Linked to zaphod as a llama-swap peer: appears there as `marvin/big`. Setup log: `marvin/SETUP.md`. On Wi-Fi.
+- marvin: Bosgame M5, Ryzen AI Max+ 395, 128 GB (120 GB usable by the GPU). Ubuntu 26.04, llama-swap image `llama-swap-marvin:267`. Model `big` = Qwen3.8-Flash-Next UD-IQ4_XS, 128K, MTP draft 3, ~40 tok/s writing (33 in agent use). Linked to zaphod as a llama-swap peer: appears there as `marvin/big`. Setup log: `marvin/SETUP.md`. On Wi-Fi.
 
 ## Layout
 | Path | What |
@@ -44,8 +44,8 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 
 ## Next steps
 1. Terminal-Bench full run of `coder-tb`, with and without the-craft (overnight, in tmux).
-2. marvin: MTP speed-up for `big` (baseline 24.7 tok/s writing), then quality tests.
-2b. After the marvin Terminal-Bench run: add `--metrics` to llama-server on both machines (Homepage "pending" count),
+2. Done 2026-10-29: marvin MTP draft 3 (24.7 → 39.6 tok/s writing), tool-use x3, Terminal-Bench 19/19.
+2b. marvin Terminal-Bench done (19/19, 2026-10-29). Next, each needs Daniel's go-ahead: a the-craft run for comparison; add `--metrics` to llama-server on both machines (Homepage "pending" count),
     and try `big` at 256K context (plans: measured before/after; ~+3 GB).
 3. Tuning ideas in tuning/results.md.
 4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.

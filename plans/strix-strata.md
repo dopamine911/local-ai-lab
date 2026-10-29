@@ -1,6 +1,6 @@
 # Plan: Strata on marvin (Strix Halo), then port UnbiasedStrata to AMD and offer the PR
 
-Status: plan, 2026-10-29. Nothing done yet. Starts after the marvin Terminal-Bench full run (llama.cpp) has finished.
+Status: plan, 2026-10-29. Nothing done yet. The llama.cpp baseline is complete (Terminal-Bench 19/19 on 2026-10-29); waiting on the decisions at the bottom.
 
 ## Why
 
@@ -28,7 +28,7 @@ ports UnbiasedStrata's clean build to AMD gfx1151 and measures it the same way, 
 | Speed, MTP draft 3 (3 code requests) | 39.6 tok/s writing | same |
 | Real-use speed during tool-eval | ~36 writing, ~246 reading, 72% MTP accepted | MLflow live_* |
 | Tool use, full suite x3 (series marvin-flash-next-iq4xs-mtp3) | 90 / 93 / 92 (common score), 0 made up | `./series marvin` |
-| Terminal-Bench Core-19 full | tonight's run (13/13 at 18:51) | MLflow, tasks.json |
+| Terminal-Bench Core-19 full | 19/19 (18 first attempt), 5.5 h, real use 33 writing / 254 reading tok/s | MLflow c145733e, tasks.json |
 | Memory | 93.7 GB model + MTP 4.1 GB; ~11 GB RAM left during the benchmark | marvin/SETUP.md |
 
 Add before Phase 1 (one change each, with llama.cpp, so both engines get the same tests):

@@ -144,6 +144,7 @@ answer in a loop. MLflow: a957f4cb, 37ac5695, fe7f05a3.
 | Date | Machine / model | Tier | Result | Note |
 | --- | --- | --- | --- | --- |
 | 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots | smoke (1 task) | 1/1, first attempt, ~3 min | MLflow 57214956 |
+| 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots, no skill | **full (19 tasks)** | **19/19**: 18 on the first attempt, `mteb-retrieve` on the second; 5.5 h | MLflow c145733e. Miss on attempt 1: the task required encoding through the `mteb` package; the model hit an error there, bypassed mteb (called the model underneath, skipping mteb's query formatting) and picked the wrong line. A rule bent to get past an error. Real use: 33 tok/s writing, 254 reading, 60% MTP accepted, 92% of input from cache. Slowest task: llm-inference-batching-scheduler 77 min. |
 
 Published full runs in the benchmark repo (other people's machines, for reference): Flash-Next UD-IQ4_XS on Strix Halo
 (EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
