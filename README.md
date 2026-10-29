@@ -36,6 +36,9 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
   Embedding Model Engine: **OpenAI**, URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `embed`.
   Hybrid Search: **on**. Reranking Engine: **External**, URL `http://127.0.0.1:8080/v1/rerank`, key: ZAPHOD_KEY, model `rerank`.
   After changing the embedding model, re-index existing documents (same page, "Reindex Knowledge Base Vectors").
+- **Speech-to-text (on zaphod):** Admin Panel → Settings → Audio → Speech-to-Text Engine: **OpenAI**,
+  URL `http://127.0.0.1:8080/v1`, key: ZAPHOD_KEY, model `stt` (Qwen3-ASR, ~30 languages).
+  For other languages use model `stt-whisper` (Whisper, 99 languages).
 - Built in already (no setup): read a web page, current time, run code, memory, knowledge bases.
 - Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
 - `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.

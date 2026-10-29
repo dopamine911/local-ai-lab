@@ -45,3 +45,8 @@ llama-swap models (`coder-2`, `ornith`, ...) before generating images and switch
 - 2026-10-28 Step 3 models done: `embed` (Qwen3-Embedding-4B Q6_K) + `rerank` (Qwen3-Reranker-0.6B Q8_0), always loaded on card 1.
   Open WebUI connection: set by hand in Admin Panel (see README.md, Open WebUI tools).
 - 2026-10-28 Found and fixed: llama.cpp's Vulkan0 is card 2; models were on the opposite card to their names.
+- 2026-10-29 Step 4 done: `stt` = Qwen3-ASR-1.7B Q8_0 (audiocpp_server, audio.cpp build 4efa395 of 2026-10-24; newest release v0.9.3)
+  and `stt-whisper` = Whisper large-v3-turbo Q8_0 (whisper.cpp v1.9.5, newest). Card 2. All three candidates
+  (also Cohere Transcribe) transcribed jfk.wav exactly in 0.16-0.33 s; picked by Open ASR leaderboard accuracy.
+  Helpers (embed, rerank, stt, stt-whisper) now preload at startup. Memory with all loaded: card 1 29.7 GB, card 2 25.5 GB.
+  Open WebUI connection: set by hand (README.md, Open WebUI tools).
