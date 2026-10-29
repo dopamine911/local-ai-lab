@@ -16,6 +16,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 | `hub/` | Caddy, Open WebUI, Beszel, Homepage, MLflow (see README.md) |
 | `marvin/llama-swap/` | Files to copy to marvin |
 | `tuning/` | Benchmarks and results (see tuning/README.md) |
+| `setup/` | Rebuild a machine: REBUILD.md, host.sh, models.sh, models-<machine>.txt |
 
 ## llama-swap on zaphod
 - Image `llama-swap-zaphod:267-media`: official llama-swap 267 programs (llama.cpp b11870, plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa, built from the Dockerfile. Previous image `:267` (text only) is kept for rollback. Models in /srv/models.
@@ -23,6 +24,9 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 - Listens on 127.0.0.1:8080 only; `tailscale serve --bg --tcp=8080 tcp://localhost:8080` exposes it on the tailnet. Also https://zaphod.ai.dopamine911.com via Caddy.
 - Config edits reload automatically. Check with `cd ~/llama-swap && docker compose logs --tail 20`.
 - Commit every config change: "what · from → to · why". Benchmarks record the last commit that touched `zaphod/llama-swap/`.
+
+## Rebuild
+`setup/REBUILD.md` + `setup/host.sh` + `setup/models.sh` rebuild either machine. Every change to a machine (package, boot setting, Tailscale, web-UI setting, model) goes into a script or REBUILD.md in the same commit.
 
 ## Do not undo
 - `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` in compose.yaml. Resizable BAR is off, and without this switch llama.cpp puts part of the model in system RAM: 3-10x slower.

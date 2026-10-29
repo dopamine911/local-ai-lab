@@ -62,45 +62,13 @@ Image: `comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14`, built from hub/comfyui/Doc
 - Each model: Admin Panel → Settings → Models → (model) → Advanced Params → Function Calling: **Native**.
 - `WEBUI_SECRET_KEY` is fixed in `.env` so logins and saved tool connections survive container updates.
 
-## Tonight: set up marvin
+## Set up or rebuild a machine
 
-1. **Install Ubuntu 26.04 Server** on marvin, same as zaphod. Name it `marvin`. In the installer, pick **UEFI** boot if asked (avoids zaphod's CSM problem).
-2. **BIOS:** set the GPU memory (UMA frame buffer) to its lowest option. Linux gives the GPU memory instead.
-3. **Basics**, same as zaphod: Wi-Fi or Ethernet, `sudo apt update && sudo apt full-upgrade -y`, Tailscale (`tailscale up`), SSH.
-   Good: from zaphod, `ssh marvin` works.
-4. **Let the GPU use nearly all 128 GB.** Add to `GRUB_CMDLINE_LINUX_DEFAULT` in `/etc/default/grub`:
-   ```
-   amdgpu.gttsize=126976 ttm.pages_limit=32505856
-   ```
-   then `sudo update-grub && sudo reboot`.
-   Good: `sudo dmesg | grep -i 'gtt'` shows about 124 GB.
-5. **GPU groups and Docker** (as on zaphod):
-   ```bash
-   sudo usermod -aG render,video $USER
-   sudo apt install -y docker.io docker-compose-v2 && sudo usermod -aG docker $USER
-   ```
-   Log out and back in. Good: `docker run --rm hello-world` works.
-6. **Copy the files from zaphod** (run on zaphod):
-   ```bash
-   scp -r ~/homelab/marvin/llama-swap marvin:~/
-   ```
-7. **On marvin, build the image and make the key:**
-   ```bash
-   cd ~/llama-swap && docker build -t llama-swap-zaphod:267 .
-   printf 'MARVIN_KEY=sk-%s\n' "$(openssl rand -hex 24)" > .env && chmod 600 .env && cat .env
-   ```
-   Save the key in your password manager.
-8. **Download the model (about 94 GB)** on marvin:
-   ```bash
-   sudo mkdir -p /srv/models && sudo chown $USER: /srv/models
-   for p in 1 2 3; do wget -c -P /srv/models https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF/resolve/main/UD-IQ4_XS/Qwen3.8-Flash-Next-UD-IQ4_XS-0000$p-of-00003.gguf; done
-   ```
-9. **Start it:** `docker compose up -d && docker compose logs -f`.
-   Good: `Health check passed` for `big`.
-10. **Make it reachable from zaphod:** `sudo tailscale serve --bg --tcp=8080 tcp://localhost:8080`
-11. **Add marvin to zaphod** (back on zaphod): put `MARVIN_KEY=...` in `~/llama-swap/.env`, remove the `#` from the `peers:` block in `~/llama-swap/config/config.yaml`, then `cd ~/llama-swap && docker compose up -d`.
-    Good: `curl -s -H "Authorization: Bearer $ZAPHOD_KEY" http://localhost:8080/v1/models` lists `marvin/big`.
-12. Later: speculative decoding on marvin (download `MTP/mtp-Qwen3.8-Flash-Next-Q8_0.gguf`, add `${mtp}` to `big`).
+Follow `setup/REBUILD.md`: BIOS and installer choices, then `setup/host.sh` (host settings), `setup/models.sh`
+(pinned model downloads), secrets, and `docker compose`. marvin's first setup is logged step by step in `marvin/SETUP.md`.
+
+Still to do on marvin: speed test, start llama-swap, then add it to zaphod as a peer (remove the `#` from the `peers:`
+block in `zaphod/llama-swap/config/config.yaml` and put `MARVIN_KEY` in `~/llama-swap/.env` on zaphod).
 
 ## Hub (after marvin, or any time)
 

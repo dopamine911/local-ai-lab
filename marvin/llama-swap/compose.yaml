@@ -3,6 +3,7 @@
 # Start: docker compose up -d     Logs: docker compose logs -f
 services:
   llama-swap:
+    build: .                            # docker compose build
     image: llama-swap-marvin:267
     container_name: llama-swap
     restart: unless-stopped

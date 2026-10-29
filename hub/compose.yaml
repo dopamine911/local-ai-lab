@@ -120,7 +120,8 @@ services:
   # ComfyUI on card 2. Not started with the rest: `./image-mode on` frees card 2 and starts it,
   # `./image-mode off` stops it and gives card 2 back to llama-swap.
   comfyui:
-    image: comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14   # built from comfyui/Dockerfile
+    build: ./comfyui                    # docker compose --profile images build comfyui
+    image: comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14
     container_name: comfyui
     profiles: [images]
     restart: "no"
