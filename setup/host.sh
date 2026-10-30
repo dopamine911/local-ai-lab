@@ -15,7 +15,7 @@ esac
 
 step "1. packages"
 apt-get update -q
-apt-get install -y -q docker.io docker-compose-v2 mesa-vulkan-drivers vulkan-tools radeontop btop \
+apt-get install -y -q docker.io docker-compose-v2 docker-buildx mesa-vulkan-drivers vulkan-tools radeontop btop \
   python3-venv curl git ssh-import-id
 
 step "2. groups for $U (docker, GPU)"
