@@ -1,6 +1,8 @@
 # Plan: Strata on marvin (Strix Halo), then port UnbiasedStrata to AMD and offer the PR
 
-Status: plan, 2026-10-29. Nothing done yet. The llama.cpp baseline is complete (Terminal-Bench 19/19 on 2026-10-29); waiting on the decisions at the bottom.
+Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
+Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log); step 6 (marvin) waits for Daniel: see
+`decisions.md` "Waiting on Daniel".
 
 ## Why
 
@@ -197,3 +199,18 @@ Decisions made while Daniel was away: `decisions.md`.
    compiler. Starts with `--network none`. Not yet tested on a GPU (zaphod has no gfx1151; its cards are in use).
    **Next: step 6 on marvin, waits for Daniel** (Terminal-Bench must be finished). Open before step 6: the pack
    (reuse upstream 0.2.7's from `strata-data`, or build one with the fork's `tools/iq_pack.py --compat-bf16`).
+5b. Tests image (fork `4149027`, `--target tests`): `unbiased-strata-tests:gfx1151`, 1.18 GB, ID
+   `sha256:d427915b29584e38c0cfa21036d174fc93fe38d5b697ff493935cb5344bc2583` = the runtime image + `strata-device`,
+   `hip_prefill_hcd_exact_parity`, `hip_prefill_hipblaslt_gemm`, `hip_prefill_mmq_parity` (gfx1151 code only).
+   Default `docker build` still gives the runtime image, ID unchanged. **Order on marvin, after Daniel's OK** (each
+   with `--network none --device /dev/kfd --device /dev/dri --group-add` render + video; GPU memory free and power
+   mode checked first):
+   1. Copy both images: `docker save unbiased-strata:gfx1151 unbiased-strata-tests:gfx1151 | ssh marvin docker load`;
+      check the IDs above on marvin.
+   2. `strata-device --list-devices` (tests image default): good = one gfx1151 GPU, "can run".
+   3. The three parity tests: good = pass (exit 0), not skip (77). The hcd one needs the table (set in the image).
+   4. Engine start with the Phase 1 settings + `--prefill 16384`: good = the start line lists 19 gfx1151 switches and
+      `prefill gemm: hipBLASLt tuning enabled (… gfx1151, version 100401)`.
+   5. **If the slim image fails at start** (a library or kernel file loaded at run time, which `ldd` cannot see): run
+      the same command in `unbiased-strata-build:gfx1151` (full ROCm, 11+ GB). Works there = the slimming is at fault;
+      fails there too = the engine or the port.

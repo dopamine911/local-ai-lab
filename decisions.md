@@ -3,6 +3,19 @@
 Newest last. Each: what, why, how to undo. Started 2026-10-30 (Phase 3 of `plans/strix-strata.md`, porting
 UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md`, code map `plans/strix-strata-port-notes.md`).
 
+## Waiting on Daniel
+
+1. **OK to start Phase 3 step 6 on marvin?** Only after Terminal-Bench on Strata has finished. Good answer: "yes,
+   Terminal-Bench is done" (then I copy the two images to marvin and run the checks in the Phase 3 log, step 5b).
+2. **Two fork pieces under 2 weeks old** (decision 5): start marvin now, or wait until 2026-11-04 for the strict
+   rule. Good answer: "now" or "wait".
+3. **The pack for the fork's `strata` engine:** reuse upstream 0.2.7's pack from marvin's `strata-data` volume
+   (quick, but the format may differ between engine 0.1.52 and the fork's 0.1.45), or build one with the fork's
+   `tools/iq_pack.py --compat-bf16` (clean, takes disk and time). My suggestion: build one with the fork's tool, so
+   the test is all-fork. Good answer: "reuse" or "build".
+4. **Makefile fix** so `make build BACKEND=hip` turns `STRATA_PREFILL_MMQ` on (decision 6): later, as part of the
+   Phase 4 follow-up PR? Good answer: "yes later" or "no". Nothing is posted anywhere without your OK.
+
 Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / GitHub comment, no version under
 2 weeks old, no change to the CUDA path.
 
@@ -43,3 +56,7 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
 10. **Image built with `--provenance=false`.** Without it BuildKit adds a per-build record and the image ID changes on
     every build, even fully cached (checked: two builds, same ID with the flag, different without).
 11. **Stopped before step 6** (marvin): instructions say nothing on marvin until you say Terminal-Bench is finished.
+12. **Tests image added** (advisor's point): step 6's first checks (`strata-device`, the HIP parity tests) are not
+    built by `make build`, so they get their own image (`--target tests`, runtime + 4 programs) instead of being
+    found missing on marvin. Also `hip_prefill_mmq_parity`, beyond the two the instructions name: it checks the MMQ
+    kernels PR #19's Makefile leaves out. Built on zaphod with no source patch.
