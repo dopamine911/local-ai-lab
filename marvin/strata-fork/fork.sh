@@ -21,9 +21,9 @@ set -uo pipefail
 # marvin only (stop/start run marvin's llama-swap compose); `args` is a dry run and works anywhere the images are
 [ "${1:-}" = args ] || [ "$(hostname)" = marvin ] || { echo "run this on marvin (this is $(hostname))"; exit 1; }
 RT=unbiased-strata:gfx1151; TESTS=unbiased-strata-tests:gfx1151; RELAY_IMG=python:3.13-slim-trixie
-# config digests: fork a185402 (main merged in), plans/strix-strata.md Phase 3 log 9
-RT_CFG=sha256:1f7416250926d09ad7bb911ffddfc9e11bf5c5a301bf32f7d6f29dc8bf345503
-TESTS_CFG=sha256:67b979473ec679f01e95c53c9a0ca3fa3bd83bd14f6d6ec6e020c209d6703956
+# config digests: fork 02c9904 (main merged + 3 upstream fixes), plans/strix-strata.md Phase 3 log 11
+RT_CFG=sha256:a3f9f8189d842593eda765b73b3e64636a79259bfdb5f390b2f2f821c966d340
+TESTS_CFG=sha256:db7575e76a856d49aa70e6158a1b46635353d4efc185cad806ec1815a60c1f4e
 M=/srv/models; F=Qwen3.8-Flash-Next-UD-IQ4_XS
 PACK=${PACK:-$M/strata-fork/pack-ud-iq4_xs}
 PRESET=${PRESET:-p16m}; PARALLEL=${PARALLEL:-2}
