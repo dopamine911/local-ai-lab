@@ -78,6 +78,13 @@ keys in Proton Pass.
 
 Good result: adding a tool once makes it available in every agent.
 
+To do (Daniel 2026-10-30): `hub/mcp/status.sh`, read-only, one screen: registered tool servers, their tools, and
+which agent (client) may use which. MCPJungle's web dashboard (docs.mcpjungle.com/guides/dashboard) is Beta and
+"only supported when running mcpjungle in development mode" (no per-agent tokens or allowed lists, no login
+described); our 0.4.6 in enterprise mode answers 404 there. Re-check at each MCPJungle update: use it only once it
+works in enterprise mode with a login, behind Caddy on Tailscale, and is at least 2 weeks old.
+Good result: one command shows every tool and who may use it, with no secrets printed.
+
 ### 4. Shared memory: LocalRecall (or similar)
 github.com/mudler/LocalRecall (MIT, ~1k stars, no releases yet: pin an image digest). Uses zaphod's `embed` model.
 Indexes `~/homelab` and `~/full-homelab` from Git automatically, served to agents through the gateway.
