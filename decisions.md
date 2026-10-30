@@ -60,3 +60,9 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     built by `make build`, so they get their own image (`--target tests`, runtime + 4 programs) instead of being
     found missing on marvin. Also `hip_prefill_mmq_parity`, beyond the two the instructions name: it checks the MMQ
     kernels PR #19's Makefile leaves out. Built on zaphod with no source patch.
+13. **Image digests recorded both ways** (found on re-check). The plan listed the runtime image by its config digest
+    (`8869cd2b…`) and the tests image by its manifest digest (`d427915b…`); zaphod's Docker (containerd store) shows
+    the manifest digest as the ID, so `docker images` showed `3d785883…` and looked like a changed image. Nothing
+    changed: `.Descriptor` shows manifest `3d785883…` with config `8869cd2b…`. The plan now lists both digests for
+    both images, and step 5b.1 says how to compare on marvin. Side note: I ran `ssh marvin true` once
+    (connection test only, no command on marvin, no GPU or Docker contact).

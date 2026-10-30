@@ -193,20 +193,25 @@ Decisions made while Daniel was away: `decisions.md`.
    byte-identical between two builds of the same tree. CUDA path: untouched (fork diff since `115af49` is `docker/` only).
 4. Tests without a GPU: `make test` passes (engine_test 7 cases, literals, picture cache, e2e HTTP checks); it tests
    the front end only. Also `arch_defaults_test` (built by hand, no GPU): OK, the gfx1151 table has 19 switches.
-5. Runtime image (fork `0ac55a1`, default target): `unbiased-strata:gfx1151`, 1.09 GB, ID
-   `sha256:8869cd2ba45592f85aef562d3875e7fa11224d9864d27050ae9ab13a7cbfd195` (stable with `--provenance=false`).
+5. Runtime image (fork `0ac55a1`, default target): `unbiased-strata:gfx1151`, 1.09 GB, config digest
+   `sha256:8869cd2ba45592f85aef562d3875e7fa11224d9864d27050ae9ab13a7cbfd195`, manifest digest
+   `sha256:3d785883812b2b4cc5c08d5b840a0bb622868cc435ef89517a717c9bed9f5f5c` (both stable with `--provenance=false`).
+   zaphod's Docker uses the containerd image store, so `docker images` shows the **manifest** digest as the ID;
+   a Docker with the classic store shows the **config** digest. Compare like with like.
    Holds the 3 programs, the 100401 tuning table (`STRATA_HIPBLASLT_TUNING` set), 619 MB of ROCm libraries, no
    compiler. Starts with `--network none`. Not yet tested on a GPU (zaphod has no gfx1151; its cards are in use).
    **Next: step 6 on marvin, waits for Daniel** (Terminal-Bench must be finished). Open before step 6: the pack
    (reuse upstream 0.2.7's from `strata-data`, or build one with the fork's `tools/iq_pack.py --compat-bf16`).
-5b. Tests image (fork `4149027`, `--target tests`): `unbiased-strata-tests:gfx1151`, 1.18 GB, ID
+5b. Tests image (fork `4149027`, `--target tests`): `unbiased-strata-tests:gfx1151`, 1.18 GB, config digest
+   `sha256:8902459072a9bd260ce2671569545efbf90353c73f47dc2af851c40402d33485`, manifest digest
    `sha256:d427915b29584e38c0cfa21036d174fc93fe38d5b697ff493935cb5344bc2583` = the runtime image + `strata-device`,
    `hip_prefill_hcd_exact_parity`, `hip_prefill_hipblaslt_gemm`, `hip_prefill_mmq_parity` (gfx1151 code only).
    Default `docker build` still gives the runtime image, ID unchanged. **Order on marvin, after Daniel's OK** (each
    with `--network none --device /dev/kfd --device /dev/dri --group-add` render + video; GPU memory free and power
    mode checked first):
    1. Copy both images: `docker save unbiased-strata:gfx1151 unbiased-strata-tests:gfx1151 | ssh marvin docker load`;
-      check the IDs above on marvin.
+      check on marvin: `docker image inspect <image> --format '{{.Id}} {{json .Descriptor}}'`. Good = the config
+      digest above appears (as `.Id` on the classic store, or as `config.digest` on the containerd store).
    2. `strata-device --list-devices` (tests image default): good = one gfx1151 GPU, "can run".
    3. The three parity tests: good = pass (exit 0), not skip (77). The hcd one needs the table (set in the image).
    4. Engine start with the Phase 1 settings + `--prefill 16384`: good = the start line lists 19 gfx1151 switches and
