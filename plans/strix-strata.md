@@ -342,3 +342,11 @@ Decisions made while Daniel was away: `decisions.md`.
    (90 rows, gfx1151, version 100401)`; 2+3 → "5". The slim image needed no fallback. Runs 1 and 2 failed only on
    my script (19-switch line present; `grep -q` under pipefail gave a false BAD), fixed in `f41d2f4`.
    Not yet measured: speed, quality, tool use (next: `./fork.sh start`, then `tuning/speed` against marvin:8099).
+7. **Speed, fork on marvin** (2026-10-30 17:12, `tuning/speed`, MLflow 318a12f2, `runs/2026-10-30-1712-speed-big-fork.json`;
+   Performance mode, GPU 137 W average while busy, 100-146 W, peak 93 C): **32K reading 821.6 tok/s** (upstream p16:
+   817, llama.cpp 315) and **writing 49.5 tok/s** (upstream p16: 55.5, llama.cpp 44.0). Thinking level medium (the
+   template then adds no system text: 34-token prompt vs upstream's 76 at xhigh, so the medium default works).
+   Draft acceptance about the same (fork 263/348, upstream 265/336) but 400 tokens took 8.1 s vs 7.2 s, so the
+   ~11% writing gap looks like the engine (fork 0.1.45 vs upstream 0.1.52), not drafting; not proven: upstream's
+   55.5 was at xhigh (different text). Daniel: xhigh was a problem, no xhigh rerun. Like-for-like option: upstream
+   Strata at p16m (medium) through the same speed test.
