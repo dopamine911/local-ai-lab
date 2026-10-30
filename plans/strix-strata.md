@@ -350,3 +350,15 @@ Decisions made while Daniel was away: `decisions.md`.
    ~11% writing gap looks like the engine (fork 0.1.45 vs upstream 0.1.52), not drafting; not proven: upstream's
    55.5 was at xhigh (different text). Daniel: xhigh was a problem, no xhigh rerun. Like-for-like option: upstream
    Strata at p16m (medium) through the same speed test.
+8. **Like for like at medium** (Daniel: every test at medium): upstream Strata 0.2.7 at preset `p16m` (medium, prompt
+   chunk 16384), same test right after the fork (MLflow c05ca923, `runs/2026-10-30-1721-speed-…ud-iq4_xs.json`; GPU
+   139 W average while busy, peak 94 C; same 34-token prompt):
+   | Engine (medium, p16m settings) | 32K reading tok/s | writing tok/s (3 runs) | drafts accepted |
+   | --- | ---: | ---: | --- |
+   | upstream Strata 0.2.7 (engine 0.1.52) | 821.9 | **53.5** (51.2 / 53.5 / 55.6) | 251/359, 263/371, 268/360 |
+   | our fork, gfx1151 build (engine 0.1.45) | 821.6 | **49.5** (49.5 / 48.3 / 49.6) | 266/373, 259/362, 263/348 |
+   | llama.cpp `big` (Phase 1, 0e1b8a5d) | 315 | 44.0 | |
+   Reading: equal. Writing: fork ~7% lower at the same power and draft acceptance, so engine time per step (likely
+   0.1.45 vs 0.1.52; confidence ~0.7, not proven). Upstream got faster run to run (7.9 → 7.2 s per 400 tokens), the
+   fork stayed flat (8.1-8.3 s): more runs would firm up the gap. Both still well ahead of llama.cpp (2.6x reading,
+   +12% writing for the fork). marvin back to llama-swap `big` at 17:23.
