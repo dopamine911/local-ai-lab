@@ -88,3 +88,16 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     (plan step 5b). Not baked into the image (`USER` line): that would change the pushed Dockerfile and the image
     digests; the run command is where the Strata test sets it too. Checked on zaphod, no GPU: both start as user 1000.
     Also fixed: Daniel's answers were dated 2026-10-31; it is 2026-10-30 (I read "good morning" as the next day).
+15. **Pack built on zaphod first** (Daniel: "build"; all 3 jobs). marvin's model files are downloaded again to zaphod
+    from the same pinned revision with the same sha256 (`setup/models.sh marvin UD-IQ4_XS`), so marvin is not
+    touched and its Wi-Fi is not used. On marvin later: copy the pack, or rebuild it there and compare hashes.
+    The pack holds no experts (they are read from the GGUF), so it should be a few GB.
+16. **MTP pieces reused, not downloaded**: identical to the fork's published set (plan 5d).
+17. **Pack tools from the Ubuntu snapshot, not pip**: same pin as the rest of the image. The snapshot server is down
+    (503) today; I wait rather than use the live archive (unpinned) or pip.
+18. **Step 6 script reads Phase 1's engine command from marvin at run time** instead of a copy written now: it is
+    the exact command upstream ran (incl. flags its server added), and I cannot read marvin today. The script prints
+    and records the arguments before starting. `./fork.sh args` shows them without a GPU.
+19. **Live sessions via a second zaphod peer** (`marvin-fork` → `big-fork`), drafted only: zaphod's llama-swap
+    reloads its config on every edit, so the live config is not touched. Only one engine on marvin at a time
+    (memory): `fork.sh start` stops marvin's llama-swap, `stop` starts it again, as in Phase 1.

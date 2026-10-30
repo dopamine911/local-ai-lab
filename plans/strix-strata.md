@@ -284,3 +284,22 @@ Decisions made while Daniel was away: `decisions.md`.
    5. **If the slim image fails at start** (a library or kernel file loaded at run time, which `ldd` cannot see): run
       the same command in `unbiased-strata-build:gfx1151` (full ROCm, 11+ GB). Works there = the slimming is at fault;
       fails there too = the engine or the port.
+5c. Step 6 tooling, ready (2026-10-30, nothing run on marvin): `marvin/strata-fork/fork.sh` (runs on marvin):
+   `check` = checks 1-4 above in order (preflight: date ≥ 2026-11-04, image digests, pack, GPU power limit; stops
+   llama-swap and starts it again at the end; stops at the first failure; results in `~/strata-fork/results.txt`),
+   plus one short answer (2+3) so the hipBLASLt line is seen even if the table loads at the first prompt. `start` /
+   `status` / `stop` = the fork served sealed on marvin:8099 like `strata-test.sh`, with `big`'s sampling and thinking
+   level medium (`--chat-template-kwargs`, this llama.cpp has no `--reasoning-effort`; check thinking length on
+   first use). `args` = dry run. Engine arguments = Phase 1's own (preset `p16m`): read from the last "engine
+   started:" line in marvin's strata-data (the real command; on zaphod that line had `--layer-split auto` and
+   `--batch`, which the preset json lacks), fork paths swapped in. Checked on zaphod: syntax, the marvin-only guard
+   (every command except `args` stops at once elsewhere), arguments read from zaphod's own upstream preset.
+   `marvin/strata-fork/zaphod-peer.draft.yaml`: the zaphod llama-swap peer `marvin-fork` → `big-fork` for live
+   sessions (Open WebUI, agents); a draft, not in the live config.
+5d. Pack inputs (2026-10-30): MTP pieces need no download: zaphod's `strata-data/Strata-data/mtp/rt` (4 files) is
+   byte-identical to the fork's published set (HF `robertkarl/UnbiasedStrataPacks` @ `cb35f7b7`: 3 by LFS sha256,
+   `dense.txt` by git blob id), and marvin's copy came from zaphod with sha256 checked (Phase 1 decision 2). Expert
+   profile: the fork's shipped `data/expert-profile.bin` (ranks all 24,576). Model shards: downloading marvin's
+   pinned UD-IQ4_XS files to zaphod with `setup/models.sh marvin UD-IQ4_XS` (sha256 checked). Pack tool image
+   (`--target pack-tools`, numpy + regex from the same Ubuntu snapshot): not built yet, snapshot.ubuntu.com answers
+   500/502/503 today; retry, no fallback to the unpinned archive.

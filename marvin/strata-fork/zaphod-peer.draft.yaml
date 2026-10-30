@@ -1,0 +1,21 @@
+# DRAFT, not in use. Lets zaphod's llama-swap (and so Open WebUI and agents) reach the fork on marvin as `big-fork`,
+# for the live-session test (plans/strix-strata.md: upstream only after live sessions and plenty of stats).
+# Only while `./fork.sh start` runs on marvin; then llama-swap on marvin is stopped and `marvin/big` is offline.
+#
+# To switch it on (after Daniel's go-ahead, when the fork passed `./fork.sh check`):
+#   1. On marvin: ./fork.sh start   (makes ~/strata-fork/key once, mode 600; kept between starts)
+#   2. Put that key into zaphod's zaphod/llama-swap/.env as MARVIN_FORK_KEY=... (mode 600) and into Proton Pass.
+#      Never into this repo. .env is read only when the container starts (compose env_file), so then:
+#      cd ~/llama-swap && docker compose up -d   (recreates llama-swap: zaphod's models drop out for ~1 min)
+#   3. Paste the block below under `peers:` in zaphod/llama-swap/config/config.yaml, next to `marvin:`.
+#      llama-swap reloads by itself; check: cd ~/llama-swap && docker compose logs --tail 20
+#   4. Good result: `big-fork` is listed at https://zaphod.ai.dopamine911.com/v1/models and answers in Open WebUI.
+#   5. Commit the config change ("what · from → to · why"). To switch off: remove the block, ./fork.sh stop on marvin.
+#
+#  marvin-fork:
+#    proxy: http://marvin:8099
+#    apiKey: ${env.MARVIN_FORK_KEY}
+#    models:
+#      - big-fork               # UnbiasedStrata gfx1151 (fork hip-gfx1151), Qwen3.8-Flash-Next UD-IQ4_XS, 128K
+#    timeouts:
+#      responseHeader: 900      # same as marvin's: long prompts
