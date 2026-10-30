@@ -28,3 +28,18 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
    you chose it) and its llama.cpp submodule `a6de9af3` (2026-10-19: ggml-org `3cf03257` from 2026-09-20 plus the fork
    author's two tool-call parser commits). They are the source under test, not a dependency choice, so I went on;
    nothing is deployed. If you want strict 2 weeks: wait until 2026-11-04 before anything runs on marvin.
+6. **Build flags via `CMAKE_EXTRA`, Makefile unchanged.** The Dockerfile passes `-DSTRATA_PREFILL_MMQ=ON` and
+   TheRock's paths. Fixing PR #19's Makefile (HIP branch turns MMQ on) is left for later: one change at a time, and
+   first marvin should show the build works. Candidate for the Phase 4 follow-up PR (your call).
+7. **Retries with the source mounted, final recipe in the Dockerfile.** `docker run --network=none -v fork:/src`
+   kept the build folder between attempts; the Dockerfile's `build` stage runs the same command. Both builds give
+   byte-identical GPU code; the CPU code differs in bytes but not in size (likely the build folder name and the git
+   commit string llama.cpp embeds; not proven, confidence ~0.8).
+8. **Runtime image keeps ROCm's own folder layout** (`/opt/rocm/lib`, `/opt/rocm/.kpack`) so rocBLAS / hipBLASLt find
+   their kernel files without settings. Only `blas_lib_gfx1151.kpack` is included: rocBLAS, hipBLASLt and rocSOLVER
+   name it; nothing linked names the other five archives (fft, hiptensor, rand, rccl, rocalution, 63 MB).
+9. **No GPU test on zaphod.** zaphod has no gfx1151 (its cards would only give "no code for this card"), and both
+   cards are serving llama-swap. First check on marvin instead: the engine finds the GPU and lists 19 switches.
+10. **Image built with `--provenance=false`.** Without it BuildKit adds a per-build record and the image ID changes on
+    every build, even fully cached (checked: two builds, same ID with the flag, different without).
+11. **Stopped before step 6** (marvin): instructions say nothing on marvin until you say Terminal-Bench is finished.

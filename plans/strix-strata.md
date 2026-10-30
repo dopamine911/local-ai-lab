@@ -185,3 +185,15 @@ Decisions made while Daniel was away: `decisions.md`.
 2. Toolchain image (fork commit `ed764de`, `docker/hip-gfx1151.Dockerfile --target toolchain`): base
    `ubuntu:resolute-20260927` by digest, Ubuntu snapshot 2026-10-10, ROCm 7.14.1 tarball by sha256. Built in 200 s,
    11.4 GB. Checked: ROCm 7.14.1, AMD clang 23.0.0git, HIP 7.14, hipBLASLt 1.4.1 (= 100401, matches the tuning table).
+3. Build (fork `63adfc3`, `--target build`, network off): `make build BACKEND=hip HIP_ARCHS=gfx1151 PORTABLE=1` with
+   STRIX_HALO.md's cmake flags incl. `STRATA_PREFILL_MMQ=ON` via `CMAKE_EXTRA`. **No source patch needed** (none of
+   issue #6's patches). 4.5 min with 16 jobs. GPU code: gfx1151 only (strata 128 kernel images, strata-poly 48),
+   byte-identical between two builds of the same tree. CUDA path: untouched (fork diff since `115af49` is `docker/` only).
+4. Tests without a GPU: `make test` passes (engine_test 7 cases, literals, picture cache, e2e HTTP checks); it tests
+   the front end only. Also `arch_defaults_test` (built by hand, no GPU): OK, the gfx1151 table has 19 switches.
+5. Runtime image (fork `0ac55a1`, default target): `unbiased-strata:gfx1151`, 1.09 GB, ID
+   `sha256:8869cd2ba45592f85aef562d3875e7fa11224d9864d27050ae9ab13a7cbfd195` (stable with `--provenance=false`).
+   Holds the 3 programs, the 100401 tuning table (`STRATA_HIPBLASLT_TUNING` set), 619 MB of ROCm libraries, no
+   compiler. Starts with `--network none`. Not yet tested on a GPU (zaphod has no gfx1151; its cards are in use).
+   **Next: step 6 on marvin, waits for Daniel** (Terminal-Bench must be finished). Open before step 6: the pack
+   (reuse upstream 0.2.7's from `strata-data`, or build one with the fork's `tools/iq_pack.py --compat-bf16`).
