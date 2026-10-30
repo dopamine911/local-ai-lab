@@ -110,6 +110,12 @@ one change per commit.
    table, machine details from `tuning/manifest.sh`), and what was NOT validated (Windows, other AMD chips).
 5. Small, reviewable commits; CUDA path untouched; no secrets or machine names beyond hardware in the PR.
 
+## Later: llama.cpp ROCm build as a third contender
+strixhalo.wiki/AI/llamacpp-performance (Qwen3-30B-A3B, not our model): Vulkan RADV reads 755 tok/s at depth 0 but
+17 at 128K depth; ROCm 41, lhl's rocm-wmma-tune branch 51. Agents work at long depth, so after the Strata tests:
+build llama.cpp for HIP/gfx1151 in a container (same pinned tag as Vulkan), run `tuning/speed` + a depth sweep on
+`big`, one change at a time. marvin `big` already has the wiki's flags (-ngl 999, -fa on, -lm dio, RADV).
+
 ## Risks
 
 - Strix Halo support upstream is "experimental"; the speed claims may not hold on marvin.
