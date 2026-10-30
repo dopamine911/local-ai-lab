@@ -3,7 +3,8 @@
 Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
 Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log; pushed to dopamine911/UnbiasedStrata
 `hip-gfx1151`). Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
-(Daniel 2026-10-30, `decisions.md` "Daniel's answers").
+(Daniel 2026-10-30, `decisions.md` "Daniel's answers"). Phase 4 (anything upstream): on hold until proven with
+live sessions and plenty of stats.
 
 ## Why
 
@@ -105,6 +106,10 @@ one change per commit.
    one engine loaded at a time), so Open WebUI, agents and zaphod see it like any other model.
 
 ## Phase 4: contribute upstream (results first, PR only for what is new)
+
+**On hold (Daniel 2026-10-30):** no upstream submission of any kind (comment, issue, PR, contact with the PR #19
+author) until the port is proven: fully tested with live sessions (real use through llama-swap, Open WebUI and
+agents, not only benchmarks) and plenty of stats recorded (MLflow). Daniel decides when that bar is met.
 
 1. Don't open a competing AMD PR. Post the Strix Halo (gfx1151) results as a comment on PR #19 and issue #6: first
    validation on a third AMD family, with the measurements table. That supports getting #19 merged.

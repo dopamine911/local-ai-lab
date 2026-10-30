@@ -27,6 +27,11 @@ UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md
    Good answer: "a" or "b". Either way upstream PR #19 needs a rebase before it can merge; telling its author is
    upstream contact and needs Daniel's OK.
 
+7. **Upstream on hold** (Daniel 2026-10-30): no upstream submission of any kind (comment on PR #19 / issue #6, a PR,
+   contact with the PR #19 author) until the port is proven: fully tested with live sessions and plenty of stats.
+   Daniel decides when that bar is met. Covers items 4 and 6 above: the Makefile fix and the PR #19 rebase stay local.
+   Recorded in the plan (status line, Phase 4).
+
 Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / GitHub comment upstream, no version under
 2 weeks old, no change to the CUDA path.
 
