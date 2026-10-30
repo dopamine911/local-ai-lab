@@ -55,6 +55,22 @@ Steps, one at a time, each with a good result:
 3. Note what breaks or is missing for local models (tool-call format, reasoning output, context limits, speed).
 4. Then the own-task test (step 2) runs through Enso.
 
+Where the lab plugs into Enso (from reading Enso's README and `docs/features`, 2026-10-30; nothing tried yet).
+After steps 1-4 above, one row at a time:
+
+| Enso has | The lab supplies | Effort |
+| --- | --- | --- |
+| pi's `models.json` (any OpenAI-compatible provider) | llama-swap: `coder`, `ornith`, `chat`, `marvin/big` | Config only (step 1 above) |
+| Command judge, `local` backend (`security.judge.local`: a llama.cpp router on a loopback address only) | llama-swap on zaphod's `127.0.0.1:8080` | Config only, if Enso runs on zaphod |
+| `web_search` (the model's own search API, else Tavily) | SearXNG, already running | A new backend in Enso (Daniel's code) |
+| Extensions | MCPJungle tools (`search`, `browser`), with an Enso token in `hub/mcp/clients/` | An extension, or keep Enso's guarded tools |
+| Daily JSONL receipts (`~/.enso/logs/`), `bun run eval <thread> --row` | MLflow (every benchmark run) | A small importer (step 6) |
+| Incident thresholds (first guesses; halting off by default) | Tool-test cases where models repeat attacker text (TC-57/58/60), run on several local models | Run them through Enso, then `bun run incidents replay` to tune |
+
+The last two give each side what it lacks: Enso gets calibration data from models that misbehave more often,
+and the lab gets a way to test local models on real work, not only benchmarks. Related Enso issue draft (not
+posted): a comparison view for two forks, e.g. the same task on a frontier model and on `marvin/big`.
+
 ### 2. A test made of Daniel's own tasks
 10-20 tasks he would normally give a frontier model (code changes, debugging, writing, research), each with a short
 "what a good answer looks like". Run on each local model through Enso; Daniel scores them (pass / partly / fail).
