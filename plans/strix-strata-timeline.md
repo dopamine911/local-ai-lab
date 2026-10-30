@@ -68,4 +68,8 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:06:34 | Fork served (medium); speed test | reading 811.4, writing 49.7 tok/s | MLflow 212e554d |
 | 18:10:20 | Fork stopped; llama-swap back (`big` online) | | results.txt, b353ae4 |
 | 18:10 | Fork branch pushed (02c9904) | | |
-| 18:12 | Ubuntu base bump: `resolute-20261024.1` + snapshot 2026-10-30; full rebuild started | running | |
+| 18:12-18:28 | Ubuntu base bump: `resolute-20261024.1` + snapshot 2026-10-30; full rebuild; `make test` | 15 min; pass; pack identical | fork cc2a9ca |
+| 18:29 | New images copied to marvin | | |
+| 18:30:06 | marvin check on the new base | **passed** | results.txt |
+| 18:31:45 | Fork served (medium); speed test | reading **786.8** (falling: 821.6 → 811.4 → 786.8), writing 49.6 | MLflow 9fdeb14c |
+| 18:35:20 | Fork stopped; llama-swap back (`big` online) | | results.txt |

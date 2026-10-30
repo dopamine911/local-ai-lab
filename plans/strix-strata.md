@@ -384,3 +384,11 @@ Decisions made while Daniel was away: `decisions.md`.
    212e554d; GPU 137 W average, peak 93 C): writing **49.7** (before 49.5), 32K reading **811.4** (before 821.6,
    -1.2%; runs 803 / 811 / 812 vs 815 / 822 / 822). None of the three fixes is on the prompt path and main's merge did
    not change ggml, so likely run-to-run/heat; not proven (would need the pre-fix image run back to back).
+12. **Ubuntu base bumped** (Daniel 2026-10-30; fork `cc2a9ca`): `resolute-20261024.1` (sha256:6a06111c…) + snapshot
+   2026-10-30. Full rebuild 15 min; same compilers (cmake 4.2.3, g++ 15.2, AMD clang 23, Python 3.14.4), newer
+   curl / git / ca-certificates security fixes; `make test` passes; pack byte-identical. Images: runtime `6631f978…`,
+   tests `1f6f4be5…`. marvin check passed (18:30). Speed at medium (MLflow 9fdeb14c; GPU 138 W average, peak 92 C):
+   writing **49.6**, 32K reading **786.8** (780.7 / 787.5 / 786.8). **Open: reading has fallen across today's fork runs,
+   821.6 → 811.4 → 786.8 (-4%), writing flat, power the same.** Neither the fixes nor the base touch the GPU prompt
+   path (same ROCm files), so marvin drift (heat soak, RAM: 12 GB free while serving) is as likely as a build cause.
+   Not yet separated: needs the previous images run back to back with this one.
