@@ -127,3 +127,6 @@ Daniel: "That wasn't my rule, lets modify that to just pinning the latest versio
 session's summary, not from Daniel. New rule: pin the latest version exactly (digest / exact version / sha256), no
 minimum age. Decisions above that waited only for that rule (items 2, 24, 25: run on 2026-11-04 / 2026-11-06) no
 longer need to wait; marvin being free is the remaining condition.
+26. **Daniel 2026-10-30: every test at thinking level medium** ("xhigh was a problem", "keep all at med"). No xhigh
+    runs. `fork.sh` keeps `THINK` (default medium) but it is not to be changed for tests. Fair speed comparison =
+    upstream Strata at preset `p16m` (medium) through the same `tuning/speed` test, next.
