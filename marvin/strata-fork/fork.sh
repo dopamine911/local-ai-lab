@@ -117,7 +117,9 @@ check)
   log "before: $(mem)"
   # 1. the GPU is seen and this build can run it
   out=$(docker run --rm --network none "${USERRUN[@]}" "$TESTS" strata-device --list-devices 2>&1); echo "$out" >> "$DIR/results.txt"
-  echo "$out" | grep -q gfx1151 && ok "strata-device sees gfx1151" || bad "strata-device: no gfx1151 (output above)"
+  echo "$out" | grep -q "arch gfx1151" || bad "strata-device: no gfx1151 (output in results.txt)"
+  echo "$out" | grep -q "cannot run" && bad "strata-device: this build cannot run the GPU (output in results.txt)"
+  ok "strata-device sees gfx1151 and can run it"
   # 2. the three HIP parity tests: pass = exit 0; 77 = skipped (counts as a failure here)
   for t in hip_prefill_hipblaslt_gemm hip_prefill_hcd_exact_parity hip_prefill_mmq_parity; do
     docker run --rm --network none "${USERRUN[@]}" "$TESTS" "$t" >> "$DIR/results.txt" 2>&1; rc=$?
