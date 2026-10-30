@@ -152,6 +152,25 @@ one JSONL file, keyword search only; harder to review than Markdown); small Mark
 memory-mcp and memxp-mcp (young, little use). Fallback with no new software: agents write notes into a git folder
 that LocalRecall indexes.
 
+**Checked 2026-10-30 after Daniel's objection (agents skim Markdown, so memory should be short facts, not files):**
+- **Mnemosyne (mnemosyne-oss/mnemosyne)**, the one Hermes Agent supports (via MCP and a plugin). MIT, ~3.5k stars,
+  316 forks, several active contributors, core dependency PyYAML only. Read in the v3.15.1 source (2026-07-30; 4.0.0
+  is from 2026-10-27, under 2 weeks): `remember` stores a short memory with importance, source type, scope, expiry
+  (`valid_until`) and veracity (`stated`/`inferred`/`tool`...); **no model call unless `extract=True`** (LLM fact
+  extraction, default off) or `sleep` consolidation is run. Search: FTS5 keyword + optional local embeddings
+  (384-dim, binarised) + importance, all in one SQLite file. Also: temporal triples with valid-from dates,
+  `invalidate` (with a replacement) and `validate`, working memory injected before model calls (push, not pull),
+  export/import (incl. from mem0, Honcho, Letta). MCP over stdio or SSE (not streamable HTTP: our `mcp-proxy`
+  bridge works for stdio). 30 tools: expose only remember/recall/invalidate/validate/get. No telemetry library found
+  (grep: posthog/sentry/analytics). Still to check: embeddings via llama-swap (`MNEMOSYNE_EMBEDDING_API_URL`) vs
+  local download, what `validate` changes, behaviour with no internet. **Leading candidate.**
+- **Mnemosy (28naem-del/mnemosyne, npm `mnemosy-ai`, mnemosy.ai)**: a different project with a similar name. Good
+  design (evidence links, validity windows, correction history, no model call to save) but one maintainer (91 of
+  101 commits), 154 stars, 2.0.0 from 2026-10-27, three 3.0 release candidates in 3 days. Revisit after 2026-11-10.
+- **Honcho (plastic-labs/honcho)**: no. AGPL-3.0; a background "deriver" calls a model on saved messages to reason
+  about each person ("peer psychology"), defaults to OpenAI (gpt-5.4-mini, text-embedding-3-small), Postgres +
+  Redis, hosted MCP by default. Same objection as mem0, stronger.
+
 **Rule for any of them:** agents write only to a memory folder; Daniel reviews it with `git diff` before it is
 committed; the folder is private (memories may name machines and decisions), so not in this public repo; LocalRecall
 does not index unreviewed memory files.
