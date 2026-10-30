@@ -26,6 +26,7 @@ UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md
       until 2026-11-06; the new engine adds an untested HIP build.
    Good answer: "a" or "b". Either way upstream PR #19 needs a rebase before it can merge; telling its author is
    upstream contact and needs Daniel's OK.
+   **Daniel: later (a).** Test PR #19 as is on marvin; merge main in after testing, not before 2026-11-06.
 
 7. **Upstream on hold** (Daniel 2026-10-30): no upstream submission of any kind (comment on PR #19 / issue #6, a PR,
    contact with the PR #19 author) until the port is proven: fully tested with live sessions and plenty of stats.
