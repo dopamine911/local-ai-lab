@@ -115,6 +115,10 @@ a Beta CLI that moves coding sessions between Claude Code/Codex/OpenCode (instal
 not say where memories are stored; it has pricing and a plugin, so treat it as the hosted product unless shown otherwise.
 So: mem0 library or its self-hosted `server/`, sealed, on our models, plus a reviewed or own small MCP server.
 Good result: tell one agent a rule; a different agent, new session, follows it without being told.
+Also seen (parked 2026-10-30): MemTensor/memmy-agent (MIT, created 2026-07-16, releases every few days, latest
+v1.2.401 2026-10-27). A personal agent plus memory hub that hooks into Claude Code/Codex; desktop app or curl|bash CLI
+(systemd user service), no Docker, no MCP in its README, OpenAI shown by default, desktop trial needs a sign-up,
+telemetry unknown. Overlaps with Enso. Revisit if it gains a server/container mode with MCP and settles down.
 
 ### 5. Reading the web: page fetch and a browser
 Clean page text for agents (candidate *(check)*: Crawl4AI) and a browser they can drive (Playwright MCP *(check)*),
