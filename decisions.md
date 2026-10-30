@@ -3,20 +3,19 @@
 Newest last. Each: what, why, how to undo. Started 2026-10-30 (Phase 3 of `plans/strix-strata.md`, porting
 UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md`, code map `plans/strix-strata-port-notes.md`).
 
-## Waiting on Daniel
+## Daniel's answers (2026-10-31)
 
-1. **OK to start Phase 3 step 6 on marvin?** Only after Terminal-Bench on Strata has finished. Good answer: "yes,
-   Terminal-Bench is done" (then I copy the two images to marvin and run the checks in the Phase 3 log, step 5b).
-2. **Two fork pieces under 2 weeks old** (decision 5): start marvin now, or wait until 2026-11-04 for the strict
-   rule. Good answer: "now" or "wait".
-3. **The pack for the fork's `strata` engine:** reuse upstream 0.2.7's pack from marvin's `strata-data` volume
-   (quick, but the format may differ between engine 0.1.52 and the fork's 0.1.45), or build one with the fork's
-   `tools/iq_pack.py --compat-bf16` (clean, takes disk and time). My suggestion: build one with the fork's tool, so
-   the test is all-fork. Good answer: "reuse" or "build".
-4. **Makefile fix** so `make build BACKEND=hip` turns `STRATA_PREFILL_MMQ` on (decision 6): later, as part of the
-   Phase 4 follow-up PR? Good answer: "yes later" or "no". Nothing is posted anywhere without your OK.
+1. **Step 6 on marvin: wait.** marvin is still busy. Nothing on marvin until Daniel says it is free.
+2. **Fork pieces under 2 weeks old: wait** for the strict rule. Earliest step 6 date: **2026-11-04** (and marvin free).
+3. **Pack: build** one with the fork's `tools/iq_pack.py --compat-bf16`, so the test is all-fork. Needs the Unsloth
+   GGUF shards (only on marvin now, about 60 GB) and numpy (pinned, 2 weeks old). How to get the shards is decided
+   then; not over marvin's Wi-Fi while it is busy.
+4. **Makefile fix** (`make build BACKEND=hip` turns `STRATA_PREFILL_MMQ` on): **yes, later**, in the Phase 4
+   follow-up PR. Still nothing posted upstream without Daniel's OK.
+5. **Push:** Daniel asked to push to his fork `dopamine911/UnbiasedStrata`. Done: branch `hip-gfx1151`
+   115af49 → 4149027 (the 4 docker commits; gitleaks clean). Nothing sent to robertkarl/UnbiasedStrata.
 
-Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / GitHub comment, no version under
+Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / GitHub comment upstream, no version under
 2 weeks old, no change to the CUDA path.
 
 ## 2026-10-30

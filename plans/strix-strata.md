@@ -1,8 +1,9 @@
 # Plan: Strata on marvin (Strix Halo), then port UnbiasedStrata to AMD and offer the PR
 
 Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
-Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log); step 6 (marvin) waits for Daniel: see
-`decisions.md` "Waiting on Daniel".
+Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log; pushed to dopamine911/UnbiasedStrata
+`hip-gfx1151`). Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
+(Daniel 2026-10-31, `decisions.md` "Daniel's answers").
 
 ## Why
 
