@@ -175,6 +175,7 @@ async def main():
     s = await asyncio.start_server(handle, "0.0.0.0", '"$PORT"'); await s.serve_forever()
 asyncio.run(main())' >/dev/null
   docker network connect "$NET" strata-fork-relay
+  for i in $(seq 1 15); do curl -sf -m 2 -o /dev/null http://$TS:$PORT/health && break; sleep 1; done   # relay start-up
   curl -sf -m 5 -H "Authorization: Bearer $(cat "$KEYF")" "http://$TS:$PORT/v1/models" >/dev/null && ok "API answers on $TS:$PORT" || bad "API not answering on $TS:$PORT"
   log "internet from inside: $(docker run --rm --network "$NET" "$RELAY_IMG" python3 -c '
 import urllib.request
