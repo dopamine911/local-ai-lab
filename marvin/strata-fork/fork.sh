@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # UnbiasedStrata (our gfx1151 build, fork branch hip-gfx1151) on marvin. Plan: plans/strix-strata.md, Phase 3 step 6.
 # Runs ON marvin. Copy: scp marvin/strata-fork/fork.sh marvin:strata-fork/
-# Not before 2026-11-04 (Daniel: 2-week rule for the fork) and only when Daniel says marvin is free.
+# Only when Daniel says marvin is free (llama-swap's `big` is offline while it runs).
 #
 #   ./fork.sh check    step 6 checks 1-4, in order, stops at the first failure (llama-swap stopped, started again after)
 #   ./fork.sh start    stop llama-swap, serve the fork sealed on marvin's Tailscale address :8099 (like strata-test.sh)
@@ -21,9 +21,9 @@ set -uo pipefail
 # marvin only (stop/start run marvin's llama-swap compose); `args` is a dry run and works anywhere the images are
 [ "${1:-}" = args ] || [ "$(hostname)" = marvin ] || { echo "run this on marvin (this is $(hostname))"; exit 1; }
 RT=unbiased-strata:gfx1151; TESTS=unbiased-strata-tests:gfx1151; RELAY_IMG=python:3.13-slim-trixie
-# config digests (plans/strix-strata.md Phase 3 log 5 / 5b)
-RT_CFG=sha256:8869cd2ba45592f85aef562d3875e7fa11224d9864d27050ae9ab13a7cbfd195
-TESTS_CFG=sha256:8902459072a9bd260ce2671569545efbf90353c73f47dc2af851c40402d33485
+# config digests: fork a185402 (main merged in), plans/strix-strata.md Phase 3 log 9
+RT_CFG=sha256:1f7416250926d09ad7bb911ffddfc9e11bf5c5a301bf32f7d6f29dc8bf345503
+TESTS_CFG=sha256:67b979473ec679f01e95c53c9a0ca3fa3bd83bd14f6d6ec6e020c209d6703956
 M=/srv/models; F=Qwen3.8-Flash-Next-UD-IQ4_XS
 PACK=${PACK:-$M/strata-fork/pack-ud-iq4_xs}
 PRESET=${PRESET:-p16m}; PARALLEL=${PARALLEL:-2}
@@ -47,10 +47,6 @@ DATA=(-v "$PACK:/pack:ro" -v strata-data:/sd:ro)
 
 preflight() {
   [ "$(hostname)" = marvin ] || bad "run this on marvin"
-  if [ "$(date +%Y%m%d)" -lt 20261104 ]; then   # 2-week rule for the fork (PR #19 2026-10-21, submodule 2026-10-19)
-    [ "${EARLY_OK:-}" = daniel-2026-10-30 ] || bad "not before 2026-11-04 (Daniel: 2-week rule for the fork)"
-    log "EXCEPTION to the 2-week rule: Daniel 2026-10-30, this test only (decisions.md 25)"
-  fi
   docker ps --format '{{.Names}}' | has -x strata && bad "upstream Strata is running: ~/strata-test/strata-test.sh stop first"
   for i in "$RT $RT_CFG" "$TESTS $TESTS_CFG"; do set -- $i
     docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | has "$2" \
