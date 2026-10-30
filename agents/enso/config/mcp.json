@@ -5,12 +5,13 @@
       "headers": {
         "Authorization": "!printf 'Bearer %s' \"$(cat /home/ubuntu/.enso/keys/mcp-token)\""
       },
-      "description": "The lab's tools through MCPJungle: web search and page reading, a headless browser, and memory (search the lab's own notes)",
+      "description": "The lab's tools through MCPJungle: web search and page reading, a headless browser, memory (search the lab's notes) and recall (short memories shared by all agents)",
       "exposure": "deferred",
       "toolExposure": {
         "search__*": "direct",
         "browser__*": "deferred",
-        "memory__*": "direct"
+        "memory__*": "direct",
+        "recall__*": "direct"
       }
     }
   }

@@ -34,6 +34,15 @@ for f in mcp/servers/*.json; do
   if out=$("$MJ" register --force -c "$f" 2>&1); then echo "== tool server: $(basename "$f" .json)"
   else echo "== tool server: $(basename "$f" .json) FAILED: $(echo "$out" | head -1)"; fi
 done
+# A server with a <name>.tools file keeps only the tools listed there (one per line, # comments); the rest are off.
+for tf in mcp/servers/*.tools; do   # not $t: the EXIT trap deletes "$t"
+  [ -f "$tf" ] || continue
+  srv=$(basename "$tf" .tools); keep=$(grep -v "^#" "$tf" | sed "s/^/${srv}__/")
+  "$MJ" list tools 2>&1 | grep -oE "${srv}__[A-Za-z0-9_]+" | sort -u | while read -r tool; do
+    if echo "$keep" | grep -qx "$tool"; then "$MJ" enable tool "$tool" >/dev/null; else "$MJ" disable tool "$tool" >/dev/null; fi
+  done
+  echo "== tool server: $srv: on: $(echo $keep | tr ' ' ',')"
+done
 for f in mcp/clients/*.json; do
   n=$(basename "$f" .json)
   "$MJ" delete mcp-client "$n" >/dev/null 2>&1 || true

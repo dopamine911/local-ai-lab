@@ -121,3 +121,9 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     For the step 6 test only: fork commit `115af49` (2026-10-21) and submodule `a6de9af3` (2026-10-19), 9 and 11
     days old. `fork.sh` allows it only with `EARLY_OK=daniel-2026-10-30` and logs the exception. Live use / anything
     lasting still waits for 2026-11-04 unless Daniel says otherwise.
+
+## 2026-10-30: the "2-week rule" is withdrawn
+Daniel: "That wasn't my rule, lets modify that to just pinning the latest version." It came from an earlier
+session's summary, not from Daniel. New rule: pin the latest version exactly (digest / exact version / sha256), no
+minimum age. Decisions above that waited only for that rule (items 2, 24, 25: run on 2026-11-04 / 2026-11-06) no
+longer need to wait; marvin being free is the remaining condition.

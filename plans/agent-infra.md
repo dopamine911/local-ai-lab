@@ -124,7 +124,21 @@ the private repo's contents are inside it.
 
 Good result: an agent asked "how did we fix the slow card?" finds `problems/2026-10-28-slow-gpu-card.md`.
 
-### 4b. Memory from conversations — mem0 DROPPED (Daniel 2026-10-30); candidate: Basic Memory
+### 4b. Memory from conversations: Mnemosyne — DONE 2026-10-30 (mem0 dropped, Basic Memory rejected)
+**Running:** Mnemosyne 4.0.0 (hub/compose.yaml `mnemosyne`, image built from hub/memory/mnemosyne.Dockerfile), MCP tool
+`recall` for enso and claude-code; MCPJungle keeps 5 of its 30 tools on (`hub/mcp/servers/recall.tools`: remember,
+recall, get, invalidate, validate). Short memories with importance, type, scope, veracity, expiry; saving calls no
+model. Embeddings: its own local model (bge-small, 384 dims, CPU, downloaded at build), because 4.0 refuses to send an
+API key over plain http (no override) and so llama-swap `embed` can't be used without a proxy. On memory-internal only
+(mcpjungle reaches it; no internet), bearer token `MNEMOSYNE_MCP_TOKEN`.
+**Measured:** coder in Enso saved a rule (scope global, veracity stated); Claude Code in another session recalled it.
+A reworded question ("where should I record a change I made to a server's configuration?") found nothing by default:
+Mnemosyne first requires shared words, then uses meaning (its docs, "Recall Tuning"). With
+`MNEMOSYNE_POLYPHONIC_RECALL=1` (its documented fix; it widens results, which matters only with several users in one
+bank) the same question found the rule. One change, before/after.
+**Not yet:** a review step for agent-written memories (Basic Memory was rejected: agents skim Markdown); Daniel can
+check them with `invalidate`/`validate` through any agent. Basic Memory notes below kept for the record.
+
 **Why mem0 is dropped:** in its default mode every "add" is model calls (extract facts, then decide add/update/delete
 against existing memories). The memories a model writes are never reviewed, and with local models (which make things
 up and repeat attacker text in our tests) a bad memory spreads to every later session. It also costs GPU time on a

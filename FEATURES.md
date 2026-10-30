@@ -64,7 +64,8 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | Enso (Daniel's coding-agent harness, pi 1.1.0) in a container on zaphod: local models from llama-swap, MCPJungle tools, no internet, own workspace clone; for local models working on Enso issues | ready (2026-10-30; interactive use not yet tried) | [agents/enso/README.md](agents/enso/README.md) |
 | Page fetching never reaches the lab (Open WebUI, search tool, browser: all tested) | working | [hub/compose.yaml](hub/compose.yaml) `ENABLE_LOCAL_WEB_FETCH` |
 | `memory` tool: search the lab's own notes (~/homelab + private ~/full-homelab Markdown) with LocalRecall 0.6.6 (Postgres, keyword + vector, llama-swap `embed`); read-only; Enso and Claude Code only (private text: not Open WebUI); test transcripts and benchmark tasks kept out | working | [hub/compose.yaml](hub/compose.yaml), [hub/memory/](hub/memory/), [hub/mcp/servers/memory.json](hub/mcp/servers/memory.json) |
-| Memory from conversations (mem0), session recording | planned | [plans/agent-infra.md](plans/agent-infra.md) |
+| `recall` tool: short memories shared by all agents (Mnemosyne 4.0.0): remember a fact/preference/decision, recall by meaning, mark wrong or confirmed; saving calls no model; 5 of its 30 tools on; Enso and Claude Code | working | [hub/memory/mnemosyne.Dockerfile](hub/memory/mnemosyne.Dockerfile), [hub/mcp/servers/recall.tools](hub/mcp/servers/recall.tools) |
+| Session recording | planned | [plans/agent-infra.md](plans/agent-infra.md) |
 
 ## 5. Testing and measuring
 

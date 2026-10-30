@@ -1,0 +1,7 @@
+{
+  "name": "recall",
+  "transport": "streamable_http",
+  "description": "Short memories shared by all agents (Mnemosyne 4.0.0): remember a fact, preference or decision; recall the few that match; mark one wrong (invalidate) or confirmed (validate). Saving calls no model.",
+  "url": "http://mnemosyne:8080/mcp",
+  "bearer_token": "${MNEMOSYNE_MCP_TOKEN}"
+}

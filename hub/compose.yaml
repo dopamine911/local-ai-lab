@@ -365,6 +365,29 @@ services:
       LOCALRECALL_ENABLED_TOOLS: search,list_files   # read-only: only memory-sync writes
     networks: [memory-internal]                      # only mcpjungle reaches it
 
+  # Memory, part 2: Mnemosyne 4.0.0 (plans/agent-infra.md step 4b). Short memories agents save and recall
+  # (preferences, decisions, facts), one SQLite file. Saving calls no model; embeddings by its own small local model
+  # (in the image). MCP over streamable HTTP with a bearer token. Only mcpjungle reaches it (memory-internal, no
+  # internet); there all but five of its tools are switched off (hub/mcp/setup.sh). Agent tool name: `recall`.
+  mnemosyne:
+    build: {context: memory, dockerfile: mnemosyne.Dockerfile}
+    image: mnemosyne:4.0.0
+    container_name: mnemosyne
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      MNEMOSYNE_MCP_TOKEN: ${MNEMOSYNE_MCP_TOKEN:?set MNEMOSYNE_MCP_TOKEN in .env}
+      MNEMOSYNE_MCP_ALLOWED_HOSTS: mnemosyne,mnemosyne:*   # the Host header mcpjungle sends
+      MNEMOSYNE_AUTHOR_ID: mcp
+      # Let meaning alone find a memory (default: a memory must first share enough words with the question).
+      # Project's own measurement: 6/8 -> 7/8 natural-language probes; wider results only matter with several users
+      # in one bank (here: one). Measured here 2026-10-30, see plans/agent-infra.md step 4b.
+      MNEMOSYNE_POLYPHONIC_RECALL: "1"
+    volumes:
+      - ./data/mnemosyne:/data                      # the memories (nightly backup copies hub/data)
+    networks: [memory-internal]
+
   # Uploads changed Markdown files: `docker compose --profile sync run --rm memory-sync` (cron: setup/memory-sync.cron)
   memory-sync:
     profiles: [sync]

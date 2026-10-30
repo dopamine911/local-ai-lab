@@ -1,0 +1,7 @@
+# Tools left on for this server (hub/mcp/setup.sh switches off every other one). Mnemosyne offers 30;
+# these five are enough to save, find, read and correct memories. Not on: forget, import, export, sync, sleep (model).
+mnemosyne_remember
+mnemosyne_recall
+mnemosyne_get
+mnemosyne_invalidate
+mnemosyne_validate

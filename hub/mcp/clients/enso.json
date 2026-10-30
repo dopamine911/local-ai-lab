@@ -3,7 +3,8 @@
   "allowed_servers": [
     "search",
     "browser",
-    "memory"
+    "memory",
+    "recall"
   ],
   "access_token_ref": {
     "env": "MCP_TOKEN_ENSO"

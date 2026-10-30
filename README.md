@@ -68,6 +68,7 @@ Every agent has its own token and list of allowed tool servers; no token or a wr
 | `search` | Web search via our SearXNG, and reading public web pages (`web_url_read` refuses home-network and Tailscale addresses) | openwebui, claude-code |
 | `browser` | Headless Chromium (Playwright MCP 0.0.83): open pages, click, type, read, screenshot. On an internal network; its only way out is `browser-proxy` (Squid, `hub/browser-proxy/squid.conf`), which refuses home-network, Tailscale, Docker and zaphod addresses (tested). See blocked requests: `docker exec browser-proxy tail /var/log/squid/access.log` (TCP_DENIED) | openwebui, claude-code |
 | `memory` | Search the lab's own notes (LocalRecall over ~/homelab and ~/full-homelab Markdown; synced hourly by `hub/memory/sync.sh`). Read-only. Raw tool-test transcripts and Terminal-Bench tasks are excluded (attacker text, benchmark contamination) | enso, claude-code |
+| `recall` | Short memories shared by all agents (Mnemosyne 4.0.0, one SQLite file in hub/data/mnemosyne): remember, recall, get, invalidate, validate (the other 25 tools are off, `hub/mcp/servers/recall.tools`) | enso, claude-code |
 
 Setup and rebuild: `hub/mcp/setup.sh` (servers in `hub/mcp/servers/`, agent logins in `hub/mcp/clients/`,
 tokens in `hub/.env` as `MCP_TOKEN_<NAME>`). Admin: `mcpjungle list tools`, `mcpjungle list mcp-clients`.
