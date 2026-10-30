@@ -103,6 +103,7 @@ Main results so far (details in [tuning/results.md](tuning/results.md)):
 | --- | --- | --- |
 | [plans/agent-infra.md](plans/agent-infra.md) | Infrastructure for all agents: Enso on local models, own-task test, gateway, memory, tracing, reliability, hardening | in progress (gateway done) |
 | [plans/strix-strata.md](plans/strix-strata.md) | Strata on marvin (sealed off), then port UnbiasedStrata to AMD gfx1151 and contribute upstream | planned (fork ready) |
+| [plans/maya.md](plans/maya.md) | Project Maya: much bigger models (GLM-5.3-Flash 321B) on marvin; ideas for the fork | to check (after the port) |
 | [plans/strata.md](plans/strata.md) | Strata tests on zaphod | done |
 | [plans/more-models.md](plans/more-models.md) | Vision, chat, document search, speech, images | done |
 | [plans/morning-guide-2026-10-29.md](plans/morning-guide-2026-10-29.md) | Overnight work summary and steps for Daniel | done |
