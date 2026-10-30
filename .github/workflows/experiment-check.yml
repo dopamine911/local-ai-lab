@@ -1,0 +1,26 @@
+# Experiment PRs (label "experiment") must carry every section of .github/PULL_REQUEST_TEMPLATE/experiment.md, with no
+# TODO left. Issue #5 (autoresearch): an agent posting with gh skips the template, so this is what enforces it.
+# No third-party actions and no secrets: the body is read from an environment variable, never pasted into the script.
+name: Experiment check
+on:
+  pull_request:
+    types: [opened, edited, synchronize, labeled, reopened]
+permissions:
+  contents: read
+jobs:
+  sections:
+    if: contains(github.event.pull_request.labels.*.name, 'experiment')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Required sections present and filled
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=0
+          for s in "Proposal" "Change" "Environment" "Results" "Quality guard" "Power and temperature" "MLflow" "Verdict" "Reverted" "Memory"; do
+            if ! printf '%s\n' "$BODY" | grep -q "^## $s\$"; then echo "missing section: $s"; missing=1; fi
+          done
+          # placeholders: a line that is just TODO, "#TODO", or a table cell "| TODO |" (the word in prose is fine)
+          if printf '%s\n' "$BODY" | grep -Eq '^TODO$|#TODO|\| TODO \|'; then echo "placeholder left:"; printf '%s\n' "$BODY" | grep -En '^TODO$|#TODO|\| TODO \|'; missing=1; fi
+          if ! printf '%s\n' "$BODY" | grep -Eqi '^(better|no change|worse|unclear)\b' ; then echo "Verdict must start with: better / no change / worse / unclear"; missing=1; fi
+          exit $missing

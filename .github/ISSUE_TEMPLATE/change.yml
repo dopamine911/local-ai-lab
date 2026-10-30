@@ -1,0 +1,34 @@
+name: Lab change
+description: A change to a machine, service or setting (not an experiment). Written as "what · from → to · why".
+title: "<what> · <from> → <to>"
+labels: [enhancement]
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem, with evidence (numbers, logs, links).
+    validations: {required: true}
+  - type: textarea
+    id: change
+    attributes:
+      label: Change
+      description: What changes, from → to, and which files. One change at a time.
+    validations: {required: true}
+  - type: textarea
+    id: measure
+    attributes:
+      label: Measure before and after
+      description: What is measured, and what a good result looks like.
+    validations: {required: true}
+  - type: textarea
+    id: rebuild
+    attributes:
+      label: Rebuild
+      description: Which script or setup/REBUILD.md step records this, so the machine can be rebuilt without memory.
+    validations: {required: true}
+  - type: textarea
+    id: undo
+    attributes:
+      label: Undo
+    validations: {required: false}

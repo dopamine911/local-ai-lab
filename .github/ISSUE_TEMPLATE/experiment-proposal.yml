@@ -1,0 +1,63 @@
+name: Experiment proposal
+description: One change to test, with its source and test plan (autoresearch #5, or by hand). Daniel approves before it runs.
+title: "experiment · <what> · <from> → <to>"
+labels: [experiment, proposal]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        One change per experiment, measured before and after (lab rule). Nothing here touches production: the test
+        runs on a separate test instance during a reservation (#3), and the instance is reverted afterwards.
+  - type: input
+    id: target
+    attributes:
+      label: Target
+      description: Machine and unit, model, and the test instance it runs on.
+      placeholder: "zaphod card 2 · coder (Qwen3.8-27B UD-Q4_K_XL) · test instance on its own port"
+    validations: {required: true}
+  - type: textarea
+    id: change
+    attributes:
+      label: The one change
+      description: Exact setting, before and after. One setting only.
+      placeholder: "llama-server -ub: 512 (default) → 2048"
+    validations: {required: true}
+  - type: textarea
+    id: source
+    attributes:
+      label: Where the idea came from
+      description: Links (changelog, issue, wiki, paper) or the file and line in this repo. Quote the claim.
+    validations: {required: true}
+  - type: textarea
+    id: prior
+    attributes:
+      label: Tried before?
+      description: What `recall`, `memory` and tuning/results.md say about this setting. "Not found" is an answer; say what you searched.
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected effect
+      description: Which metric moves, by how much, and why. Include what could get worse.
+    validations: {required: true}
+  - type: textarea
+    id: plan
+    attributes:
+      label: Test plan
+      description: Harness and options (tuning/speed, tuning/quality subset, tuning/kl), runs per side (at least 3), estimated time, and the reservation needed.
+    validations: {required: true}
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk
+      options:
+        - "Low: test-instance flags only"
+        - "Medium: different build or image of a test instance"
+        - "High: anything else (needs Daniel before planning)"
+    validations: {required: true}
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Undo
+      description: How the test instance goes back to the baseline.
+    validations: {required: true}

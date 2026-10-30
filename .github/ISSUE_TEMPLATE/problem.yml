@@ -1,0 +1,28 @@
+name: Problem
+description: Something is broken or slower than it should be.
+labels: [bug]
+body:
+  - type: input
+    id: where
+    attributes:
+      label: Machine and service
+      placeholder: "marvin · llama-swap big"
+    validations: {required: true}
+  - type: textarea
+    id: symptom
+    attributes:
+      label: Symptom
+      description: What you see, with numbers (tok/s, watts, errors) and when it started.
+    validations: {required: true}
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What a good result looks like, with numbers.
+    validations: {required: true}
+  - type: textarea
+    id: checked
+    attributes:
+      label: Already checked
+      description: Commands run and their output. Don't paste keys or tokens.
+    validations: {required: false}
