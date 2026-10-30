@@ -324,3 +324,13 @@ Decisions made while Daniel was away: `decisions.md`.
    byte-identical files: checksums in `marvin/strata-fork/pack-ud-iq4_xs.sha256`. First run failed: the image lacked
    the vendored gguf-py and python3-yaml (README says gguf-py comes from the submodule; my miss), fixed.
    On marvin (after Daniel's OK): copy the 1.4 GB pack (small enough for Wi-Fi), `sha256sum -c` against the file.
+5f. **Copied to marvin** (2026-10-30, Daniel: marvin free, copy now, run 2026-11-04): marvin's homelab fast-forwarded
+   (750eedf → 40a80d4; nothing under `marvin/llama-swap/` changed). Images by `docker save | ssh marvin docker load`
+   (28 s): config digests `8869cd2b…` / `8902459…` = the zaphod builds. Pack by rsync (152 s): `sha256sum -c` OK. MTP
+   rt on marvin = zaphod's = the fork's published set. `./fork.sh args` on marvin (dry run, no GPU) reads preset
+   `p16m` from the engine log: `--pack /pack --native <shard 1> --expert-profile /pack/expert-profile.bin
+   --expert-cache 16806 --spec 4 --spec-min-p 0.5 --mtp /sd/Strata-data/mtp/rt --max-context 131072 --kv int8
+   --ple-io ram --kv-resident 32768 --resident-budget-gib 55 --prefill 16384 --batch 2` (no `--ple-gguf`: with
+   `--native` the engine finds the PLE shard itself). Upstream Strata (`strata`, Phase 1) was still running; the
+   check refuses to start while it runs. **On 2026-11-04:** `~/strata-test/strata-test.sh stop`, then
+   `~/homelab/marvin/strata-fork/fork.sh check`.

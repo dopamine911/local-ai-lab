@@ -113,3 +113,7 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     `reasoning_effort: "none"` turns thinking off (llama.cpp's parser, which the front end uses). Not yet run: check
     thinking length on first live use. Also checked: the 19-switch count is not reduced by the image's
     `STRATA_HIPBLASLT_TUNING` (not in the gfx1151 table); `strata-device` prints `arch gfx1151` (check 1 greps that).
+24. **Daniel 2026-10-30: marvin is free; copy now, run 2026-11-04** (2-week rule kept); **push both**. Fork pushed
+    (`hip-gfx1151` → `2bff35e`, gitleaks clean); homelab was already on GitHub (another agent pushes main).
+    On marvin: homelab checkout fast-forwarded (no llama-swap config change), images loaded, pack copied, all
+    checked (plan 5f). No GPU use, no container started or stopped; upstream Strata left running as found.
