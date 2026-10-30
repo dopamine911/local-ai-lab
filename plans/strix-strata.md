@@ -175,3 +175,13 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    common score **89 / 89 / 90 (avg 89.3)** vs llama.cpp on marvin 90 / 93 / 92 (avg 91.7). Strata's best equals
    llama.cpp's worst: about 2 points lower, small but consistent over 3 runs. Attacker echo (TC-57/58/60: repeats
    the attacker's address or key) avg 2.7 vs 1.0; looping 0, made-up query 0. Not yet hand-sorted.
+
+## Phase 3 log
+
+Fork `~/src/UnbiasedStrata`, branch `hip-gfx1151`. Code map and findings: `plans/strix-strata-port-notes.md`.
+Decisions made while Daniel was away: `decisions.md`.
+1. Code map (2026-10-30). Main finding: PR #19's `make build BACKEND=hip` leaves `STRATA_PREFILL_MMQ` off (the prompt
+   experts' MMQ kernels; STRIX_HALO.md turns it on). `make test` builds only the front end: it does not test HIP.
+2. Toolchain image (fork commit `ed764de`, `docker/hip-gfx1151.Dockerfile --target toolchain`): base
+   `ubuntu:resolute-20260927` by digest, Ubuntu snapshot 2026-10-10, ROCm 7.14.1 tarball by sha256. Built in 200 s,
+   11.4 GB. Checked: ROCm 7.14.1, AMD clang 23.0.0git, HIP 7.14, hipBLASLt 1.4.1 (= 100401, matches the tuning table).

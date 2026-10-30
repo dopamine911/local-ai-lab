@@ -10,9 +10,8 @@ some of the cause may be engine changes since 0.1.45, not the port.
    experts need it (`-DSTRATA_PREFILL_MMQ=ON`). Without it the `elseif(STRATA_PREFILL_MMQ)` branch
    (CMakeLists.txt:1737) never runs: no ggml MMQ prompt kernels, no `STRATA_PREFILL_FUSED`. Likely a big loss in reading
    speed. First build: pass it via `CMAKE_EXTRA`. A Makefile fix is a separate commit and a Phase 4 candidate.
-2. **Compiler path.** Makefile: `HIP_CXX ?= $(ROCM_PATH)/llvm/bin/clang++`. TheRock puts clang at
-   `$SDK/lib/llvm/bin/clang++` (STRIX_HALO.md). If so, the wildcard is empty and CMake searches PATH. Check after
-   extracting; pass `HIP_CXX=` by hand.
+2. ~~Compiler path~~ (checked 2026-10-30, not a problem): TheRock 7.14.1 has clang at both `$SDK/llvm/bin/clang++`
+   (the Makefile's default) and `$SDK/lib/llvm/bin/clang++` (STRIX_HALO.md). AMD clang 23.0.0git.
 3. **Build with `PORTABLE=1`.** Upstream's BUILD.json: `"portable": true`. Without it ggml-cpu is built
    `-march=native` for zaphod's Zen 2 (no AVX-512) and then runs on marvin's Zen 5. Strata's own AVX-512 kernels
    choose at run time either way (CMakeLists.txt:30-33).
@@ -58,7 +57,7 @@ gfx1151 gets nothing: we pass `--prefill 16384` like Phase 1).
 ## Build recipe to try first (step 3), from STRIX_HALO.md section 2
 
 ```sh
-make build BACKEND=hip HIP_ARCHS=gfx1151 ROCM_PATH=$SDK HIP_CXX=$SDK/lib/llvm/bin/clang++ PORTABLE=1 \
+make build BACKEND=hip HIP_ARCHS=gfx1151 ROCM_PATH=$SDK PORTABLE=1 \
   CMAKE_EXTRA="-DSTRATA_PREFILL_MMQ=ON -DCMAKE_HIP_COMPILER_ROCM_ROOT=$SDK \
     '-DCMAKE_PREFIX_PATH=$SDK;$SDK/lib/rocm_sysdeps;$SDK/lib/llvm' \
     '-DCMAKE_HIP_FLAGS=--rocm-path=$SDK --rocm-device-lib-path=$SDK/lib/llvm/amdgcn/bitcode'"
