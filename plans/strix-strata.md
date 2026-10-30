@@ -3,7 +3,7 @@
 Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
 Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log; pushed to dopamine911/UnbiasedStrata
 `hip-gfx1151`). Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
-(Daniel 2026-10-31, `decisions.md` "Daniel's answers").
+(Daniel 2026-10-30, `decisions.md` "Daniel's answers").
 
 ## Why
 
@@ -238,9 +238,13 @@ Decisions made while Daniel was away: `decisions.md`.
    `sha256:8902459072a9bd260ce2671569545efbf90353c73f47dc2af851c40402d33485`, manifest digest
    `sha256:d427915b29584e38c0cfa21036d174fc93fe38d5b697ff493935cb5344bc2583` = the runtime image + `strata-device`,
    `hip_prefill_hcd_exact_parity`, `hip_prefill_hipblaslt_gemm`, `hip_prefill_mmq_parity` (gfx1151 code only).
-   Default `docker build` still gives the runtime image, ID unchanged. **Order on marvin, after Daniel's OK** (each
-   with `--network none --device /dev/kfd --device /dev/dri --group-add` render + video; GPU memory free and power
-   mode checked first):
+   Default `docker build` still gives the runtime image, ID unchanged. **Order on marvin, after Daniel's OK** (GPU
+   memory free and power mode checked first). Every container runs as a normal user with only the GPU groups, like
+   the relay container in the Strata test (both images default to root):
+   `docker run --rm --network none --user 1000:1000 --group-add $(getent group render | cut -d: -f3) --group-add
+   $(getent group video | cut -d: -f3) --device /dev/kfd --device /dev/dri --read-only --tmpfs /tmp -e HOME=/tmp ...`
+   (group numbers read on marvin; HOME=/tmp because the image's /root is not writable for user 1000). Checked on
+   zaphod without a GPU: both images start as user 1000 with a read-only filesystem. Also in the step 6 test script.
    1. Copy both images: `docker save unbiased-strata:gfx1151 unbiased-strata-tests:gfx1151 | ssh marvin docker load`;
       check on marvin: `docker image inspect <image> --format '{{.Id}} {{json .Descriptor}}'`. Good = the config
       digest above appears (as `.Id` on the classic store, or as `config.digest` on the containerd store).

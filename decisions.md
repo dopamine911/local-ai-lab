@@ -3,7 +3,7 @@
 Newest last. Each: what, why, how to undo. Started 2026-10-30 (Phase 3 of `plans/strix-strata.md`, porting
 UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md`, code map `plans/strix-strata-port-notes.md`).
 
-## Daniel's answers (2026-10-31)
+## Daniel's answers (2026-10-30)
 
 1. **Step 6 on marvin: wait.** marvin is still busy. Nothing on marvin until Daniel says it is free.
 2. **Fork pieces under 2 weeks old: wait** for the strict rule. Earliest step 6 date: **2026-11-04** (and marvin free).
@@ -65,3 +65,8 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     changed: `.Descriptor` shows manifest `3d785883…` with config `8869cd2b…`. The plan now lists both digests for
     both images, and step 5b.1 says how to compare on marvin. Side note: I ran `ssh marvin true` once
     (connection test only, no command on marvin, no GPU or Docker contact).
+14. **Containers on marvin run as a normal user** (other agent's review). Both images default to root; step 6 runs
+    them with `--user 1000:1000`, only the render + video groups, read-only filesystem, `--tmpfs /tmp -e HOME=/tmp`
+    (plan step 5b). Not baked into the image (`USER` line): that would change the pushed Dockerfile and the image
+    digests; the run command is where the Strata test sets it too. Checked on zaphod, no GPU: both start as user 1000.
+    Also fixed: Daniel's answers were dated 2026-10-31; it is 2026-10-30 (I read "good morning" as the next day).
