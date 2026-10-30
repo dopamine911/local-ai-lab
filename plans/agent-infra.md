@@ -49,6 +49,13 @@ How it meets the lab (checked in pi's docs, not tried yet):
    MCP gateway (step 3) may reach Enso only through an extension; Enso's guarded tools stay the primary path.
 4. **Evidence**: Enso's logs (`~/.enso/logs/enso-*.jsonl`) can feed MLflow later (step 6, profiling).
 
+**Status 2026-10-30:** Enso runs in a container on zaphod (`agents/enso/`, README there): pi 1.1.0, provider `lab`
+(coder, coder-tb, ornith, chat, marvin/big), MCPJungle tools (login `enso`), on the internal network `agents-internal`
+(no internet). Checked: `coder` answered through Enso, and called `mcp__lab__search__searxng_web_search` through
+MCPJungle. Correction to point 3 above: pi 1.1 has MCP built in; Enso's `--no-extensions` drops it, and
+`-e builtin:mcp -e builtin:tool-search` brings it back. The web page has no MCP yet (Enso change). Next: Daniel tries
+`./enso.sh tui --model lab/coder` on a real Enso issue.
+
 Steps, one at a time, each with a good result:
 1. pi `models.json` with the llama-swap provider (no key in the file). Good: `/model` lists coder, ornith, chat, marvin/big.
 2. One small real task with `coder` (fast, zaphod) and the same with `marvin/big`. Good: finished, receipts in the log.

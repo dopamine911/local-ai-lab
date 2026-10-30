@@ -1,0 +1,54 @@
+# Enso in a container on zaphod (plans/agent-infra.md step 1). Use agents/enso/enso.sh, not compose directly.
+#
+# enso        Enso + pi, on agents-internal only: it reaches llama-swap (models) and mcpjungle (tools) and nothing
+#             else, no internet. Its home (keys, pi config, sessions, logs) and the workspace are folders on zaphod.
+# enso-relay  Publishes Enso's web page on zaphod's 127.0.0.1:5178 (an internal network can't publish ports).
+#             Same relay as marvin/strata-test. Open http://localhost:5178 on zaphod, or from another machine:
+#             ssh -L 5178:127.0.0.1:5178 zaphod   (Enso accepts only a loopback Host header).
+name: enso
+services:
+  enso:
+    image: enso-agent:537559a
+    container_name: enso
+    restart: "no"
+    user: "1000:1000"
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      ENSO_HOME: /home/ubuntu/.enso
+    volumes:
+      - ${HOME}/agents/enso-home:/home/ubuntu/.enso
+      - ${HOME}/agents/work:/work
+    networks: [agents-internal]
+
+  enso-relay:
+    image: python:3.13-slim-trixie
+    container_name: enso-relay
+    restart: "no"
+    user: "65534:65534"
+    read_only: true
+    cap_drop: [ALL]
+    ports:
+      - "127.0.0.1:5178:5178"
+    command:
+      - python3
+      - -c
+      - |
+        import asyncio
+        async def pipe(r, w):
+            try:
+                while (d := await r.read(65536)): w.write(d); await w.drain()
+            finally: w.close()
+        async def handle(cr, cw):
+            try: sr, sw = await asyncio.open_connection("enso", 15178)
+            except OSError: cw.close(); return
+            await asyncio.gather(pipe(cr, sw), pipe(sr, cw), return_exceptions=True)
+        async def main():
+            s = await asyncio.start_server(handle, "0.0.0.0", 5178); await s.serve_forever()
+        asyncio.run(main())
+    networks: [agents-internal, outside]
+
+networks:
+  agents-internal:
+    external: true
+  outside: {}

@@ -1,0 +1,16 @@
+{
+  "providers": {
+    "lab": {
+      "baseUrl": "http://llama-swap:8080/v1",
+      "api": "openai-completions",
+      "apiKey": "!cat /home/ubuntu/.enso/keys/zaphod-key",
+      "models": [
+        { "id": "coder", "name": "coder: Qwen3.8-27B, zaphod card 1, 64K", "reasoning": true, "contextWindow": 65536, "maxTokens": 16384 },
+        { "id": "coder-tb", "name": "coder-tb: Qwen3.8-27B, zaphod card 1, 256K", "reasoning": true, "contextWindow": 262144, "maxTokens": 32768 },
+        { "id": "ornith", "name": "ornith: Ornith-1.5 35B-A3B, zaphod card 2, 256K, vision", "reasoning": true, "input": ["text", "image"], "contextWindow": 262144, "maxTokens": 32768 },
+        { "id": "chat", "name": "chat: Gemma 4 31B, zaphod card 2, 128K, vision", "input": ["text", "image"], "contextWindow": 131072, "maxTokens": 16384 },
+        { "id": "marvin/big", "name": "marvin/big: Qwen3.8-Flash-Next, marvin, 128K", "reasoning": true, "contextWindow": 131072, "maxTokens": 32768 }
+      ]
+    }
+  }
+}

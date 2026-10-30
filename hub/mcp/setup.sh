@@ -35,5 +35,8 @@ done
 for f in mcp/clients/*.json; do
   n=$(basename "$f" .json)
   "$MJ" delete mcp-client "$n" >/dev/null 2>&1 || true
-  "$MJ" create mcp-client --conf "$f" | grep -i 'servers accessible' | sed "s/^/== client $n: /"
+  # mcpjungle prints its result on stderr; without 2>&1 the grep found nothing and pipefail stopped the loop after the
+  # first client (found 2026-10-30: enso and openwebui were never (re)created).
+  out=$("$MJ" create mcp-client --conf "$f" 2>&1) || { echo "== client $n: FAILED"; echo "$out" | grep -iv token; exit 1; }
+  echo "$out" | grep -i 'servers accessible' | sed "s/^/== client $n: /"
 done

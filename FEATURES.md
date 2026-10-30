@@ -60,7 +60,8 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | MCPJungle 0.4.6 gateway: tools set up once, one token + allowed-tool list per agent, enterprise (locked-down) mode | working | [README.md](README.md) "Agent tools", [hub/mcp/setup.sh](hub/mcp/setup.sh) |
 | `search` tool: SearXNG search + public page reading (refuses home/Tailscale addresses) | working | [hub/mcp/servers/search.json](hub/mcp/servers/search.json) |
 | `browser` tool: headless Chromium (Playwright MCP) on an internal network, out only through a filtering proxy | working | [hub/mcp/servers/browser.json](hub/mcp/servers/browser.json), [hub/browser-proxy/squid.conf](hub/browser-proxy/squid.conf) |
-| Connected agents: Open WebUI, Claude Code | working | [hub/mcp/clients/](hub/mcp/clients/) |
+| Connected agents: Open WebUI, Claude Code, Enso (container) | working | [hub/mcp/clients/](hub/mcp/clients/) |
+| Enso (Daniel's coding-agent harness, pi 1.1.0) in a container on zaphod: local models from llama-swap, MCPJungle tools, no internet, own workspace clone; for local models working on Enso issues | ready (2026-10-30; interactive use not yet tried) | [agents/enso/README.md](agents/enso/README.md) |
 | Page fetching never reaches the lab (Open WebUI, search tool, browser: all tested) | working | [hub/compose.yaml](hub/compose.yaml) `ENABLE_LOCAL_WEB_FETCH` |
 | Shared memory for agents (LocalRecall), Enso as the daily coding agent, session recording | planned | [plans/agent-infra.md](plans/agent-infra.md) |
 

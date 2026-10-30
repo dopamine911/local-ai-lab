@@ -16,3 +16,11 @@ services:
     env_file: .env
     environment:
       GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM: "1"
+    networks: [default, agents-internal]
+
+networks:
+  # Containerised agents (agents/enso) reach llama-swap here as http://llama-swap:8080, and nothing else: no route
+  # to the internet or the host. Created by this stack (it starts first); hub and agents/enso join it as external.
+  agents-internal:
+    name: agents-internal
+    internal: true

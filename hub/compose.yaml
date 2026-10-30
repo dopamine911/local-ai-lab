@@ -180,7 +180,7 @@ services:
       OTEL_ENABLED: "false"
     volumes:
       - ./data/mcpjungle:/data           # SQLite database (nightly backup copies it)
-    networks: [default, browser-internal]   # browser-internal: to reach playwright-mcp
+    networks: [default, browser-internal, agents-internal]   # browser-internal: to reach playwright-mcp; agents-internal: containerised agents (agents/enso)
 
   # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
   mcp-searxng:
@@ -312,6 +312,9 @@ services:
       - ../assets:/app/public/images:ro   # background picture etc. (repo folder assets/)
 
 networks:
+  # Created by zaphod/llama-swap (starts first): containerised agents reach mcpjungle here, with no other route out.
+  agents-internal:
+    external: true
   # Internal: no route to the internet or the host's networks. Fixed subnet so the proxy can allow only this network.
   browser-internal:
     internal: true

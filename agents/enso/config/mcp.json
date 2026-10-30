@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "lab": {
+      "url": "http://mcpjungle:8080/mcp",
+      "headers": {
+        "Authorization": "!printf 'Bearer %s' \"$(cat /home/ubuntu/.enso/keys/mcp-token)\""
+      },
+      "description": "The lab's tools through MCPJungle: web search (SearXNG) and page reading, and a headless browser",
+      "exposure": "deferred",
+      "toolExposure": {
+        "search__*": "direct",
+        "browser__*": "deferred"
+      }
+    }
+  }
+}
