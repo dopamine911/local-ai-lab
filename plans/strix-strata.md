@@ -177,6 +177,23 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    common score **89 / 89 / 90 (avg 89.3)** vs llama.cpp on marvin 90 / 93 / 92 (avg 91.7). Strata's best equals
    llama.cpp's worst: about 2 points lower, small but consistent over 3 runs. Attacker echo (TC-57/58/60: repeats
    the attacker's address or key) avg 2.7 vs 1.0; looping 0, made-up query 0. Not yet hand-sorted.
+9. Terminal-Bench full on Strata (started 2026-10-30 02:01, preset p16, job `20261030-020139-…-f19a97ac`).
+   At 07:00, 5 h in: **4/4 passed, but only 4 of 19 done** (llama.cpp did all 19 in 5.5 h). Per task:
+   | Task | llama.cpp min / steps / tokens written | Strata min / steps / tokens written |
+   | --- | --- | --- |
+   | nginx-request-logging | 3.4 / 4 / 2.1K | 4.9 / 9 / 4.8K |
+   | sparql-university | 8.9 / 9 / 9.7K | 17.5 / 16 / 29K |
+   | headless-terminal | 7.8 / 10 / 8.1K | 125.8 / 69 / 225K |
+   | fix-ocaml-gc | 33.0 / 40 / 12.8K | 45.3 / 38 / 41K |
+   | mailman | 27.7 / 27 / 36K | 100+ / 72+ / 176K+ (running) |
+   Cause: not looping; long thinking (30-60K characters per step, then a short answer). **The two engines think at
+   different levels:** llama.cpp's `big` runs `--reasoning-effort medium` (marvin config `qwen-sampling`); Strata
+   sends no level, so its chat template uses its default **xhigh** (`serve/chat_template.jinja`:
+   `reasoning_effort|default('xhigh')`). Sampling is otherwise the same (Strata's model-card set for thinking:
+   temp 1.0, top-p 0.95, top-k 20). So this run, and the tool-use x3 in item 8, compare xhigh against medium.
+   Strata can be set to medium: per request (`reasoning_effort` or `chat_template_kwargs`), or for every request with
+   `"reasoning_effort"` in its run config (`[strata] thinking level: …` in the log confirms). Fair comparison = rerun
+   tool-use x3 and Terminal-Bench at medium. Daniel decides whether to let this xhigh run finish first.
 
 ## Phase 3 log
 
