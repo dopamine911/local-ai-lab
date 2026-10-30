@@ -11,7 +11,8 @@
 #
 # Before the first run, from zaphod (images built there, fork commit in the plan):
 #   docker save unbiased-strata:gfx1151 unbiased-strata-tests:gfx1151 | ssh marvin docker load
-# The pack (built with the fork's tools/iq_pack.py --compat-bf16) in $PACK, with expert-profile.bin in it.
+# The pack, built on zaphod (plan 5e), copied to $PACK; checked against pack-ud-iq4_xs.sha256 before every run:
+#   rsync -a --mkpath /srv/models/strata-fork/pack-ud-iq4_xs/ marvin:/srv/models/strata-fork/pack-ud-iq4_xs/
 # Engine settings: the Phase 1 upstream run's own arguments, read from marvin's strata-data volume (preset $PRESET),
 # with the fork's pack and the same MTP pieces (strata-data/Strata-data/mtp/rt, sha256 = the fork's published set).
 # Every container: normal user, only the GPU groups, read-only filesystem, no network (checks) or an internal one.
@@ -49,6 +50,8 @@ preflight() {
     docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | grep -q "$2" \
       && ok "image $1 is the one built on zaphod ($2)" || bad "image $1 missing or not $2 (load it from zaphod)"; done
   [ -f "$PACK/native_experts.txt" ] && [ -f "$PACK/expert-profile.bin" ] || bad "no finished pack with expert-profile.bin in $PACK"
+  (cd "$PACK" && sha256sum -c --quiet "$HOME/homelab/marvin/strata-fork/pack-ud-iq4_xs.sha256") \
+    && ok "pack matches the one built on zaphod (pack-ud-iq4_xs.sha256)" || bad "pack differs from pack-ud-iq4_xs.sha256"
   for n in 1 2 3; do [ -f "$M/$F-0000$n-of-00003.gguf" ] || bad "missing $F-0000$n-of-00003.gguf"; done
   log "GPU power limit: $(cat /sys/class/drm/card*/device/hwmon/hwmon*/power1_cap 2>/dev/null | head -1 | awk '{print $1/1000000 " W"}') (check: not ~55 W, CLAUDE.md known issue)"
 }
