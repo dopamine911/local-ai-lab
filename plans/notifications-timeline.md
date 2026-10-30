@@ -14,4 +14,5 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | 18:48 | Caddy route `notify.<DOMAIN>` | over Tailscale HTTPS: daniel 200, anonymous 403 | this commit |
 | 18:49 | `hub/notify` sender | lab-done and lab-alert sent; unknown topic refused; token not in the process list | this commit |
 | 18:50 | `tuning/log` notifies after every benchmark it logs (lab-alert on failure; `NOTIFY=0` off) | tested on a sample of the 17/19 run's output: title, result line, MLflow link (`/#/runs/<id>`, route checked in MLflow 3.17.2) | this commit |
+| 18:53 | Checked the other branches: a failed run sends lab-alert with the error lines; `hub/notify` reports "failed (HTTP 000)" when ntfy is down (was exiting silently) | pass | next commit |
 | next | Daniel: phone app set up (REBUILD.md "Phone notifications") | — | — |

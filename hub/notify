@@ -31,6 +31,6 @@ args=(-sS -o /dev/null -w '%{http_code}' -H @/dev/fd/3 -H "Title: $title" -H "Pr
 [ -n "$tags" ] && args+=(-H "Tags: $tags")
 [ -n "$click" ] && args+=(-H "Click: $click")
 [ -n "$md" ] && args+=(-H "Markdown: yes")
-code=$(curl "${args[@]}" --data-binary "$msg" "$URL/$topic" 3< <(printf 'Authorization: Bearer %s\n' "$token"))
+code=$(curl "${args[@]}" --data-binary "$msg" "$URL/$topic" 3< <(printf 'Authorization: Bearer %s\n' "$token") || true)
 unset token
 [ "$code" = 200 ] && echo "sent: $title" || { echo "notify: failed (HTTP $code)"; exit 1; }

@@ -102,7 +102,11 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 2. Settings → Manage users → add server `https://notify.<DOMAIN>`, user `daniel`, password `NTFY_PHONE_PASSWORD`
    (hub/.env, Proton Pass "ntfy phone").
 3. Subscribe to `lab-done`, `lab-alert`, `lab-research` on that server (not ntfy.sh).
+   For each: turn on **Instant delivery** (otherwise the app polls a self-hosted server), and exempt the ntfy app
+   from Android battery optimisation.
 4. On zaphod: `~/homelab/hub/notify "test" "rebuild check"`. Good result: the phone shows it within seconds.
+   If the app refuses the login: set `NTFY_ENABLE_LOGIN: "true"` for `ntfy` in hub/compose.yaml (login API only;
+   the web app stays off) and `docker compose up -d ntfy`. Messages are kept 24 h: a phone offline longer misses them.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 
