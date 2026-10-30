@@ -56,7 +56,6 @@ preflight() {
   (cd "$PACK" && sha256sum -c --quiet "$HOME/homelab/marvin/strata-fork/pack-ud-iq4_xs.sha256") \
     && ok "pack matches the one built on zaphod (pack-ud-iq4_xs.sha256)" || bad "pack differs from pack-ud-iq4_xs.sha256"
   for n in 1 2 3; do [ -f "$M/$F-0000$n-of-00003.gguf" ] || bad "missing $F-0000$n-of-00003.gguf"; done
-  log "GPU power limit: $(cat /sys/class/drm/card*/device/hwmon/hwmon*/power1_cap 2>/dev/null | head -1 | awk '{print $1/1000000 " W"}') (check: not ~55 W, CLAUDE.md known issue)"
 }
 
 engine_args() {  # Phase 1's arguments with the fork's paths; one per line. Source: the last "engine started:" line of
@@ -116,7 +115,8 @@ args) engine_args ;;
 check)
   log "=== check $(date '+%F %T'), preset $PRESET, pack $PACK"
   preflight
-  stop_llama_swap; trap 'docker rm -f "$NAME" >/dev/null 2>&1; docker network rm "$NET" >/dev/null 2>&1; start_llama_swap' EXIT
+  ELOG=$DIR/engine-$(date +%Y%m%d-%H%M%S).log
+  stop_llama_swap; trap 'docker logs "$NAME" > "$ELOG" 2>&1 && log "engine log saved: $ELOG"; docker rm -f "$NAME" >/dev/null 2>&1; docker network rm "$NET" >/dev/null 2>&1; start_llama_swap' EXIT
   log "before: $(mem)"
   # 1. the GPU is seen and this build can run it
   out=$(docker run --rm --network none "${USERRUN[@]}" "$TESTS" strata-device --list-devices 2>&1); echo "$out" >> "$DIR/results.txt"
@@ -131,16 +131,19 @@ check)
   #    only, asked from a throwaway container); the hipBLASLt table is loaded by then (at start or at the first prompt)
   docker network inspect "$NET" >/dev/null 2>&1 || docker network create --internal "$NET" >/dev/null
   FRONT=(); KEYF_MOUNT=(); engine_start "$NET"
-  docker logs "$NAME" 2>&1 | grep -qE "gfx1151.*19 exact speed switches" && ok "19 gfx1151 switches on" || bad "the start log does not list 19 gfx1151 switches"
+  fail=0; soft() { log "BAD: $*"; fail=1; }
+  docker logs "$NAME" 2>&1 | grep -qE "gfx1151.*19 exact speed switches" && ok "19 gfx1151 switches on" || soft "the start log does not list 19 gfx1151 switches"
   ans=$(docker run --rm --network "$NET" --read-only --cap-drop ALL --user 65534:65534 "$RELAY_IMG" python3 -c '
 import json, urllib.request
 r = urllib.request.Request("http://'"$NAME"':8080/v1/chat/completions", headers={"Content-Type": "application/json"},
     data=json.dumps({"messages": [{"role": "user", "content": "What is 2+3? Answer with one number."}],
                      "max_tokens": 400, "reasoning_effort": "none"}).encode())
 print(json.load(urllib.request.urlopen(r, timeout=600))["choices"][0]["message"].get("content", "").strip()[:200])' 2>&1)
-  log "answer to 2+3: $ans"; echo "$ans" | grep -q 5 && ok "the engine answers (5)" || bad "no sensible answer (above)"
+  log "answer to 2+3: $ans"; echo "$ans" | grep -q 5 && ok "the engine answers (5)" || soft "no sensible answer (above)"
+  log "GPU power now: $(awk '{print $1/1000000 " W"}' /sys/class/drm/card*/device/hwmon/hwmon*/power1_input 2>/dev/null | head -1)"
   L=$(docker logs "$NAME" 2>&1); echo "$L" | grep -iE "gfx1151|hipBLASLt|hipBLASEx|switch|memory guard|expert cache|error|warn" | head -40 >> "$DIR/results.txt"
-  echo "$L" | grep -qE "hipBLASLt tuning enabled.*gfx1151.*100401" && ok "hipBLASLt table loaded (gfx1151, 100401)" || bad "hipBLASLt table not loaded (log lines in results.txt)"
+  echo "$L" | grep -qE "hipBLASLt tuning enabled.*gfx1151.*100401" && ok "hipBLASLt table loaded (gfx1151, 100401)" || soft "hipBLASLt table not loaded"
+  [ $fail = 0 ] || bad "step 3 failed (above); full engine log saved at the end"
   log "=== check passed. Next: ./fork.sh start, then the speed / quality tests (plan Phase 3 step 6)" ;;
 start)
   preflight
