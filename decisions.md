@@ -15,6 +15,18 @@ UnbiasedStrata to gfx1151; instructions `plans/strix-strata-port-instructions.md
 5. **Push:** Daniel asked to push to his fork `dopamine911/UnbiasedStrata`. Done: branch `hip-gfx1151`
    115af49 → 4149027 (the 4 docker commits; gitleaks clean). Nothing sent to robertkarl/UnbiasedStrata.
 
+6. **Open, for Daniel: `hip-gfx1151` is 8 commits behind main** (found 2026-10-30 after Daniel asked). The branch is
+   PR #19 (`115af49`, based on main `2049dd2`); main has since added the DeepSeek-V4.1 engine `strata-dsv41` (also
+   built for HIP), tool-call healing (#17/#18) and a llama.cpp submodule bump (`44072a19`), all 2026-10-21..23.
+   Main does **not** merge cleanly: conflicts in `Makefile` (both change the configure / TARGETS lines) and
+   `README.md`. GitHub shows PR #19 "not mergeable" (dirty), last updated 2026-10-21. Options:
+   a. **Test PR #19 as is on marvin (2026-11-04), rebase onto main later in Phase 4** (suggested): it is what was
+      chosen to test, the images are built, and main's newest pieces pass the 2-week rule only on 2026-11-06.
+   b. Rebase now: resolve the Makefile conflict by hand (our own edit of PR #19's build file), rebuild, and wait
+      until 2026-11-06; the new engine adds an untested HIP build.
+   Good answer: "a" or "b". Either way upstream PR #19 needs a rebase before it can merge; telling its author is
+   upstream contact and needs Daniel's OK.
+
 Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / GitHub comment upstream, no version under
 2 weeks old, no change to the CUDA path.
 
