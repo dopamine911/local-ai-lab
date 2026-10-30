@@ -109,6 +109,11 @@ Not this: docs.mem0.ai/platform/mem0-mcp is the hosted Platform's MCP (`https://
 account, not on our machines). Useful only as the tool list a self-hosted memory server should offer: add_memory,
 search_memories, get_memories, get_memory, update_memory, delete_memory, delete_all_memories, list_entities,
 delete_entities, list_events, get_event_status.
+Not this either: OpenMemory (mem0.ai/openmemory). The self-hosted OpenMemory MCP server + UI was removed from the
+mem0 repo on 2026-07-29 (commit ea2ee07586, "remove OpenMemory from the monorepo"); the name `mem0ai/openmemory` is now
+a Beta CLI that moves coding sessions between Claude Code/Codex/OpenCode (install by curl | bash). The page itself does
+not say where memories are stored; it has pricing and a plugin, so treat it as the hosted product unless shown otherwise.
+So: mem0 library or its self-hosted `server/`, sealed, on our models, plus a reviewed or own small MCP server.
 Good result: tell one agent a rule; a different agent, new session, follows it without being told.
 
 ### 5. Reading the web: page fetch and a browser
