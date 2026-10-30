@@ -6,3 +6,7 @@ tuning/runs/*.err
 hub/homepage/logs/
 tuning/terminal-bench/
 __pycache__/
+
+# Editor swap files (vim): a swap file of .env holds its secrets
+*.swp
+*.swo
