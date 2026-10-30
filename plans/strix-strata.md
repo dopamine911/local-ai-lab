@@ -194,6 +194,16 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    Strata can be set to medium: per request (`reasoning_effort` or `chat_template_kwargs`), or for every request with
    `"reasoning_effort"` in its run config (`[strata] thinking level: …` in the log confirms). Fair comparison = rerun
    tool-use x3 and Terminal-Bench at medium. Daniel decides whether to let this xhigh run finish first.
+   **Final (Daniel: let it finish):** 19/19 (18 first attempt, extract-elf on the second), 13.3 h vs llama.cpp's
+   5.5 h, MLflow db7b5ff4. Same score; the extra time is the xhigh thinking. Slowest: cobol-modernization 117 min
+   (llama.cpp 17), headless-terminal 126 (8), mailman 106 (28), llm-inference-batching-scheduler 97 (77).
+10. Thinking level medium (Daniel 2026-10-30: tool-use x3 first, cheaper; Terminal-Bench only if it passes).
+   `strata-test.sh` default is now `STRATA_SET="prefill=16384 reasoning-effort=medium"`. Strata's launcher writes
+   `--reasoning-effort medium` into the run config; the server takes it out of the engine arguments and uses it as the
+   default level. Checked: `/data/state/strata/runtime/launch-p16m.server.log` says `thinking level: medium` (the
+   engine log does not show it). tool-eval-bench sends no level of its own (only its warm-up turns thinking off).
+   Preset `p16m`, series `strata-strix-iq4xs-medium`, same 3 runs as item 8. Decision rule: clearly below 91.7, or
+   still more attacker echo than llama.cpp → stop Strata; else Terminal-Bench at medium (must be 19/19 in < 5.5 h).
 
 ## Phase 3 log
 

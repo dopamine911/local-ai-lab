@@ -147,6 +147,7 @@ Note 2026-10-29: every marvin speed before 23:28 that day was measured with the 
 | --- | --- | --- | --- | --- |
 | 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots | smoke (1 task) | 1/1, first attempt, ~3 min | MLflow 57214956 |
 | 2026-10-29 | marvin: Flash-Next UD-IQ4_XS, MTP 3, 128K, 2 slots, no skill | **full (19 tasks)** | **19/19**: 18 on the first attempt, `mteb-retrieve` on the second; 5.5 h | MLflow c145733e. Miss on attempt 1: the task required encoding through the `mteb` package; the model hit an error there, bypassed mteb (called the model underneath, skipping mteb's query formatting) and picked the wrong line. A rule bent to get past an error. Real use: 33 tok/s writing, 254 reading, 60% MTP accepted, 92% of input from cache. Slowest task: llm-inference-batching-scheduler 77 min. |
+| 2026-10-30 | marvin: same model on **Strata 0.2.7** (gfx1151, sealed), MTP, 128K, 2 slots, prefill 16384, thinking **xhigh** (Strata's default) | **full (19 tasks)** | **19/19**: 18 on the first attempt, `extract-elf` on the second; **13.3 h** | MLflow db7b5ff4. Same score as llama.cpp, 2.4x the time: llama.cpp runs at thinking medium, so this is not a like-for-like comparison (plans/strix-strata.md Phase 1 item 9). Slowest: cobol-modernization 117 min (llama.cpp 17), headless-terminal 126 min (8). |
 
 Published full runs in the benchmark repo (other people's machines, for reference): Flash-Next UD-IQ4_XS on Strix Halo
 (EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
