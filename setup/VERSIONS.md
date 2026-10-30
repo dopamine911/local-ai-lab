@@ -31,7 +31,7 @@ one service at a time, and run its check.
 
 | What | Pinned | Latest | Why not bumped in the audit |
 | --- | --- | --- | --- |
-| llama-swap (and the llama.cpp build inside it) | 267 (llama.cpp b11870) | v268 (2026-10-28) | Changes every speed and quality baseline in tuning/results.md; marvin is busy with the port. Bump as its own change: speed + tool-use before/after, re-test the grammar bug (CLAUDE.md Known issues) |
-| harbor (Terminal-Bench runner) | 0.20.0 | 0.25.0 (2026-10-25) | Results would no longer compare with the 19/19 and 17/19 runs; bump with a fresh baseline run |
+| llama-swap (and the llama.cpp build inside it), issue #1 | 267 (llama.cpp b11870) | v268 (2026-10-28) | Changes every speed and quality baseline in tuning/results.md; marvin is busy with the port. Bump as its own change: speed + tool-use before/after, re-test the grammar bug (CLAUDE.md Known issues) |
+| harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | Results would no longer compare with the 19/19 and 17/19 runs; bump with a fresh baseline run |
 | pi (inside Enso) | 1.1.0 | 1.4.0 | Enso supports only pi >=1.1.0 <1.2.0 (`SUPPORTED_PI_VERSIONS`); moves when Enso does |
 | tool-eval-bench | 3.0.0 | 3.0.0 | current |
