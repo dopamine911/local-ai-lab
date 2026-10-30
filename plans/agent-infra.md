@@ -124,32 +124,37 @@ the private repo's contents are inside it.
 
 Good result: an agent asked "how did we fix the slow card?" finds `problems/2026-10-28-slow-gpu-card.md`.
 
-### 4b. Memory from conversations: mem0 (candidate, Daniel 2026-10-29)
-github.com/mem0ai/mem0 (Apache 2.0). Different job from LocalRecall: an LLM reads conversations and keeps facts and
-decisions ("Daniel prefers...", "we decided..."), so every agent knows them next session. LocalRecall searches documents.
-Checked 2026-10-29, conditions before use:
-1. Telemetry is ON by default (PostHog, us.i.posthog.com: OS version, processor, model and store names; start/reset
-   events always, others sampled 10%). Set `MEM0_TELEMETRY=false` AND run it on an internal Docker network with no
-   route out (like plans/strix-strata.md), so a missed setting fails closed.
-2. Default LLM and embedder are OpenAI (`gpt-5-mini`, `text-embedding-3-small`): point both at llama-swap (`embed` +
-   a chat model); the sealed network stops a fallback to OpenAI.
-3. No official MCP server in its README; community ones (e.g. elvismdev/mem0-mcp-selfhosted) need a code review first.
-   No GitHub releases shown: pin a commit or a PyPI version at least 2 weeks old.
-4. Every memory write is a model call: measure load on zaphod and how well the local model picks what to keep.
-Not this: docs.mem0.ai/platform/mem0-mcp is the hosted Platform's MCP (`https://mcp.mem0.ai/mcp`, memories in a Mem0
-account, not on our machines). Useful only as the tool list a self-hosted memory server should offer: add_memory,
-search_memories, get_memories, get_memory, update_memory, delete_memory, delete_all_memories, list_entities,
-delete_entities, list_events, get_event_status.
-Not this either: OpenMemory (mem0.ai/openmemory). The self-hosted OpenMemory MCP server + UI was removed from the
-mem0 repo on 2026-07-29 (commit ea2ee07586, "remove OpenMemory from the monorepo"); the name `mem0ai/openmemory` is now
-a Beta CLI that moves coding sessions between Claude Code/Codex/OpenCode (install by curl | bash). The page itself does
-not say where memories are stored; it has pricing and a plugin, so treat it as the hosted product unless shown otherwise.
-So: mem0 library or its self-hosted `server/`, sealed, on our models, plus a reviewed or own small MCP server.
-Good result: tell one agent a rule; a different agent, new session, follows it without being told.
-Also seen (parked 2026-10-30): MemTensor/memmy-agent (MIT, created 2026-07-16, releases every few days, latest
-v1.2.401 2026-10-27). A personal agent plus memory hub that hooks into Claude Code/Codex; desktop app or curl|bash CLI
-(systemd user service), no Docker, no MCP in its README, OpenAI shown by default, desktop trial needs a sign-up,
-telemetry unknown. Overlaps with Enso. Revisit if it gains a server/container mode with MCP and settles down.
+### 4b. Memory from conversations — mem0 DROPPED (Daniel 2026-10-30); candidate: Basic Memory
+**Why mem0 is dropped:** in its default mode every "add" is model calls (extract facts, then decide add/update/delete
+against existing memories). The memories a model writes are never reviewed, and with local models (which make things
+up and repeat attacker text in our tests) a bad memory spreads to every later session. It also costs GPU time on a
+card agents use. `infer=False` skips the model but is then only a vector store, which LocalRecall already is.
+(Earlier notes on mem0's telemetry and OpenMemory are in git history.)
+
+**What we want instead:** saving a memory needs no model call; memories are files a person can read, review in
+`git diff`, keep or drop; self-hosted with an MCP server; pinnable, at least 2 weeks old.
+
+**Candidate: Basic Memory** (github.com/basicmachines-co/basic-memory, AGPL-3.0, ~4.4k stars, active). Checked in
+the v0.23.2 source (2026-08-25; 0.24.x and 1.0.0 are under 2 weeks old):
+- Notes are plain Markdown files in a folder (entities, observations, relations parsed from the text) plus a local
+  SQLite index for search. Writing a note calls no model. The folder can be a git repo.
+- MCP over streamable HTTP (`basic-memory mcp --transport streamable-http --port 8000 --path /mcp`).
+- Telemetry (Logfire) is off by default (`logfire_enabled` / `logfire_send_to_logfire` false; env prefix
+  `BASIC_MEMORY_`).
+- Semantic search is on by default with FastEmbed (`bge-small-en-v1.5`, 384 dims), which downloads its model from
+  Hugging Face on first use: bake it into the image at build time, or use an OpenAI-compatible endpoint
+  (`semantic_embedding_provider` / `semantic_embedding_api_base`, i.e. llama-swap `embed`), or start with keyword
+  search only.
+- Not yet checked: its MCP tool list (which tools write, delete or move files), and how it behaves with no internet.
+
+**Other options seen (not checked in source):** the official MCP reference `memory` server (MIT; a knowledge graph in
+one JSONL file, keyword search only; harder to review than Markdown); small Markdown-in-git servers such as
+memory-mcp and memxp-mcp (young, little use). Fallback with no new software: agents write notes into a git folder
+that LocalRecall indexes.
+
+**Rule for any of them:** agents write only to a memory folder; Daniel reviews it with `git diff` before it is
+committed; the folder is private (memories may name machines and decisions), so not in this public repo; LocalRecall
+does not index unreviewed memory files.
 
 ### 5. Reading the web: page fetch and a browser
 Clean page text for agents (candidate *(check)*: Crawl4AI) and a browser they can drive (Playwright MCP *(check)*),
