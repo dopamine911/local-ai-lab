@@ -2,7 +2,7 @@
 
 Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
 Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log; pushed to dopamine911/UnbiasedStrata
-`hip-gfx1151`); pack built (5e), step 6 script `marvin/strata-fork/fork.sh` and live-session draft ready (5c). **Step 6 check passed on marvin 2026-10-30** (Phase 3 log 6); speed/quality not yet measured. Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
+`hip-gfx1151`); pack built (5e), step 6 script `marvin/strata-fork/fork.sh` and live-session draft ready (5c). **Step 6 check passed on marvin 2026-10-30** (Phase 3 log 6); main merged, 3 upstream fixes ported, speed measured (log 7-11). Timeline: `plans/strix-strata-timeline.md`. Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
 (Daniel 2026-10-30, `decisions.md` "Daniel's answers"). Phase 4 (anything upstream): on hold until proven with
 live sessions and plenty of stats.
 

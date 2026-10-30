@@ -136,3 +136,9 @@ longer need to wait; marvin being free is the remaining condition.
 28. **Branch merged with main** (plan 9). Engine choice waits for Daniel (plan 10): the fork's rule is exact defaults,
     so `STRATA_HC_Q8` stays opt-in whatever engine; suggested: test `STRATA_HC_Q8=1` once to confirm it is the gap,
     then cherry-pick the three fixes (+ mode 8) onto 0.1.45 rather than port to 0.1.54.
+29. **Incident, 17:16-17:19: the fork was started at xhigh on marvin although Daniel rejected that command.** The tool
+    call showed as rejected, but its first part (`THINK=xhigh fork.sh start` + a power sampler) had already run on
+    marvin: ready 17:17:33, no request sent, no speed run, no result recorded; my next `fork.sh stop` replaced it. Found
+    while writing the timeline. All recorded results are at medium.
+30. **Timeline kept** (Daniel 2026-10-30: "document all the times and what was done"): `plans/strix-strata-timeline.md`,
+    from commits and machine logs; updated with every step.
