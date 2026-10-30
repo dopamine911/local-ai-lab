@@ -120,6 +120,30 @@ agents, not only benchmarks) and plenty of stats recorded (MLflow). Daniel decid
    table, machine details from `tuning/manifest.sh`), and what was NOT validated (Windows, other AMD chips).
 5. Small, reviewable commits; CUDA path untouched; no secrets or machine names beyond hardware in the PR.
 
+## Later: fan control on marvin (researched 2026-10-30, nothing installed)
+
+marvin facts that decide it: board Sixunited AXB35-02, fan chip (EC) ITE IT5570 firmware 1.08, BIOS 1.07,
+**Secure Boot on, kernel lockdown = integrity**, kernel 7.0.0-42. Measured so far: GPU holds 2,800-2,890 MHz at
+123-139 W while busy; peaks 93-97 C on 32K reads; no throttling seen yet. One user reports the factory curve reaches
+80% fan only at 95 C and a steeper curve held 140 W at 79-80 C (Yamz-Labs/kyojin PR #95; single report, unverified).
+
+| Option | How | Fits marvin? |
+| --- | --- | --- |
+| 1. BIOS fan setting | by hand | Works, nothing installed. But the one BIOS fan change (2026-10-30) coincided with the 55 W drop; re-check power after any change |
+| 2. `ec_su_axb35` kernel module (github.com/cmetz/ec-su_axb35-linux, GPL-2.0) | kernel `ec_read`/`ec_write`; sysfs `/sys/class/ec_su_axb35/` (fan1-3 mode auto/fixed/curve, level 0-5, ramp curves, RPM; `apu/power_mode` read/write; temp) | **Best fit.** Works with Secure Boot if signed: repo has Ubuntu 26.04 DKMS + MOK scripts (`contrib/ubuntu/`). No releases: pin commit `f62c2c2` (2026-08-20). Costs: one MOK enrollment at the boot screen (Daniel at marvin), DKMS rebuild on kernel updates, no board check in the code. Settings not kept across boots: own systemd unit in `setup/` |
+| 3. `strix-halo-fand` (github.com/nathanmarlor/strix-halo-fan-control, MIT) | root daemon writing EC registers through `ec_sys write_support=1` (debugfs) | **Very likely blocked** by lockdown (integrity mode blocks debugfs writes); would need Secure Boot off. No releases. Not recommended |
+| 4. PTM7950 pad | physical | No software. Lowers temperature for any fan curve |
+| 5. EC/BIOS firmware update (EC 1.06 "slightly quieter"; BIOS 1.09) | Windows flasher | Risk of bricking; wiki says don't flash a stable system. No |
+
+Extra value of option 2 even without touching fans: `apu/power_mode` shows Quiet/Balanced/Performance from Linux,
+so the "back to 55 W" problem (CLAUDE.md Known issues) can be checked directly instead of inferred from watts.
+Note: setting power mode through the EC resets RyzenAdj limits (wiki); we don't use RyzenAdj.
+
+Steps if Daniel chooses option 2, one at a time: (1) read-only first: build, sign, load; check `info.sh` RPM and
+power mode match the BIOS; no writes. (2) Measure a long full load (32K reads back to back, 10 min) with factory
+fans: clock, temp, watts. (3) Only if clocks drop (e.g. under ~2,600 MHz at 95 C+): a `curve` setting, same test
+after. Sources: strixhalo.wiki Guides/Sixunited_AXB35/Power_Mode_and_Fan_Control, Hardware/Boards/Sixunited_AXB35/Firmware.
+
 ## Later: llama.cpp ROCm build as a third contender
 strixhalo.wiki/AI/llamacpp-performance (Qwen3-30B-A3B, not our model): Vulkan RADV reads 755 tok/s at depth 0 but
 17 at 128K depth; ROCm 41, lhl's rocm-wmma-tune branch 51. Agents work at long depth, so after the Strata tests:
