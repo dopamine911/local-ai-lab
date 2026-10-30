@@ -169,3 +169,7 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    `tuned`, `amd_iommu=off`. Heat: GPU peaked at 93-97 C in Performance (64 C in Quiet); limit is ~100 C, watch it.
 6. `tuned` accelerator-performance (setup/host.sh step 8): Strata 32K reading 758 → 757, writing 55.7 → 55.1: no change (MLflow d7875016). Kept, harmless.
 7. Prompt chunk 16384 (`STRATA_SET=prefill=16384`, now the script's default): 32K reading 757 → **817** (+8%), writing 55.5 (MLflow f807b742). **Settings for the quality tests:** Performance mode, tuned, Strata defaults + prefill 16384, preset `p16`. Strata reads 2.6x llama.cpp (315) on the same test.
+8. Tool use, full suite x3 (series `strata-strix-iq4xs`, preset p16, MLflow d90fbf73 / de97f22f / 6d009a3f):
+   common score **89 / 89 / 90 (avg 89.3)** vs llama.cpp on marvin 90 / 93 / 92 (avg 91.7). Strata's best equals
+   llama.cpp's worst: about 2 points lower, small but consistent over 3 runs. Attacker echo (TC-57/58/60: repeats
+   the attacker's address or key) avg 2.7 vs 1.0; looping 0, made-up query 0. Not yet hand-sorted.
