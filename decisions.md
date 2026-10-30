@@ -107,3 +107,9 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     the pack; not in `setup/models-zaphod.txt`, so not part of zaphod's rebuild). Daniel decides.
 22. Correction to decision 3: "python3 3.14.3" is the `python3` package; the interpreter (`python3.14`) is 3.14.4 in
     every image (same snapshot, checked).
+23. **Thinking level checked in the code** (was ~0.7): the pack's chat template (from the Unsloth GGUF) has
+    `reasoning_effort|default('xhigh')` with xhigh / medium / low; the fork's front end passes
+    `--chat-template-kwargs` as the default for every request (`frontend/strata_context.cpp:1317`); a request's
+    `reasoning_effort: "none"` turns thinking off (llama.cpp's parser, which the front end uses). Not yet run: check
+    thinking length on first live use. Also checked: the 19-switch count is not reduced by the image's
+    `STRATA_HIPBLASLT_TUNING` (not in the gfx1151 table); `strata-device` prints `arch gfx1151` (check 1 greps that).
