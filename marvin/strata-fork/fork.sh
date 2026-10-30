@@ -44,7 +44,10 @@ DATA=(-v "$PACK:/pack:ro" -v strata-data:/sd:ro)
 
 preflight() {
   [ "$(hostname)" = marvin ] || bad "run this on marvin"
-  [ "$(date +%Y%m%d)" -ge 20261104 ] || bad "not before 2026-11-04 (Daniel: 2-week rule for the fork)"
+  if [ "$(date +%Y%m%d)" -lt 20261104 ]; then   # 2-week rule for the fork (PR #19 2026-10-21, submodule 2026-10-19)
+    [ "${EARLY_OK:-}" = daniel-2026-10-30 ] || bad "not before 2026-11-04 (Daniel: 2-week rule for the fork)"
+    log "EXCEPTION to the 2-week rule: Daniel 2026-10-30, this test only (decisions.md 25)"
+  fi
   docker ps --format '{{.Names}}' | grep -qx strata && bad "upstream Strata is running: ~/strata-test/strata-test.sh stop first"
   for i in "$RT $RT_CFG" "$TESTS $TESTS_CFG"; do set -- $i
     docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | grep -q "$2" \

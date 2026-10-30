@@ -117,3 +117,7 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
     (`hip-gfx1151` → `2bff35e`, gitleaks clean); homelab was already on GitHub (another agent pushes main).
     On marvin: homelab checkout fast-forwarded (no llama-swap config change), images loaded, pack copied, all
     checked (plan 5f). No GPU use, no container started or stopped; upstream Strata left running as found.
+25. **Exception to the 2-week rule: Daniel 2026-10-30, "Yes, run today"** (asked twice; first answer was "wait").
+    For the step 6 test only: fork commit `115af49` (2026-10-21) and submodule `a6de9af3` (2026-10-19), 9 and 11
+    days old. `fork.sh` allows it only with `EARLY_OK=daniel-2026-10-30` and logs the exception. Live use / anything
+    lasting still waits for 2026-11-04 unless Daniel says otherwise.
