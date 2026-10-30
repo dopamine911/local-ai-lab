@@ -6,7 +6,7 @@ Last updated 2026-10-29.
 
 Start here for how-to: [README.md](README.md). Rebuild a machine: [setup/REBUILD.md](setup/REBUILD.md).
 Notes for Claude Code sessions: [CLAUDE.md](CLAUDE.md). Results of every test: [tuning/results.md](tuning/results.md).
-Pictures (open in a browser): [lab map](docs/diagrams/lab-map.html), [results charts](docs/diagrams/results.html).
+Pictures of how it fits together (shows on GitHub): [docs/diagrams](docs/diagrams/README.md).
 
 ## 1. Machines
 
