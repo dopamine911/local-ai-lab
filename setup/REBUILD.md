@@ -46,7 +46,7 @@ sudo ~/homelab/setup/host.sh
 ```
 It installs Docker and tools, adds you to the docker/render/video groups, imports your SSH keys from GitHub,
 logs in to Tailscale (open the link it prints), shares port 8080 on the tailnet, makes `/srv/models`, links
-`~/llama-swap`, and on marvin sets the GPU memory boot setting. Then **reboot**.
+`~/llama-swap`, sets the time zone to America/Chicago, and on marvin sets the GPU memory boot setting. Then **reboot**.
 
 Good: from zaphod, `ssh marvin` (or the other way) works without a password; `docker ps` works without sudo.
 
@@ -104,7 +104,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
-MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 to marvin by `setup/backup-to-marvin.sh`
+MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 (Chicago time) to marvin by `setup/backup-to-marvin.sh`
 (last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild.
 On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly backup back on.
 

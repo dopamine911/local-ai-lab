@@ -39,6 +39,11 @@ install -d -o "$U" /srv/models
 step "6. ~/llama-swap link"
 sudo -u "$U" ln -sfn "/home/$U/homelab/$H/llama-swap" "/home/$U/llama-swap"
 
+step "6b. time zone America/Chicago (Daniel's local time; was Ubuntu's default UTC until 2026-10-30)"
+# Logs, file names and cron use it (the nightly backup's 04:17 is Chicago time). Containers stay UTC unless they set TZ.
+[ "$(timedatectl show -p Timezone --value)" = America/Chicago ] || timedatectl set-timezone America/Chicago
+timedatectl | grep 'Time zone'
+
 if [ "$H" = marvin ]; then
   step "7. marvin: let the GPU use 120 GB of the shared memory (default is about half)"
   f=/etc/default/grub.d/90-gpu-memory.cfg
