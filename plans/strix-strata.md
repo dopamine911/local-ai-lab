@@ -303,3 +303,11 @@ Decisions made while Daniel was away: `decisions.md`.
    pinned UD-IQ4_XS files to zaphod with `setup/models.sh marvin UD-IQ4_XS` (sha256 checked). Pack tool image
    (`--target pack-tools`, numpy + regex from the same Ubuntu snapshot): not built yet, snapshot.ubuntu.com answers
    500/502/503 today; retry, no fallback to the unpinned archive.
+5e. **Pack built** (2026-10-30, fork `2bff35e`, image `unbiased-strata-pack:gfx1151`): shards downloaded to zaphod
+   (94 GB, 2 h 17 min, `MODELS-OK`); `iq_pack.py --compat-bf16` in the container (no network, user 1000, read-only,
+   only the 3 shards mounted): **14 s, 1.4 GB** at `/srv/models/strata-fork/pack-ud-iq4_xs` + the fork's
+   `expert-profile.bin`. 1,079 tensors (303 served from the GGUF), 460 converted (264 exact, 196 rounded, max |err|
+   0.0144). Pack format v4 (layer 14's gate/up/down span two shards); the fork engine reads up to v4. A second run gave
+   byte-identical files: checksums in `marvin/strata-fork/pack-ud-iq4_xs.sha256`. First run failed: the image lacked
+   the vendored gguf-py and python3-yaml (README says gguf-py comes from the submodule; my miss), fixed.
+   On marvin (after Daniel's OK): copy the 1.4 GB pack (small enough for Wi-Fi), `sha256sum -c` against the file.

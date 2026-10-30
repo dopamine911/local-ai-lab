@@ -101,3 +101,9 @@ Hard stops kept (not decided alone): no sudo, nothing on marvin, no push / PR / 
 19. **Live sessions via a second zaphod peer** (`marvin-fork` → `big-fork`), drafted only: zaphod's llama-swap
     reloads its config on every edit, so the live config is not touched. Only one engine on marvin at a time
     (memory): `fork.sh start` stops marvin's llama-swap, `stop` starts it again, as in Phase 1.
+20. **Pack: copy zaphod's to marvin, not rebuild there.** It is 1.4 GB (no experts), byte-identical on two runs, and
+    checked by `marvin/strata-fork/pack-ud-iq4_xs.sha256`. Rebuilding on marvin would only repeat the same bytes.
+21. **The 94 GB of shards on zaphod: keep for now, suggest deleting** after marvin's step 6 (they exist only to build
+    the pack; not in `setup/models-zaphod.txt`, so not part of zaphod's rebuild). Daniel decides.
+22. Correction to decision 3: "python3 3.14.3" is the `python3` package; the interpreter (`python3.14`) is 3.14.4 in
+    every image (same snapshot, checked).
