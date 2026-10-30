@@ -19,7 +19,7 @@ services:
       - ./data/caddy-config:/config
 
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.12.4
+    image: ghcr.io/open-webui/open-webui:v0.12.5@sha256:03443b8de6b617da9d900edd09b4bf1cb0ddbfdcba6afb42c548336a0b821ded
     container_name: open-webui
     restart: unless-stopped
     network_mode: host
@@ -102,7 +102,7 @@ services:
       - ./data/open-webui:/app/backend/data
 
   beszel:
-    image: henrygd/beszel:0.21.1
+    image: henrygd/beszel:0.21.1@sha256:8514a69d9bbbcb74f371a3205561ee231fc0289739cea64e8131f341d695b770
     container_name: beszel
     restart: unless-stopped
     network_mode: host
@@ -113,7 +113,7 @@ services:
   # Monitoring agent for zaphod. Starts only with:  docker compose --profile agent up -d
   # Fill BESZEL_KEY in .env first (README step 7).
   beszel-agent:
-    image: henrygd/beszel-agent:0.21.1-alpine
+    image: henrygd/beszel-agent:0.21.1-alpine@sha256:4100e26f7b5e6ab89e73699b2366417795f5046ab36bc452daf1f105766b40a0
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host
@@ -136,7 +136,7 @@ services:
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro  # systemd service status
 
   mlflow:
-    image: ghcr.io/mlflow/mlflow:v3.17.2
+    image: ghcr.io/mlflow/mlflow:v3.17.2@sha256:2cc40b3208991940d824d04f339833a0b69507569012aa5ec545690608602fc0
     container_name: mlflow
     restart: unless-stopped
     network_mode: host
@@ -151,7 +151,7 @@ services:
 
   # Private web search for Open WebUI. Its own network; only zaphod can reach it.
   searxng:
-    image: searxng/searxng:2026.10.25-54ca1d9cf
+    image: searxng/searxng:2026.10.30-ffa88e3ba@sha256:f4aa660c54d062dedb268be84e821ea24e39f48c7a496af8dd02cc9eedb93847
     container_name: searxng
     restart: unless-stopped
     ports:
@@ -168,7 +168,7 @@ services:
   # Free and open source (MPL-2.0); "enterprise" is only the locked-down mode. Tools run in their OWN containers below,
   # never inside this one (its database holds every agent's token).
   mcpjungle:
-    image: ghcr.io/mcpjungle/mcpjungle:0.4.6@sha256:59940d2e3a586ab9a063cf24fa37460bc993686fa056729fd1ada25436123dd9
+    image: ghcr.io/mcpjungle/mcpjungle:0.4.7@sha256:ac387071719c5703614524791c5052b12df16b2d114e277ab1862402c5105b0c
     container_name: mcpjungle
     restart: unless-stopped
     user: "1000:1000"
@@ -184,7 +184,7 @@ services:
 
   # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
   mcp-searxng:
-    image: isokoliuk/mcp-searxng:2.6.0@sha256:9389eed474a62bc35aafbf4d819b77ee54ecc25b5a1d1310ad0d45db2a056e0f
+    image: isokoliuk/mcp-searxng:2.9.0@sha256:8f1dd92a9e2875cb4e8df7036785ec4c088b7600cefb611de472a352a3dcba60
     container_name: mcp-searxng
     restart: unless-stopped
     read_only: true
@@ -218,7 +218,7 @@ services:
 
   # The browser's only way out (hub/browser-proxy/squid.conf): web ports only, private destinations refused.
   browser-proxy:
-    image: ubuntu/squid:6.6-24.04_edge@sha256:8a3baed477e2c282ab8aa5edad442f69873246964f225c5c2ae8364b6610963c
+    image: ubuntu/squid:7.2-26.04_edge@sha256:d11db6479501aa4618b3253f95a88b2547229e2d081726b6fb20dc75a98cc61b
     container_name: browser-proxy
     restart: unless-stopped
     networks: [default, browser-internal]
@@ -228,7 +228,7 @@ services:
   # A sandboxed Linux shell + files for the models (connected in Open WebUI as a terminal).
   # The AI works inside this container only: own home folder, no Docker socket, no host files.
   open-terminal:
-    image: ghcr.io/open-webui/open-terminal:0.14.5
+    image: ghcr.io/open-webui/open-terminal:0.14.7@sha256:f231354ca43b5ab68e383548f1ed24fc7ce0ac5f6b542ddff0b2421e2b0154ce
     container_name: open-terminal
     restart: unless-stopped
     ports:
@@ -260,7 +260,7 @@ services:
 
   # GPU load, memory, temperature and power for the Homepage start page (read-only, from /sys).
   gpu-stats:
-    image: python:3.13-slim-trixie
+    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
     container_name: gpu-stats
     restart: unless-stopped
     network_mode: host
@@ -276,7 +276,7 @@ services:
 
   # Agent statistics for the Homepage start page (read-only): requests, tokens, speeds (24 h), slots, context use.
   agent-stats:
-    image: python:3.13-slim-trixie
+    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
     container_name: agent-stats
     restart: unless-stopped
     network_mode: host
@@ -292,7 +292,7 @@ services:
     command: ["python3", "/app/agent_stats.py"]
 
   homepage:
-    image: ghcr.io/gethomepage/homepage:v2.7.0
+    image: ghcr.io/gethomepage/homepage:v2.7.0@sha256:19c5c09184458a41b7b5915e71463a39f36cd33540f41bdbed008791b8182d5f
     container_name: homepage
     restart: unless-stopped
     network_mode: host
@@ -391,7 +391,7 @@ services:
   # Uploads changed Markdown files: `docker compose --profile sync run --rm memory-sync` (cron: setup/memory-sync.cron)
   memory-sync:
     profiles: [sync]
-    image: docker.io/library/python@sha256:2c941e860699f878900b0edc2403613c234d4b32eda3cc9fa7036991a2a63c4a   # 3.12-slim
+    image: docker.io/library/python:3.12.16-slim@sha256:8523d6abeb48ceae0b7240d30c5808fc26cb79c1a635bacdf19cf3baecfbec07
     user: "1000:1000"
     read_only: true
     command: ["python3", "-I", "/app/sync.py"]

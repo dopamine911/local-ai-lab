@@ -1,18 +1,18 @@
 # Enso (Daniel's harness around the pi coding agent) in a container, for local models on zaphod.
 # Plan: plans/agent-infra.md step 1. How to run: agents/enso/README.md.
 #
-# Every input is pinned: the base image by digest, Ubuntu packages by the archive snapshot of one date, bun by
-# sha256, Enso by commit, and pi and every other package by Enso's bun.lock (pi 1.1.0, the version Enso supports).
-# The network is used at build time only; the container runs on agents-internal (no internet).
+# Every input is pinned to its latest version: the base image by digest, Ubuntu packages by the archive snapshot of
+# one date, bun by sha256, Enso by commit, and pi and every other package by Enso's bun.lock (pi 1.1.0, the version
+# Enso supports). The network is used at build time only; the container runs on agents-internal (no internet).
 #
 #   ./agents/enso/enso.sh build
 #
-# Ubuntu 26.04, tag resolute-20260927 (the same base as the UnbiasedStrata port image)
-FROM docker.io/library/ubuntu@sha256:f144425ff09be612d6d9ad965196e9cdc23dae1f42110a8a11a3e9a8198759f7
+# Ubuntu 26.04, tag resolute-20261024.1
+FROM docker.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 ENV DEBIAN_FRONTEND=noninteractive
 # The archive as it was on this date. The first install (ca-certificates alone) skips the TLS check because the base
 # image has no CA certificates and the snapshot server is HTTPS only; apt still checks every package's signature.
-ARG UBUNTU_SNAPSHOT=20261010T000000Z
+ARG UBUNTU_SNAPSHOT=20261030T000000Z
 RUN sed -i -E "s#http://(archive|security).ubuntu.com/ubuntu/#https://snapshot.ubuntu.com/ubuntu/${UBUNTU_SNAPSHOT}/#" \
         /etc/apt/sources.list.d/ubuntu.sources \
     && apt-get -o Acquire::https::Verify-Peer=false update -q \
@@ -21,9 +21,9 @@ RUN sed -i -E "s#http://(archive|security).ubuntu.com/ubuntu/#https://snapshot.u
     && apt-get install -y -q --no-install-recommends nodejs git ripgrep unzip socat less jq python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# bun 1.4.0 (released 2026-08-20; Enso's packageManager), checked against bun's SHASUMS256.txt
-ADD --checksum=sha256:2d03fb5fb83ac8b567aca0a281b2ce1a1a19d488f56c2968d88c3f25e92fe452 \
-    https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-x64.zip /tmp/bun.zip
+# bun 1.4.4 (latest, 2026-10-22; Enso's packageManager says 1.4.0, engines >=1.4.0), checked against bun's SHASUMS256.txt
+ADD --checksum=sha256:bf8ccbfb2b0b80159e0f9a6d15c55317add8077534dbc6130a3edb52fccb395c \
+    https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-linux-x64.zip /tmp/bun.zip
 RUN unzip -q /tmp/bun.zip -d /tmp && install -m 755 /tmp/bun-linux-x64/bun /usr/local/bin/bun && rm -rf /tmp/bun*
 
 # Enso at a fixed commit (main, 2026-10-15). Its bun.lock pins pi 1.1.0 and the rest.

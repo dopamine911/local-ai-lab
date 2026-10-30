@@ -22,7 +22,7 @@ services:
 
   # GPU load, memory, temperature and power for the Homepage start page (read-only, from /sys).
   gpu-stats:
-    image: python:3.13-slim-trixie
+    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
     container_name: gpu-stats
     restart: unless-stopped
     network_mode: host
@@ -38,7 +38,7 @@ services:
 
   # Agent statistics for the Homepage start page (read-only): requests, tokens, speeds (24 h), slots, context use.
   agent-stats:
-    image: python:3.13-slim-trixie
+    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
     container_name: agent-stats
     restart: unless-stopped
     network_mode: host
@@ -56,7 +56,7 @@ services:
   # Monitoring agent. Start with:  docker compose --profile agent up -d
   # BESZEL_KEY in .env = the hub's public key (same value as hub/.env on zaphod).
   beszel-agent:
-    image: henrygd/beszel-agent:0.21.1-alpine
+    image: henrygd/beszel-agent:0.21.1-alpine@sha256:4100e26f7b5e6ab89e73699b2366417795f5046ab36bc452daf1f105766b40a0
     container_name: beszel-agent
     restart: unless-stopped
     network_mode: host

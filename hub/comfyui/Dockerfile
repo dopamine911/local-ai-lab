@@ -1,7 +1,7 @@
 # ComfyUI for zaphod's R9700s (RDNA4, gfx1201), built from official pieces:
 #   ComfyUI release tag + PyTorch's ROCm wheels (they bundle the ROCm runtime; nothing ROCm on the host).
 # Image tag: comfyui-zaphod:<COMFYUI_VERSION>-torch<TORCH>-rocm<ROCM>
-FROM python:3.13-slim-trixie
+FROM python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
 
 ARG COMFYUI_VERSION=v0.43.0
 ARG TORCH=2.15.0

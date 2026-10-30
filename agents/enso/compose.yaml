@@ -22,7 +22,7 @@ services:
     networks: [agents-internal]
 
   enso-relay:
-    image: python:3.13-slim-trixie
+    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
     container_name: enso-relay
     restart: "no"
     user: "65534:65534"

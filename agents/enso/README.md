@@ -20,7 +20,7 @@ fall short. Plan: `plans/agent-infra.md` step 1.
 1. `./enso.sh build` (once per Enso commit; ~3 min, 2.9 GB).
 2. `./enso.sh setup` (keys and config; safe to rerun after editing `config/`).
 3. `./enso.sh up`. Good result: `Enso: http://localhost:5178`.
-4. `./enso.sh check`. Good result: `ok: models`, `ok: no internet`, `ok: tools (mcpjungle): connected, 29 tools`.
+4. `./enso.sh check`. Good result: `ok: models`, `ok: no internet`, `ok: tools (mcpjungle): connected, 36 tools` (browser 25, search 4, memory 2, recall 5).
 5. Work: `./enso.sh tui --model lab/coder` (Enso's terminal on the workspace, with MCP tools), or the web page.
    One-shot: `docker exec -w /work/enso-harness enso bun /opt/enso/scripts/enso.ts -e builtin:mcp -e builtin:tool-search --model lab/coder -p "..."`.
 6. `./enso.sh down` when done.

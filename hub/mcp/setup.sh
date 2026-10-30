@@ -6,7 +6,7 @@
 #   4. creates every agent login in mcp/clients/*.json (tokens come from hub/.env, MCP_TOKEN_<NAME>; never printed)
 # Add a tool: a servers/<name>.json, its container in compose.yaml, its name in the clients' allowed_servers.
 set -euo pipefail
-V=0.4.6   # same version as the mcpjungle image in compose.yaml
+V=0.4.7   # same version as the mcpjungle image in compose.yaml
 HUB=$(cd "$(dirname "$0")/.." && pwd)
 REG=http://127.0.0.1:8085
 MJ=~/.local/bin/mcpjungle

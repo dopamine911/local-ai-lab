@@ -1,6 +1,6 @@
 FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-267 AS official
 
-FROM ubuntu:26.04
+FROM ubuntu:resolute-20261024.1@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c   # Ubuntu 26.04, pinned (was the floating ubuntu:26.04)
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libvulkan1 mesa-vulkan-drivers libgomp1 openssl ca-certificates curl \
     && rm -rf /var/lib/apt/lists/*
