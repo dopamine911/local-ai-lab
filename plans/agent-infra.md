@@ -109,6 +109,14 @@ works in enterprise mode with a login, behind Caddy on Tailscale, and is at leas
 Good result: one command shows every tool and who may use it, with no secrets printed.
 
 ### 4. Shared memory: LocalRecall (or similar)
+**Done 2026-10-30.** LocalRecall v0.6.6 + Postgres (hub/compose.yaml), MCP tool `memory` (`search`, `list_files`)
+through a bridge (mudler/mcps localrecall v0.0.4 is stdio only; `mcp-proxy` 0.13.0 serves it over HTTP,
+hub/memory/mcp-localrecall.Dockerfile). Notes are uploaded by `hub/memory/sync.sh` (changed files only; no git
+credentials or internet inside LocalRecall), 41 files. Excluded on purpose: raw tool-test transcripts (prompt-injection
+attacker text) and Terminal-Bench tasks (benchmark contamination). Allowed: enso, claude-code; not Open WebUI (others
+use it; the private repo is inside). Checked: "how did we fix the slow graphics card?" finds
+problems/2026-10-28-slow-gpu-card.md; coder in Enso answered it through the tool and named the file.
+To do (Daniel): `hub/memory/sync.sh install` (hourly cron; the session was not allowed to add a cron job).
 github.com/mudler/LocalRecall (MIT, ~1k stars, no releases yet: pin an image digest). Uses zaphod's `embed` model.
 Indexes `~/homelab` and `~/full-homelab` from Git automatically, served to agents through the gateway.
 Set `API_KEYS` and a database password (Proton Pass); never the example defaults. Listens on 127.0.0.1 only:

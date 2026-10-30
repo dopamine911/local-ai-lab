@@ -30,7 +30,9 @@ fi
 
 set -a; . ./.env; set +a   # tokens for tool servers and clients
 for f in mcp/servers/*.json; do
-  "$MJ" register --force -c "$f" >/dev/null 2>&1 && echo "== tool server: $(basename "$f" .json)"
+  # A failed registration used to print nothing at all (found 2026-10-30, memory server unreachable): say so.
+  if out=$("$MJ" register --force -c "$f" 2>&1); then echo "== tool server: $(basename "$f" .json)"
+  else echo "== tool server: $(basename "$f" .json) FAILED: $(echo "$out" | head -1)"; fi
 done
 for f in mcp/clients/*.json; do
   n=$(basename "$f" .json)

@@ -180,7 +180,7 @@ services:
       OTEL_ENABLED: "false"
     volumes:
       - ./data/mcpjungle:/data           # SQLite database (nightly backup copies it)
-    networks: [default, browser-internal, agents-internal]   # browser-internal: to reach playwright-mcp; agents-internal: containerised agents (agents/enso)
+    networks: [default, browser-internal, agents-internal, memory-internal]   # browser-internal: playwright-mcp; agents-internal: containerised agents (agents/enso); memory-internal: mcp-localrecall
 
   # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
   mcp-searxng:
@@ -311,10 +311,83 @@ services:
       - ./homepage:/app/config
       - ../assets:/app/public/images:ro   # background picture etc. (repo folder assets/)
 
+  # Memory, part 1: LocalRecall (plans/agent-infra.md step 4). Searches the lab's Markdown docs (~/homelab and
+  # ~/full-homelab), embedded with llama-swap's `embed`. Agents reach it only through mcpjungle (tool `memory`).
+  # The private repo's text is inside: no published port, no internet (internal networks only).
+  localrecall-db:
+    image: quay.io/mudler/localrecall:v0.6.6-postgresql@sha256:3ec207438a350b30186462904527a3489a9b1e6a9e419a1d67da099c814723cd
+    container_name: localrecall-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: localrecall
+      POSTGRES_USER: localrecall
+      POSTGRES_PASSWORD: ${LOCALRECALL_DB_PASSWORD:?set LOCALRECALL_DB_PASSWORD in .env}
+    volumes:
+      - ./data/localrecall-db:/var/lib/postgresql/data   # nightly backup copies hub/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U localrecall"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [memory-internal]
+
+  localrecall:
+    image: quay.io/mudler/localrecall:v0.6.6@sha256:87bbe080dc142492e3a24c2761b2e6ae3d162ab661a6d43004cd7a55da147e05
+    container_name: localrecall
+    restart: unless-stopped
+    environment:
+      VECTOR_ENGINE: postgres
+      DATABASE_URL: postgresql://localrecall:${LOCALRECALL_DB_PASSWORD}@localrecall-db:5432/localrecall?sslmode=disable
+      EMBEDDING_MODEL: embed                       # llama-swap: Qwen3-Embedding-4B (card 1, always loaded)
+      OPENAI_BASE_URL: http://llama-swap:8080/v1
+      OPENAI_API_KEY: ${ZAPHOD_KEY}
+      API_KEYS: ${LOCALRECALL_API_KEY:?set LOCALRECALL_API_KEY in .env}
+      FILE_ASSETS: /assets
+      HYBRID_SEARCH_BM25_WEIGHT: "0.5"             # keyword + vector (good for names like GGML_VK_...)
+      HYBRID_SEARCH_VECTOR_WEIGHT: "0.5"
+    volumes:
+      - ./data/localrecall:/assets
+    depends_on:
+      localrecall-db: {condition: service_healthy}
+    networks: [memory-internal, agents-internal]   # agents-internal: to reach llama-swap (embed); API key required
+
+  mcp-localrecall:
+    build: {context: memory, dockerfile: mcp-localrecall.Dockerfile}
+    image: mcp-localrecall:0.0.4-proxy0.13.0
+    container_name: mcp-localrecall
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    environment:
+      LOCALRECALL_URL: http://localrecall:8080
+      LOCALRECALL_API_KEY: ${LOCALRECALL_API_KEY}
+      LOCALRECALL_COLLECTION: homelab                # tools need no collection argument
+      LOCALRECALL_ENABLED_TOOLS: search,list_files   # read-only: only memory-sync writes
+    networks: [memory-internal]                      # only mcpjungle reaches it
+
+  # Uploads changed Markdown files: `docker compose --profile sync run --rm memory-sync` (cron: setup/memory-sync.cron)
+  memory-sync:
+    profiles: [sync]
+    image: docker.io/library/python@sha256:2c941e860699f878900b0edc2403613c234d4b32eda3cc9fa7036991a2a63c4a   # 3.12-slim
+    user: "1000:1000"
+    read_only: true
+    command: ["python3", "-I", "/app/sync.py"]
+    environment:
+      LOCALRECALL_API_KEY: ${LOCALRECALL_API_KEY}
+    volumes:
+      - ./memory/sync.py:/app/sync.py:ro
+      - ./data/memory-sync:/state
+      - ..:/src/homelab:ro
+      - ${HOME}/full-homelab:/src/full-homelab:ro
+    networks: [memory-internal]
+
 networks:
   # Created by zaphod/llama-swap (starts first): containerised agents reach mcpjungle here, with no other route out.
   agents-internal:
     external: true
+  # Memory (LocalRecall, its database, its MCP bridge, the sync): no route out. mcpjungle joins it to reach the bridge.
+  memory-internal:
+    internal: true
   # Internal: no route to the internet or the host's networks. Fixed subnet so the proxy can allow only this network.
   browser-internal:
     internal: true

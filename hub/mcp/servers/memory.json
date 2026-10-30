@@ -1,0 +1,6 @@
+{
+  "name": "memory",
+  "transport": "streamable_http",
+  "description": "Search the lab's own notes (~/homelab and the private ~/full-homelab Markdown, via LocalRecall): how things were set up, fixed and measured. Read-only.",
+  "url": "http://mcp-localrecall:8080/mcp"
+}

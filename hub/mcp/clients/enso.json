@@ -2,7 +2,8 @@
   "name": "enso",
   "allowed_servers": [
     "search",
-    "browser"
+    "browser",
+    "memory"
   ],
   "access_token_ref": {
     "env": "MCP_TOKEN_ENSO"
