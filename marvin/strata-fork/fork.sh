@@ -157,8 +157,8 @@ start)
   # This llama.cpp has no --reasoning-effort flag: the template's reasoning_effort is set as a default kwarg instead.
   # Check after start: a request without a level should think about as long as `big` does (the template default is xhigh).
   FRONT=(--api-key-file /run/key --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0.0
-         --chat-template-kwargs '{"reasoning_effort":"medium"}')
-  KEYF_MOUNT=(-v "$KEYF:/run/key:ro"); engine_start "$NET"
+         --chat-template-kwargs "{\"reasoning_effort\":\"${THINK:-medium}\"}")   # THINK=xhigh: upstream's default
+  KEYF_MOUNT=(-v "$KEYF:/run/key:ro"); log "thinking level default: ${THINK:-medium}"; engine_start "$NET"
   docker rm -f strata-fork-relay >/dev/null 2>&1
   docker run -d --name strata-fork-relay --restart no -p "$TS:$PORT:$PORT" --read-only --cap-drop ALL --user 65534:65534 \
     "$RELAY_IMG" python3 -c '
