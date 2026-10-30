@@ -37,6 +37,10 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 - BIOS: CSM Support must stay Enabled, or Ubuntu won't boot (installed in legacy mode). This is also why Resizable BAR is off.
 
 ## Known issues
+- llama.cpp#27148 (open): the RAM prompt cache (`--cache-ram`, default 8 GB, + `--cache-idle-slots`, default on; both on in
+  our build) can put text from an unrelated finished conversation into a new request under concurrent load. We share
+  models between Daniel, Paul and agents. Planned fix, measured before/after: `--cache-ram 0 --no-cache-idle-slots`
+  per model on both machines (found via strixhaloguide.com/troubleshooting, 2026-10-30).
 - llama.cpp b11870 (the build inside llama-swap 267) rejects Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
 
 ## Results
@@ -47,7 +51,8 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 2. Done 2026-10-29: marvin MTP draft 3 (24.7 → 39.6 tok/s writing), tool-use x3, Terminal-Bench 19/19.
 2b. marvin Terminal-Bench done (19/19, 2026-10-29). Next, each needs Daniel's go-ahead: a the-craft run for comparison; add `--metrics` to llama-server on both machines (Homepage "pending" count),
     and try `big` at 256K context (plans: measured before/after; ~+3 GB).
-3. Tuning ideas in tuning/results.md.
+3. Tuning ideas in tuning/results.md. marvin `big` uses llama.cpp's default batch (-b 2048 -ub 512); try -ub 2048 on
+   the 32K test (`tuning/speed`), one change, before the Strata comparison is final.
 4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.
 5. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
 
