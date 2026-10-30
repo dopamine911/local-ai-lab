@@ -238,6 +238,19 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    Strata at xhigh 89.3. Attacker echo **0 / 0 / 0** (llama.cpp 1.0, xhigh 2.7); looping 0, made-up query 0.
    16-19 min per run. Passes the rule: last night's lower score was the xhigh thinking, not the engine.
    Next: Terminal-Bench full at medium (profile `strata0.2.7-mtp-128k-np2-medium`).
+   **Terminal-Bench at medium (MLflow 670c0c7a, 2026-10-30 11:16-15:40 CDT): 17/19 in 4.39 h.** Fails the rule
+   (19/19 needed). Time: 4.39 h vs 13.3 h at xhigh; llama.cpp's 5.5 h was measured in BIOS Quiet mode, so it is not
+   comparable (llama.cpp would be faster now). Failed both attempts:
+   - `openssl-selfsigned-cert` (2.9 + 4.2 min): the agent's `/app/check_cert.py` imports `cryptography`, which the
+     test's Python doesn't have (ModuleNotFoundError). Passed on llama.cpp and Strata xhigh.
+   - `extract-elf` (27.9 + 35.0 min): output values differ from the reference. Also failed attempt 1 at xhigh (passed
+     on retry there); passed first time on llama.cpp.
+   Passed, first attempt: the other 17, incl. mteb-retrieve (16 min; llama.cpp needed a retry). Slowest: extract-elf,
+   build-cython-ext 30, fix-ocaml-gc 26, break-filter-js-from-html 25. Tokens 2.35 M in, 0.28 M out (+ retries).
+   Reading: 2 failures on 19 tasks is a small sample (one run each), so this does not prove Strata is worse; it also
+   does not show it is better. Strata's clear wins stay speed (817 vs 315 reading, 55.5 vs 44.0 writing) and tool use
+   (94.0 vs 91.7). Next is Daniel's call: the port (Phase 3) can still go ahead; a fair Terminal-Bench comparison needs
+   llama.cpp re-run in Performance mode.
 
 ## Phase 3 log
 

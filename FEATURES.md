@@ -85,6 +85,7 @@ How-to for all tools: [tuning/README.md](tuning/README.md). Every result: [tunin
 Main results so far (details in [tuning/results.md](tuning/results.md)):
 - Tool use (common score): marvin Flash-Next on Strata (thinking medium) 94.0, Ornith 92.0, marvin Flash-Next 91.7, Strata Flash-Next (zaphod) 90.0, Flint 86.0. No model made anything up.
 - Terminal-Bench on marvin (Flash-Next, no skill): **19/19** full run, 18 on the first attempt, 5.5 h (2026-10-29).
+- Terminal-Bench on marvin, same model on Strata 0.2.7: thinking xhigh 19/19 in 13.3 h; thinking medium **17/19** in 4.39 h (2026-10-30; openssl-selfsigned-cert and extract-elf failed). llama.cpp's 5.5 h was in BIOS Quiet mode, so times are not comparable.
 - Strata (another inference engine) tested on zaphod: same quality, needs both cards: [plans/strata.md](plans/strata.md).
 
 ## 6. Rebuild, backup, safety
