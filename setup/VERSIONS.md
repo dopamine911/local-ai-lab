@@ -14,6 +14,7 @@ one service at a time, and run its check.
 | mcp-searxng | hub/compose.yaml | 2.9.0 (from 2.6.0; 2.8.x fixed 4 CVEs) | a search through the `search` tool |
 | SearXNG | hub/compose.yaml | 2026.10.30-ffa88e3ba (from 2026.10.25) | same |
 | Squid (browser proxy) | hub/compose.yaml | 7.2-26.04_edge (from 6.6-24.04; `squid-gnutls -k parse` OK) | browser: public page loads, `http://192.168.1.1/` gets 403 |
+| ntfy | hub/compose.yaml | v2.35.0 (latest, added 2026-10-30) | `hub/notify "test" "x"` arrives on the phone |
 | Playwright MCP | hub/compose.yaml | v0.0.83 (latest) | same |
 | Beszel + agent | hub/compose.yaml, marvin/llama-swap/compose.yaml | 0.21.1 (latest; digest added) | Beszel page |
 | MLflow | hub/compose.yaml | v3.17.2 (latest; digest added) | MLflow page |

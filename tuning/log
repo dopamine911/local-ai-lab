@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run log_run.py inside the MLflow image (nothing to install on zaphod).
 # Usage: ./log <machine> <model> "<note>" [name=value ...] [files ...]
+# Sends a push notification when done (hub/notify, topic lab-done; lab-alert on failure). NOTIFY=0 to skip.
 set -e
 HERE="$(cd "$(dirname "$0")" && pwd)"
 M="$1"; case "$2" in marvin/*) M=marvin ;; esac   # peer models ("marvin/big") belong to that machine
@@ -15,10 +16,26 @@ if [ -n "${RUN_START:-}" ]; then
   if [ "$M" = "$(hostname)" ]; then ACTIVITY=$("$HERE/activity.sh" "$LM" "$RUN_START" "$(date +%s)")
   else ACTIVITY=$(ssh -o ConnectTimeout=10 "$M" bash -s -- "$LM" "$RUN_START" "$(date +%s)" < "$HERE/activity.sh" 2>/dev/null); fi
 fi
+OUT=$(mktemp)
 docker run --rm --network host \
   -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA -e SERIES -e MANIFEST="$MANIFEST" -e ACTIVITY="$ACTIVITY" \
   -v "$HERE/../setup:/setup:ro" \
   --env-file "$HOME/homelab/hub/.env" \
   -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \
-  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@" 2>&1 | grep -vE "View (run|experiment) "
-exit ${PIPESTATUS[0]}
+  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@" 2>&1 | grep -vE "View (run|experiment) " | tee "$OUT"
+rc=${PIPESTATUS[0]}
+# Push notification to Daniel's phone (hub/notify, issue #11): the result lines and the MLflow run. NOTIFY=0 turns it
+# off. A failed notification never fails the run.
+if [ "${NOTIFY:-1}" != 0 ]; then
+  run=$(grep -oE 'Logged run [0-9a-f]+' "$OUT" | awk '{print $3}')
+  summary=$(grep -E '^  (Terminal-Bench|tool-eval score|mean KLD|speed_|[a-z_]+ = )' "$OUT" | sed 's/^  //' | head -6)
+  if [ "$rc" = 0 ] && [ -n "$run" ]; then
+    "$HERE/../hub/notify" -g white_check_mark -c "https://mlflow.ai.dopamine911.com/#/runs/$run" \
+      "Done: $2 ($M)" "$3"$'\n'"${summary:-logged}"$'\n'"MLflow run ${run:0:8}" >/dev/null 2>&1 || true
+  else
+    "$HERE/../hub/notify" -t lab-alert -p high -g warning "Logging failed: $2 ($M)" \
+      "$3"$'\n'"$(tail -3 "$OUT")" >/dev/null 2>&1 || true
+  fi
+fi
+rm -f "$OUT"
+exit $rc

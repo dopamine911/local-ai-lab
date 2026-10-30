@@ -311,6 +311,37 @@ services:
       - ./homepage:/app/config
       - ../assets:/app/public/images:ro   # background picture etc. (repo folder assets/)
 
+  # Notifications (issue #11): ntfy, push messages to Daniel's phone (Android ntfy app, over Tailscale). Self-hosted,
+  # nothing leaves the lab (no upstream relay). Access is declared here, not clicked: deny-all by default; user
+  # `daniel` (phone, read-only on lab-* topics), user `sender` (scripts, write-only, token NTFY_SENDER_TOKEN).
+  # Topics: lab-done (jobs finished), lab-alert (problems), lab-research (autoresearch reports). Send: hub/notify.
+  ntfy:
+    image: binwiederhier/ntfy:v2.35.0@sha256:6f0c9abab7b99a978d816611cc90dabb4849b81f60c53114e91cd07931085dc0
+    container_name: ntfy
+    restart: unless-stopped
+    user: "1000:1000"
+    read_only: true
+    command: ["serve"]
+    ports:
+      - "127.0.0.1:2586:80"            # Caddy publishes it as https://notify.<DOMAIN> on Tailscale
+    environment:
+      NTFY_BASE_URL: https://notify.${DOMAIN}
+      NTFY_LISTEN_HTTP: ":80"
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_CACHE_FILE: /var/lib/ntfy/cache.db
+      NTFY_CACHE_DURATION: 24h          # short: action-button details (later) sit in this cache
+      NTFY_AUTH_FILE: /var/lib/ntfy/user.db
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_AUTH_USERS: ${NTFY_AUTH_USERS:?set NTFY_AUTH_USERS in .env}
+      NTFY_AUTH_TOKENS: ${NTFY_AUTH_TOKENS:?set NTFY_AUTH_TOKENS in .env}
+      NTFY_AUTH_ACCESS: "daniel:lab-*:ro,sender:lab-*:wo"
+      NTFY_ENABLE_SIGNUP: "false"
+      NTFY_ENABLE_LOGIN: "false"
+      NTFY_WEB_ROOT: disable            # no web app; the phone app is the reader
+      NTFY_UPSTREAM_BASE_URL: ""        # explicit: no relay through ntfy.sh (Android app connects directly)
+    volumes:
+      - ./data/ntfy:/var/lib/ntfy       # cache.db, user.db (nightly backup copies hub/data)
+
   # Memory, part 1: LocalRecall (plans/agent-infra.md step 4). Searches the lab's Markdown docs (~/homelab and
   # ~/full-homelab), embedded with llama-swap's `embed`. Agents reach it only through mcpjungle (tool `memory`).
   # The private repo's text is inside: no published port, no internet (internal networks only).

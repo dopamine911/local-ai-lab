@@ -72,7 +72,7 @@ Restore the `.env` files from your password manager (or make new ones; each `.en
 | --- | --- | --- |
 | `zaphod/llama-swap/.env` | `ZAPHOD_KEY`, `MARVIN_KEY` (same as marvin's) | New one: `printf 'ZAPHOD_KEY=%s\n' "$(openssl rand -hex 24)"`; then update hub/.env and every app that uses it |
 | `marvin/llama-swap/.env` | `MARVIN_KEY`, `BESZEL_KEY`, `TAILSCALE_IP` | New `MARVIN_KEY` as above; `BESZEL_KEY` = same as hub/.env; `TAILSCALE_IP` = `tailscale ip -4` |
-| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
+| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `NTFY_PHONE_PASSWORD`, `NTFY_SENDER_TOKEN`, `NTFY_AUTH_USERS`, `NTFY_AUTH_TOKENS`, `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
 
 Then build and start (each `compose.yaml` has its `build:` lines):
 
@@ -96,6 +96,13 @@ docker compose --profile agent up -d beszel-agent
 Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `mcp/setup.sh` ends with
 `== client ...: Servers accessible: ...` for each agent. Restoring `hub/data/mcpjungle/` from backup also brings back
 the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJungle admin") or re-run `mcp/setup.sh`.
+
+### Phone notifications (ntfy, issue #11)
+1. On the Android phone (Tailscale on): install the ntfy app.
+2. Settings → Manage users → add server `https://notify.<DOMAIN>`, user `daniel`, password `NTFY_PHONE_PASSWORD`
+   (hub/.env, Proton Pass "ntfy phone").
+3. Subscribe to `lab-done`, `lab-alert`, `lab-research` on that server (not ntfy.sh).
+4. On zaphod: `~/homelab/hub/notify "test" "rebuild check"`. Good result: the phone shows it within seconds.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 

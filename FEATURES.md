@@ -50,6 +50,7 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | Open Terminal: sandboxed code runner for Open WebUI | working | [README.md](README.md) |
 | Homepage start page: a row per machine (models loaded, system, GPU load/memory/temp/power), apps, NAS placeholder | working | [hub/homepage/](hub/homepage/), [hub/gpu-stats/gpu_stats.py](hub/gpu-stats/gpu_stats.py) |
 | Agent stats on the start page, per machine: 24 h requests, tokens in/out, average/top speed; now: active, pending, slots, context per slot | working (pending: after `--metrics`) | [hub/agent-stats/agent_stats.py](hub/agent-stats/agent_stats.py) |
+| Push notifications to the phone (ntfy 2.35.0, self-hosted, Tailscale only, nothing via ntfy.sh): topics lab-done / lab-alert / lab-research; `hub/notify` sends; every benchmark logged with `tuning/log` notifies with its result and MLflow link | working (action buttons, watchdog: #11, #12) | [hub/notify](hub/notify), [hub/compose.yaml](hub/compose.yaml) |
 | Beszel monitoring: both machines, containers, disk health, systemd services, network monitors | working | [hub/compose.yaml](hub/compose.yaml), [hub/beszel-monitors.sh](hub/beszel-monitors.sh) |
 | MLflow: every benchmark run with its full settings | working | section 5 below |
 | Models panel (load/unload models from a page) | planned (file to copy in) | [hub/models-panel/README.txt](hub/models-panel/README.txt) |

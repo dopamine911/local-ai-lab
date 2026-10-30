@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Send a push notification to Daniel's phone through the lab's ntfy (issue #11, hub/compose.yaml `ntfy`).
+#
+#   hub/notify "Title" "message"                         -> topic lab-done, normal priority
+#   hub/notify -t lab-alert -p high "Title" "message"    -> problems
+#   hub/notify -c https://mlflow.<domain>/... "Title" "message"   (tap opens the link)
+#
+#   -t topic     lab-done (default), lab-alert, lab-research
+#   -p priority  min, low, default, high, urgent
+#   -g tags      comma-separated; emoji short codes show as icons (e.g. white_check_mark, warning)
+#   -c url       opened when the notification is tapped
+#   -m           message is Markdown
+#
+# Good result: exit 0 and "sent: <title>". The token comes from hub/.env (NTFY_SENDER_TOKEN) and is never printed:
+# curl reads the Authorization header from a file descriptor, not from its arguments.
+# Works from any directory on zaphod. Not on marvin yet (it has no copy of the token).
+set -euo pipefail
+HUB=$(cd "$(dirname "$0")" && pwd)
+URL=${NTFY_URL:-http://127.0.0.1:2586}
+topic=lab-done prio=default tags="" click="" md=""
+while getopts "t:p:g:c:m" o; do
+  case $o in t) topic=$OPTARG;; p) prio=$OPTARG;; g) tags=$OPTARG;; c) click=$OPTARG;; m) md=yes;; *) sed -n 2,16p "$0"; exit 2;; esac
+done
+shift $((OPTIND - 1))
+[ $# -eq 2 ] || { sed -n 2,16p "$0"; exit 2; }
+title=$1 msg=$2
+case $topic in lab-done|lab-alert|lab-research) ;; *) echo "notify: topic must be lab-done, lab-alert or lab-research"; exit 2;; esac
+token=$(grep -m1 '^NTFY_SENDER_TOKEN=' "$HUB/.env" | cut -d= -f2-)
+[ -n "$token" ] || { echo "notify: NTFY_SENDER_TOKEN missing in hub/.env"; exit 1; }
+args=(-sS -o /dev/null -w '%{http_code}' -H @/dev/fd/3 -H "Title: $title" -H "Priority: $prio")
+[ -n "$tags" ] && args+=(-H "Tags: $tags")
+[ -n "$click" ] && args+=(-H "Click: $click")
+[ -n "$md" ] && args+=(-H "Markdown: yes")
+code=$(curl "${args[@]}" --data-binary "$msg" "$URL/$topic" 3< <(printf 'Authorization: Bearer %s\n' "$token"))
+unset token
+[ "$code" = 200 ] && echo "sent: $title" || { echo "notify: failed (HTTP $code)"; exit 1; }
