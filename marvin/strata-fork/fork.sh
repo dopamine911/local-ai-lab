@@ -31,6 +31,9 @@ DIR=$HOME/strata-fork; KEYF=$DIR/key; NET=strata-internal; PORT=8099; NAME=strat
 LS=$HOME/homelab/marvin/llama-swap
 TS=$(tailscale ip -4 2>/dev/null)
 mkdir -p "$DIR"; chmod 700 "$DIR"
+# has PATTERN: does the input match. Not grep -q (or grep >/dev/null, which GNU grep treats the same): they stop
+# reading at the first match, the writer dies of SIGPIPE, and pipefail calls the pipeline failed. -c reads it all.
+has() { [ "$(grep -cE "$@")" -gt 0 ]; }
 log() { echo "[$(date +%H:%M:%S)] $*" | tee -a "$DIR/results.txt"; }
 ok()  { log "GOOD: $*"; }
 bad() { log "BAD: $*"; exit 1; }
@@ -48,9 +51,9 @@ preflight() {
     [ "${EARLY_OK:-}" = daniel-2026-10-30 ] || bad "not before 2026-11-04 (Daniel: 2-week rule for the fork)"
     log "EXCEPTION to the 2-week rule: Daniel 2026-10-30, this test only (decisions.md 25)"
   fi
-  docker ps --format '{{.Names}}' | grep -qx strata && bad "upstream Strata is running: ~/strata-test/strata-test.sh stop first"
+  docker ps --format '{{.Names}}' | has -x strata && bad "upstream Strata is running: ~/strata-test/strata-test.sh stop first"
   for i in "$RT $RT_CFG" "$TESTS $TESTS_CFG"; do set -- $i
-    docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | grep -q "$2" \
+    docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | has "$2" \
       && ok "image $1 is the one built on zaphod ($2)" || bad "image $1 missing or not $2 (load it from zaphod)"; done
   [ -f "$PACK/native_experts.txt" ] && [ -f "$PACK/expert-profile.bin" ] || bad "no finished pack with expert-profile.bin in $PACK"
   (cd "$PACK" && sha256sum -c --quiet "$HOME/homelab/marvin/strata-fork/pack-ud-iq4_xs.sha256") \
@@ -101,12 +104,12 @@ engine_start() {  # $1 = network; the engine in the background as $NAME
     --host 0.0.0.0 --port 8080 --alias big-fork ${FRONT[@]+"${FRONT[@]}"} -- "${EA[@]}" >/dev/null || bad "docker run failed"
   t0=$(date +%s)
   for i in $(seq 1 360); do   # up to 1 hour
-    docker ps -q --filter "name=^$NAME$" | grep -q . || { docker logs --tail 40 "$NAME" 2>&1 | tee -a "$DIR/results.txt"; bad "the engine exited"; }
-    docker logs "$NAME" 2>&1 | grep -q "listening on" && break
+    docker ps -q --filter "name=^$NAME$" | has . || { docker logs --tail 40 "$NAME" 2>&1 | tee -a "$DIR/results.txt"; bad "the engine exited"; }
+    docker logs "$NAME" 2>&1 | has "listening on" && break
     [ $((i % 30)) -eq 0 ] && log "still starting: $(docker logs --tail 1 "$NAME" 2>&1 | cut -c1-160)"
     sleep 10
   done
-  docker logs "$NAME" 2>&1 | grep -q "listening on" || bad "not ready after 1 hour"
+  docker logs "$NAME" 2>&1 | has "listening on" || bad "not ready after 1 hour"
   log "ready after $(( $(date +%s) - t0 )) s; $(mem)"
 }
 
@@ -120,8 +123,8 @@ check)
   log "before: $(mem)"
   # 1. the GPU is seen and this build can run it
   out=$(docker run --rm --network none "${USERRUN[@]}" "$TESTS" strata-device --list-devices 2>&1); echo "$out" >> "$DIR/results.txt"
-  echo "$out" | grep -q "arch gfx1151" || bad "strata-device: no gfx1151 (output in results.txt)"
-  echo "$out" | grep -q "cannot run" && bad "strata-device: this build cannot run the GPU (output in results.txt)"
+  echo "$out" | has "arch gfx1151" || bad "strata-device: no gfx1151 (output in results.txt)"
+  echo "$out" | has "cannot run" && bad "strata-device: this build cannot run the GPU (output in results.txt)"
   ok "strata-device sees gfx1151 and can run it"
   # 2. the three HIP parity tests: pass = exit 0; 77 = skipped (counts as a failure here)
   for t in hip_prefill_hipblaslt_gemm hip_prefill_hcd_exact_parity hip_prefill_mmq_parity; do
@@ -132,17 +135,17 @@ check)
   docker network inspect "$NET" >/dev/null 2>&1 || docker network create --internal "$NET" >/dev/null
   FRONT=(); KEYF_MOUNT=(); engine_start "$NET"
   fail=0; soft() { log "BAD: $*"; fail=1; }
-  docker logs "$NAME" 2>&1 | grep -qE "gfx1151.*19 exact speed switches" && ok "19 gfx1151 switches on" || soft "the start log does not list 19 gfx1151 switches"
+  docker logs "$NAME" 2>&1 | has "gfx1151.*19 exact speed switches" && ok "19 gfx1151 switches on" || soft "the start log does not list 19 gfx1151 switches"
   ans=$(docker run --rm --network "$NET" --read-only --cap-drop ALL --user 65534:65534 "$RELAY_IMG" python3 -c '
 import json, urllib.request
 r = urllib.request.Request("http://'"$NAME"':8080/v1/chat/completions", headers={"Content-Type": "application/json"},
     data=json.dumps({"messages": [{"role": "user", "content": "What is 2+3? Answer with one number."}],
                      "max_tokens": 400, "reasoning_effort": "none"}).encode())
 print(json.load(urllib.request.urlopen(r, timeout=600))["choices"][0]["message"].get("content", "").strip()[:200])' 2>&1)
-  log "answer to 2+3: $ans"; echo "$ans" | grep -q 5 && ok "the engine answers (5)" || soft "no sensible answer (above)"
+  log "answer to 2+3: $ans"; echo "$ans" | has 5 && ok "the engine answers (5)" || soft "no sensible answer (above)"
   log "GPU power now: $(awk '{print $1/1000000 " W"}' /sys/class/drm/card*/device/hwmon/hwmon*/power1_input 2>/dev/null | head -1)"
   L=$(docker logs "$NAME" 2>&1); echo "$L" | grep -iE "gfx1151|hipBLASLt|hipBLASEx|switch|memory guard|expert cache|error|warn" | head -40 >> "$DIR/results.txt"
-  echo "$L" | grep -qE "hipBLASLt tuning enabled.*gfx1151.*100401" && ok "hipBLASLt table loaded (gfx1151, 100401)" || soft "hipBLASLt table not loaded"
+  echo "$L" | has "hipBLASLt tuning enabled.*gfx1151.*100401" && ok "hipBLASLt table loaded (gfx1151, 100401)" || soft "hipBLASLt table not loaded"
   [ $fail = 0 ] || bad "step 3 failed (above); full engine log saved at the end"
   log "=== check passed. Next: ./fork.sh start, then the speed / quality tests (plan Phase 3 step 6)" ;;
 start)
