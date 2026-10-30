@@ -77,7 +77,7 @@ The top four are within run-to-run noise (about ±4 points); Flint is behind. So
 
 ![Strata vs llama.cpp speed on marvin](speed.svg)
 
-Same model file on marvin: Strata reads a long prompt 2.6× as fast as llama.cpp and writes 26% faster.
+Same model file on marvin: Strata reads a long prompt 2.6× as fast as llama.cpp and writes 26% faster. On Terminal-Bench at the same thinking level, Strata scored 17/19 (4.39 h), llama.cpp 19/19.
 Source: [plans/strix-strata.md](../../plans/strix-strata.md) Phase 1, MLflow f807b742.
 
 ## Changing a diagram
