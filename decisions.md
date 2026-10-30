@@ -130,3 +130,9 @@ longer need to wait; marvin being free is the remaining condition.
 26. **Daniel 2026-10-30: every test at thinking level medium** ("xhigh was a problem", "keep all at med"). No xhigh
     runs. `fork.sh` keeps `THINK` (default medium) but it is not to be changed for tests. Fair speed comparison =
     upstream Strata at preset `p16m` (medium) through the same `tuning/speed` test, next.
+27. **2-week rule withdrawn** (Daniel 2026-10-30: "never Daniel's"; pin the latest version exactly). `fork.sh` date gate
+    removed; decision 25's exception is moot. Still to do: bump the Dockerfile's inputs (base image, Ubuntu snapshot,
+    ROCm) to latest; ROCm needs care: the hipBLASLt table only loads for an exact hipBLASLt version (100401 now).
+28. **Branch merged with main** (plan 9). Engine choice waits for Daniel (plan 10): the fork's rule is exact defaults,
+    so `STRATA_HC_Q8` stays opt-in whatever engine; suggested: test `STRATA_HC_Q8=1` once to confirm it is the gap,
+    then cherry-pick the three fixes (+ mode 8) onto 0.1.45 rather than port to 0.1.54.

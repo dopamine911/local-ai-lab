@@ -362,3 +362,17 @@ Decisions made while Daniel was away: `decisions.md`.
    0.1.45 vs 0.1.52; confidence ~0.7, not proven). Upstream got faster run to run (7.9 → 7.2 s per 400 tokens), the
    fork stayed flat (8.1-8.3 s): more runs would firm up the gap. Both still well ahead of llama.cpp (2.6x reading,
    +12% writing for the fork). marvin back to llama-swap `big` at 17:23.
+9. **Branch brought up to date with main** (Daniel 2026-10-30; fork `a185402`, merge of main `22abfdb`): conflicts in
+   Makefile (PR #19's per-backend flags kept, main's `strata-dsv41` added for both backends) and README (both sections
+   kept); submodule now `44072a1` (main's pin). gfx1151 build: 348 s, `strata-dsv41` builds for HIP too; `make test`
+   passes; the pack tools give a byte-identical pack. New images: runtime config `1f741625…`, tests `67b97947…`.
+   `fork.sh check` on marvin passed again (17:49, same results as run 3). main also changed 48 lines of the shared CPU
+   expert kernels (`iq_avx2_rows.inl`, from its Strata v0.2.4 import); only the ~1% CPU-computed experts use them.
+   Pushed to GitHub at 17:39 by another session in the same clone (not by this one), before the check.
+10. **Engine audit** (Strata 0.1.45 → 0.1.54 and PolyStrata poly.1 → poly.6, code read only; full notes kept in the
+   session scratchpad): on gfx1151 the only new answer-changing default is `STRATA_HC_Q8` (on since upstream
+   6d4874a4, 0.2.2; +8.4-9.5% writing, KL 0.025, same top token 95.4%), which the fork already has as an opt-in. No
+   network in the engine. Exact gfx1151 speedup: "expert mode 8" (4c953b42 + 9fe2ad3f, guess 0-3%). Fixes worth
+   having: f8ff3420 (`--batch` could leak one conversation into another), 86d10ed8 (gfx1151 hang ~1 in 5 at the first
+   draft check), f8019539 (Strix Halo memory sizing / OOM). A port would need `STRATA_MMQ_TQ_OVERLAY` off (patches
+   llama.cpp headers at configure). PolyStrata poly.6 does not touch the `strata` engine.
