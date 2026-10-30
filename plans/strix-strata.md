@@ -115,6 +115,10 @@ strixhalo.wiki/AI/llamacpp-performance (Qwen3-30B-A3B, not our model): Vulkan RA
 17 at 128K depth; ROCm 41, lhl's rocm-wmma-tune branch 51. Agents work at long depth, so after the Strata tests:
 build llama.cpp for HIP/gfx1151 in a container (same pinned tag as Vulkan), run `tuning/speed` + a depth sweep on
 `big`, one change at a time. marvin `big` already has the wiki's flags (-ngl 999, -fa on, -lm dio, RADV).
+Recipe (strixhalo.wiki/AI/llamacpp-with-ROCm, dated Aug 2025, ROCm 7.0.x era): `-DGGML_HIP=ON -DAMDGPU_TARGETS=gfx1151
+-DCMAKE_BUILD_TYPE=Release`; do NOT use `-DGGML_HIP_ROCWMMA_FATTN=ON` (slower at depth on ROCm 7.0.2+, unmaintained);
+runtime `ROCBLAS_USE_HIPBLASLT=1` (measure); use ROCm 7.14.1 like Strata. Known: GPU hangs (ROCm#5151), workaround
+`amdgpu.cwsr_enable=0` (strixhaloguide). kyuz0's toolboxes and lhl's rocm-wmma-tune branch: reference only.
 
 ## Risks
 
