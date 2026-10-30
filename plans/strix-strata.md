@@ -2,7 +2,7 @@
 
 Status 2026-10-30: Phase 1 measured (Strata reads 2.6x llama.cpp on marvin; Terminal-Bench on Strata running overnight).
 Phase 3 steps 1-5 done on zaphod (gfx1151 image built, see Phase 3 log; pushed to dopamine911/UnbiasedStrata
-`hip-gfx1151`); pack built (5e), step 6 script `marvin/strata-fork/fork.sh` and live-session draft ready (5c). Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
+`hip-gfx1151`); pack built (5e), step 6 script `marvin/strata-fork/fork.sh` and live-session draft ready (5c). **Step 6 check passed on marvin 2026-10-30** (Phase 3 log 6); speed/quality not yet measured. Step 6 (marvin): when marvin is free and not before 2026-11-04; pack: build with the fork's tool
 (Daniel 2026-10-30, `decisions.md` "Daniel's answers"). Phase 4 (anything upstream): on hold until proven with
 live sessions and plenty of stats.
 
@@ -334,3 +334,11 @@ Decisions made while Daniel was away: `decisions.md`.
    `--native` the engine finds the PLE shard itself). Upstream Strata (`strata`, Phase 1) was still running; the
    check refuses to start while it runs. **On 2026-11-04:** `~/strata-test/strata-test.sh stop`, then
    `~/homelab/marvin/strata-fork/fork.sh check`.
+6. **Step 6 check passed on marvin** (2026-10-30 17:07, run 3, exception decision 25; `~/strata-fork/check-run3.log`,
+   engine log `~/strata-fork/engine-20261030-170725.log`): images = zaphod builds, pack sha256 OK; `strata-device`:
+   gfx1151, can run; `hip_prefill_hipblaslt_gemm`, `hip_prefill_hcd_exact_parity`, `hip_prefill_mmq_parity`: pass
+   (exit 0, not skipped); engine with Phase 1's `p16m` settings ready in **61 s**, GPU 65 GB, RAM 110 GB used / 12 GB
+   available (Phase 1 upstream: 65 / 106); start log lists all **19 gfx1151 switches**; `hipBLASLt tuning enabled
+   (90 rows, gfx1151, version 100401)`; 2+3 → "5". The slim image needed no fallback. Runs 1 and 2 failed only on
+   my script (19-switch line present; `grep -q` under pipefail gave a false BAD), fixed in `f41d2f4`.
+   Not yet measured: speed, quality, tool use (next: `./fork.sh start`, then `tuning/speed` against marvin:8099).
