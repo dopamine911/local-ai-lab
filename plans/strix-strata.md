@@ -376,3 +376,11 @@ Decisions made while Daniel was away: `decisions.md`.
    having: f8ff3420 (`--batch` could leak one conversation into another), 86d10ed8 (gfx1151 hang ~1 in 5 at the first
    draft check), f8019539 (Strix Halo memory sizing / OOM). A port would need `STRATA_MMQ_TQ_OVERLAY` off (patches
    llama.cpp headers at configure). PolyStrata poly.6 does not touch the `strata` engine.
+11. **Three upstream bug fixes ported** (Daniel 2026-10-30; fork `7a65497`, `a0acda7`, `21bbb95`, + `02c9904`
+   UPSTREAM.md): Strata `86d10ed8` (gfx1151 first-window hang), `f8ff3420` (`--batch` conversation leak, #1503),
+   `f8019539` (Strix Halo auto expert-cache sizing). Exact (no computed value changes). Two applied with offsets only,
+   one `#include` by hand. Build OK; `conversation_cache_test` (4,782 checks) and `uma_cache_test` pass. Images:
+   runtime `a3f9f818…`, tests `db7575e7…`. `fork.sh check` on marvin passed (18:05). Speed at medium (MLflow
+   212e554d; GPU 137 W average, peak 93 C): writing **49.7** (before 49.5), 32K reading **811.4** (before 821.6,
+   -1.2%; runs 803 / 811 / 812 vs 815 / 822 / 822). None of the three fixes is on the prompt path and main's merge did
+   not change ggml, so likely run-to-run/heat; not proven (would need the pre-fix image run back to back).
