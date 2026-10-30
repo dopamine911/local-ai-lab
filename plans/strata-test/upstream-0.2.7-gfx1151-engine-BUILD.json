@@ -1,0 +1,17 @@
+{
+ "version": "0.1.52",
+ "source": "f-amd-vision a42cc3d7df70",
+ "variant": "halo",
+ "archs": [
+  "gfx1151"
+ ],
+ "portable": true,
+ "vision": "gpu",
+ "vision_cpu": "strata-vision",
+ "vision_gpu": "strata-vision-hip",
+ "vision_archs": [
+  "gfx1151"
+ ],
+ "dsv41": false,
+ "hipblaslt_version": 100401
+}

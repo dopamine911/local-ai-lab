@@ -65,6 +65,8 @@ always restarted at the end (script `trap`, like plans/strata-test/). `marvin/bi
 Go on to the port if Strata on marvin clearly wins, e.g. **reading at least 2x llama.cpp** in the 32K test and real use,
 with tool-use and Terminal-Bench at least as good. If not: write down why and stop; the llama.cpp setup stays.
 
+Instructions for the agent doing Phase 3: `plans/strix-strata-port-instructions.md`.
+
 ## Phase 3: port UnbiasedStrata to AMD gfx1151 (now likely hours: others did the HIP build part)
 
 Existing work (checked 2026-10-29, both open, no maintainer reply yet):
