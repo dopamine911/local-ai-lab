@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace;
+    }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 3rem 2rem;
+    }
+    .frame { max-width: 1040px; width: 100%; }
+    .diagram-container { width: 100%; overflow-x: auto; margin-bottom: 0.75rem; }
+    .eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.66rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-bottom: 0.5rem;
+    }
+    h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-family: var(--font-serif);
+      font-size: 1.35rem;
+      font-weight: 400;
+      margin: 1.5rem 0 0.25rem;
+    }
+    .note { font-size: 0.85rem; color: var(--color-muted); max-width: 60rem; margin-bottom: 0.75rem; line-height: 1.45; }
+    .source { font-family: var(--font-mono); font-size: 0.7rem; color: var(--color-muted); margin-bottom: 1.5rem; }
+    svg { width: 100%; min-width: 960px; display: block; }
+    @media print {
+      .diagram-container { overflow-x: visible; }
+      svg { min-width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <p class="eyebrow">Bar charts · homelab results</p>
+    <h1>What the tests show so far</h1>
+
+    <h2>Tool use: the top four are within run-to-run noise; Flint is behind</h2>
+    <p class="note">Score out of 100 on tool-eval-bench (69 scenarios, common score). Three runs each where measured.
+      The same model varies about ±4 points from run to run, so the top four are within noise of each other.</p>
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 352" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="results-tooluse-title results-tooluse-desc">
+        <title id="results-tooluse-title">Tool-use score by model and server</title>
+        <desc id="results-tooluse-desc">Horizontal bars of tool-use score out of 100: marvin with Strata at thinking medium 94.0, Ornith 92.0, marvin with llama.cpp 91.7, zaphod with Strata on one card 90.0, Flint 86.0.</desc>
+
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+        <!-- Gridlines (0 is the axis line) -->
+        <line x1="440" y1="56" x2="440" y2="304" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="600" y1="56" x2="600" y2="304" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="760" y1="56" x2="760" y2="304" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="920" y1="56" x2="920" y2="304" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="280" y1="48" x2="280" y2="304" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+
+        <!-- Tick labels -->
+        <text x="280" y="320" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">0</text>
+        <text x="440" y="320" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">25</text>
+        <text x="600" y="320" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">50</text>
+        <text x="760" y="320" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">75</text>
+        <text x="920" y="320" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">100</text>
+        <text x="600" y="336" fill="#4f5d75" font-size="7" font-family="'Geist Mono', monospace" text-anchor="middle" letter-spacing="0.14em">TOOL-USE SCORE (0-100)</text>
+
+        <!-- Row 1 (focal): marvin, Strata, thinking medium, 94.0 -->
+        <rect x="280" y="64" width="602" height="24" fill="#f5f5f5"/>
+        <rect x="280" y="64" width="602" height="24" fill="rgba(191,69,32,0.12)" stroke="#bf4520" stroke-width="1"/>
+        <text x="890" y="80" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace">94.0</text>
+        <text x="268" y="80" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">marvin, Strata (thinking medium)</text>
+
+        <!-- Row 2: Ornith, 92.0 -->
+        <rect x="280" y="112" width="589" height="24" fill="#f5f5f5"/>
+        <rect x="280" y="112" width="589" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="877" y="128" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">92.0</text>
+        <text x="268" y="128" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">zaphod, Ornith 1.5</text>
+
+        <!-- Row 3: marvin, llama.cpp, 91.7 -->
+        <rect x="280" y="160" width="587" height="24" fill="#f5f5f5"/>
+        <rect x="280" y="160" width="587" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="875" y="176" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">91.7</text>
+        <text x="268" y="176" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">marvin, llama.cpp (Flash-Next)</text>
+
+        <!-- Row 4: zaphod Strata one card, 90.0 -->
+        <rect x="280" y="208" width="576" height="24" fill="#f5f5f5"/>
+        <rect x="280" y="208" width="576" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="864" y="224" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">90.0</text>
+        <text x="268" y="224" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">zaphod, Strata (Flash-Next, one card)</text>
+
+        <!-- Row 5: Flint, 86.0 -->
+        <rect x="280" y="256" width="550" height="24" fill="#f5f5f5"/>
+        <rect x="280" y="256" width="550" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="838" y="272" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">86.0</text>
+        <text x="268" y="272" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">zaphod, Flint</text>
+      </svg>
+    </div>
+    <p class="source">Source: FEATURES.md section 5, tuning/results.md · MLflow dd68dfba, d90f9a9f, 78c3f11b (top row)</p>
+
+    <h2>Speed on marvin: same model file, Strata vs llama.cpp</h2>
+    <p class="note">Qwen3.8-Flash-Next UD-IQ4_XS on marvin, BIOS on Performance, tuning/speed. Strata reads a long prompt
+      2.6× as fast and writes 26% faster. Each chart has its own scale, both starting at zero.</p>
+    <div class="diagram-container">
+      <svg viewBox="0 0 960 216" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="results-speed-title results-speed-desc">
+        <title id="results-speed-title">Strata vs llama.cpp speed on marvin</title>
+        <desc id="results-speed-desc">Reading a 32K-token prompt: Strata 817 tokens per second, llama.cpp 315. Writing: Strata 55.5 tokens per second, llama.cpp 44.0.</desc>
+
+        <rect width="100%" height="100%" fill="#f5f5f5"/>
+
+        <!-- Panel titles -->
+        <text x="160" y="40" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">READING A 32K PROMPT · TOK/S</text>
+        <text x="640" y="40" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" letter-spacing="0.18em">WRITING · TOK/S</text>
+
+        <!-- Panel 1 grid: 0-1000 over x 160-440 -->
+        <line x1="230" y1="56" x2="230" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="300" y1="56" x2="300" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="370" y1="56" x2="370" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="440" y1="56" x2="440" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="160" y1="52" x2="160" y2="152" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <text x="160" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">0</text>
+        <text x="230" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">250</text>
+        <text x="300" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">500</text>
+        <text x="370" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">750</text>
+        <text x="440" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">1000</text>
+
+        <!-- Panel 1 bars -->
+        <rect x="160" y="68" width="229" height="24" fill="#f5f5f5"/>
+        <rect x="160" y="68" width="229" height="24" fill="rgba(191,69,32,0.12)" stroke="#bf4520" stroke-width="1"/>
+        <text x="397" y="84" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace">817</text>
+        <text x="148" y="84" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">Strata 0.2.7</text>
+
+        <rect x="160" y="112" width="88" height="24" fill="#f5f5f5"/>
+        <rect x="160" y="112" width="88" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="256" y="128" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">315</text>
+        <text x="148" y="128" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">llama.cpp</text>
+
+        <!-- Panel 2 grid: 0-60 over x 640-920 -->
+        <line x1="710" y1="56" x2="710" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="780" y1="56" x2="780" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="850" y1="56" x2="850" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="920" y1="56" x2="920" y2="152" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
+        <line x1="640" y1="52" x2="640" y2="152" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+        <text x="640" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">0</text>
+        <text x="710" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">15</text>
+        <text x="780" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">30</text>
+        <text x="850" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">45</text>
+        <text x="920" y="168" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace" text-anchor="middle">60</text>
+
+        <!-- Panel 2 bars -->
+        <rect x="640" y="68" width="259" height="24" fill="#f5f5f5"/>
+        <rect x="640" y="68" width="259" height="24" fill="rgba(191,69,32,0.12)" stroke="#bf4520" stroke-width="1"/>
+        <text x="907" y="84" fill="#bf4520" font-size="8" font-family="'Geist Mono', monospace">55.5</text>
+        <text x="628" y="84" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">Strata 0.2.7</text>
+
+        <rect x="640" y="112" width="205" height="24" fill="#f5f5f5"/>
+        <rect x="640" y="112" width="205" height="24" fill="rgba(79,93,117,0.15)" stroke="#4f5d75" stroke-width="1"/>
+        <text x="853" y="128" fill="#4f5d75" font-size="8" font-family="'Geist Mono', monospace">44.0</text>
+        <text x="628" y="128" fill="#2d3142" font-size="11" font-weight="600" font-family="'Geist', sans-serif" text-anchor="end">llama.cpp</text>
+
+        <text x="160" y="200" fill="#4f5d75" font-size="14" font-style="italic" font-family="'Instrument Serif', serif">Speed is Strata's win. Whether it is worth the switch also depends on Terminal-Bench time, still running.</text>
+      </svg>
+    </div>
+    <p class="source">Source: plans/strix-strata.md Phase 1, tuning/results.md · MLflow f807b742</p>
+  </div>
+</body>
+</html>
