@@ -128,6 +128,12 @@ Whole 93 GB model in GPU memory (120 GB limit). Details: `marvin/SETUP.md`.
 | **marvin**: Flash-Next UD-IQ4_XS + MTP, llama.cpp | 90 | 93 | 92 | 6 / 5 / 5 | 3 / 2 / 3 | 13 |
 | Strata: Flash-Next GSQ IQ3_XXS, one card | 88 | 95 | 87 | 8 / 5 / 8 | 1 / 1 / 1 | 22 |
 | Strata, two cards | 92 | | | 5 | 2 | 7.5 |
+| **marvin, Strata 0.2.7** (gfx1151), same UD-IQ4_XS, thinking xhigh (Strata's default) | 89 | 89 | 90 | | | |
+| **marvin, Strata 0.2.7**, thinking **medium** (same level as llama.cpp's `big`) | **93** | **96** | **93** | | | |
+
+Strata on marvin (2026-10-30, plans/strix-strata.md Phase 1 items 8-10): at medium, average **94.0**, attacker echo
+0 of 3 (llama.cpp 1.0, Strata xhigh 2.7). MLflow dd68dfba, d90f9a9f, 78c3f11b; series `strata-strix-iq4xs-medium`.
+The xhigh runs' lower score came from the thinking level, not the engine. Wrong actions / honest stops not yet sorted by hand.
 | Ornith 1.5 (zaphod card 2) | 93 | 89 / 93 / 93 at temp 0.6 | | 5-6 | 2 | 5 |
 
 No fabrication anywhere. The same model on two different servers and quantizations scores the same; the differences

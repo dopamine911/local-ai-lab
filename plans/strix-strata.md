@@ -204,6 +204,10 @@ Script: `marvin/strata-test/strata-test.sh` (plan / start / status / stop; runs 
    engine log does not show it). tool-eval-bench sends no level of its own (only its warm-up turns thinking off).
    Preset `p16m`, series `strata-strix-iq4xs-medium`, same 3 runs as item 8. Decision rule: clearly below 91.7, or
    still more attacker echo than llama.cpp → stop Strata; else Terminal-Bench at medium (must be 19/19 in < 5.5 h).
+   **Result (MLflow dd68dfba / d90f9a9f / 78c3f11b):** common score **93 / 96 / 93 (avg 94.0)** vs llama.cpp 91.7 and
+   Strata at xhigh 89.3. Attacker echo **0 / 0 / 0** (llama.cpp 1.0, xhigh 2.7); looping 0, made-up query 0.
+   16-19 min per run. Passes the rule: last night's lower score was the xhigh thinking, not the engine.
+   Next: Terminal-Bench full at medium (profile `strata0.2.7-mtp-128k-np2-medium`).
 
 ## Phase 3 log
 
