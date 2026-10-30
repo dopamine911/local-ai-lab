@@ -73,3 +73,7 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:30:06 | marvin check on the new base | **passed** | results.txt |
 | 18:31:45 | Fork served (medium); speed test | reading **786.8** (falling: 821.6 → 811.4 → 786.8), writing 49.6 | MLflow 9fdeb14c |
 | 18:35:20 | Fork stopped; llama-swap back (`big` online) | | results.txt |
+| 18:37-18:40 | ROCm 10.1 found (Daniel's link): `stable.repo.amd.com/rocm/core/`, tarball has no published checksum | Daniel chose the signed apt packages | |
+| 18:40 | AMD key fetched and checked (fingerprint D0F0…2107); repo signature good; gfx1151 set = 49 packages, all 10.1.0-3 | | |
+| 18:41-18:49 | Trial install in a throwaway container (first try: key not readable by apt, fixed) | 8.1 GB; hipBLASLt 1.4.1 (= 100401); clang 23 → 24 | |
+| 18:50 | Dockerfile: ROCm stage = signed packages, pinned; `.kpack` copy removed; full rebuild started | running | |
