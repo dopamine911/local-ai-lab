@@ -29,7 +29,10 @@ mem() { echo "GPU memory used $(( $(cat /sys/class/drm/card*/device/mem_info_gtt
 
 SETTINGS=(-e MODEL=ud-iq4_xs -e FAMILY=unsloth -e MODEL_PATH=/models -e CONTEXT=128k -e PARALLEL="${PARALLEL:-2}" -e VISION=off
           -e TUNE=skip -e PRESET="${PRESET:-docker}")
-STRATA_SET="${STRATA_SET-prefill=16384}"   # default: 16K prompt chunks (+8% reading on a 32K prompt, measured; STRATA_SET= turns it off)
+# Defaults: 16K prompt chunks (+8% reading on a 32K prompt, measured) and thinking level medium, the same as
+# llama.cpp's `big` (--reasoning-effort medium). Without it Strata's template thinks at xhigh (plans/strix-strata.md
+# Phase 1 item 9). Check after start: the log says "thinking level: medium". STRATA_SET= turns both off.
+STRATA_SET="${STRATA_SET-prefill=16384 reasoning-effort=medium}"
 [ -n "$STRATA_SET" ] && SETTINGS+=(-e STRATA_SET="$STRATA_SET")
 GPU=(--device /dev/kfd --device /dev/dri --group-add video --group-add "$(getent group render | cut -d: -f3)"
      --ulimit memlock=-1:-1 --shm-size 2g)
