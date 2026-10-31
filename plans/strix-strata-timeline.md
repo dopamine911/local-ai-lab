@@ -98,3 +98,10 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 20:20 | Decision: keep ROCm 10.1; fork branch pushed | | fork 9223872 |
 | 20:19 | Tool use x3 on the fork (series `fork-strix-iq4xs-medium`, same three settings as upstream's medium series) started | | |
 | 20:29-20:30 | **Stopped** during run 1 (Daniel is testing a fan patch on marvin: no more runs); fork stopped, llama-swap back (`big` online) | no score; partial engine log on marvin | `~/strata-fork/engine-quality3-partial.log` |
+
+## 2026-10-31
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 15:24 | (fan work, other session) marvin fan module installed read-only; 10 h baseline recorder started (fans auto) | | `plans/marvin-fan-timeline.md` |
+| 15:28 | Daniel: continue. Tool use x3 on the fork restarted (same three settings as upstream's medium series); its load feeds the fan recorder | running (~1 h) | MLflow |
