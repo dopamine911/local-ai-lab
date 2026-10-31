@@ -108,3 +108,6 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 15:29-16:26 | Tool use x3 on the fork | common score **92.3** (upstream 94.0, llama.cpp 91.7); gap = TC-45 `tool_choice=required` not enforced (unconstrained sampling, by design) | MLflow 181dec1b, cc54669c, f91b3677 |
 | 16:26 | Fork stopped; llama-swap back (`big` online) | | |
 | 16:30 | Daniel: stay true to the fork (no tool_choice enforcement; keep changes upstream-compatible) | recorded | decisions.md 34 |
+| 16:33 | `tbench`: new target `marvin-fork` (model big-fork, own profile, key from strata-fork/key) | | tuning/tbench |
+| 16:35:38 | Fork started on marvin for Terminal-Bench (medium, p16m); `tbench doctor` passed | | results.txt |
+| 16:37:02 | **Terminal-Bench full (Core-19) on the fork launched** (Daniel: "you can launch"), tmux `tbench-fork` on zaphod; upstream at medium: 17/19 in 4.39 h | running | `~/tbench-fork-2026-10-31.log`, harbor job 20261031-163702 |
