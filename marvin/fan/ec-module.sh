@@ -29,6 +29,9 @@ board_check() {
   local b; b=$(cat /sys/class/dmi/id/board_name 2>/dev/null || echo unknown)
   [ "$b" = AXB35-02 ] || { echo "STOP: board is '$b', not AXB35-02 (Bosgame M5). This module writes EC registers on unload."; exit 1; }
 }
+# mokutil --test-key prints "is already enrolled" AND exits non-zero when the key IS enrolled: read its text, not its
+# exit code (with pipefail, `mokutil ... | grep -q` reported an enrolled key as missing; found 2026-10-31).
+enrolled() { local out; out=$(mokutil --test-key $MOK_CERT 2>&1 || true); [[ $out == *"is already enrolled"* ]]; }
 root() { [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }; }
 say() { printf '%-34s %s\n' "$1" "$2"; }
 
@@ -39,7 +42,7 @@ check() {
   say "dkms" "$(dpkg -s dkms 2>/dev/null | awk '/^Version/{print $2}' || true)$(dpkg -s dkms >/dev/null 2>&1 || echo 'not installed')"
   say "signing key (MOK)" "$([ -e $MOK_CERT ] && echo present || echo 'not made yet (prepare)')"
   if [ -e $MOK_CERT ]; then
-    say "MOK enrolled" "$(mokutil --test-key $MOK_CERT 2>&1 | grep -q 'is already enrolled' && echo yes || echo 'NO (reboot and enroll at the blue screen)')"
+    say "MOK enrolled" "$(enrolled && echo yes || echo 'NO (reboot and enroll at the blue screen)')"
   fi
   if [ ! -d $SYS ]; then say "module" "not loaded"; return 0; fi
   say "module" "loaded, signer: $(modinfo -F signer $NAME 2>/dev/null || echo unknown)"
@@ -60,7 +63,7 @@ prepare() {
   dpkg -s dkms build-essential | awk '/^(Package|Version)/{printf "%s ", $2} END{print ""}'
   if [ ! -e $MOK_CERT ]; then dkms generate_mok; fi
   [ -e $MOK_KEY ] && [ -e $MOK_CERT ] || { echo "MOK key missing after dkms generate_mok"; exit 1; }
-  if mokutil --test-key $MOK_CERT 2>&1 | grep -q 'is already enrolled'; then
+  if enrolled; then
     echo "MOK already enrolled: no reboot needed, run: sudo $0 install"; exit 0
   fi
   echo; echo "mokutil now asks for a one-time password (5 characters or fewer). You type it again at the blue screen."
@@ -72,7 +75,7 @@ prepare() {
 
 install_mod() {
   root; board_check
-  mokutil --test-key $MOK_CERT 2>&1 | grep -q 'is already enrolled' \
+  enrolled \
     || { echo "STOP: the MOK is not enrolled. Run prepare, reboot, and enroll at the blue screen first."; exit 1; }
   if [ ! -d "$SRC/.git" ]; then sudo -u "$U" git clone -q "$REPO" "$SRC"; fi
   sudo -u "$U" git -C "$SRC" fetch -q origin && sudo -u "$U" git -C "$SRC" checkout -q "$SHA"
