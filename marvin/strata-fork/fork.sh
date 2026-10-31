@@ -24,7 +24,9 @@ RT=${RT_IMAGE:-unbiased-strata:gfx1151}; TESTS=unbiased-strata-tests:gfx1151;
 # Diagnostics only (plan 5b.5): RT_IMAGE=unbiased-strata-build:gfx1151 RT_ENTRYPOINT=/src/build/bin/unbiased-strata
 # RT_TUNING=/src/tools/hip/gfx1151-hipblaslt-100401.txt runs the full-ROCm build image instead (digest not checked).
 ENTRY=(); [ -n "${RT_ENTRYPOINT:-}" ] && ENTRY=(--entrypoint "$RT_ENTRYPOINT")
-[ -n "${RT_TUNING:-}" ] && ENTRY+=(-e "STRATA_HIPBLASLT_TUNING=$RT_TUNING") RELAY_IMG=python:3.13-slim-trixie
+[ -n "${RT_TUNING:-}" ] && ENTRY+=(-e "STRATA_HIPBLASLT_TUNING=$RT_TUNING")
+# RT_TUNING_FILE=<host path>: that hipBLASLt table instead of the image's (mounted read-only; diagnostics / calibration)
+[ -n "${RT_TUNING_FILE:-}" ] && ENTRY+=(-v "$RT_TUNING_FILE:/run/tuning.txt:ro" -e STRATA_HIPBLASLT_TUNING=/run/tuning.txt) RELAY_IMG=python:3.13-slim-trixie
 # config digests: fork fbfb29f (ROCm 10.1.0 packages), plans/strix-strata.md Phase 3 log 14
 RT_CFG=sha256:b3780eb08333f5bb817421a303d959c2b790761024fcb6d86081ee37eba13c05
 TESTS_CFG=sha256:a3c9f0bdcccda8e82266a21be51b613b813723441d1b47f21ba827feae93a300
