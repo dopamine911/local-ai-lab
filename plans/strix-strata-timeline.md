@@ -77,3 +77,5 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:40 | AMD key fetched and checked (fingerprint D0F0…2107); repo signature good; gfx1151 set = 49 packages, all 10.1.0-3 | | |
 | 18:41-18:49 | Trial install in a throwaway container (first try: key not readable by apt, fixed) | 8.1 GB; hipBLASLt 1.4.1 (= 100401); clang 23 → 24 | |
 | 18:50 | Dockerfile: ROCm stage = signed packages, pinned; `.kpack` copy removed; full rebuild started | running | |
+| 19:00:02 | Upstream Strata recheck (p16m, medium), while the ROCm 10.1 rebuild runs on zaphod | reading 822.1, writing 53.7: **marvin is not drifting**; the fork's drop is in our builds | MLflow bd592a58 |
+| 19:03:55 | Upstream stopped; llama-swap back (`big` online) | | strata-test log |

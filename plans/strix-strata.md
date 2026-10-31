@@ -392,3 +392,8 @@ Decisions made while Daniel was away: `decisions.md`.
    821.6 → 811.4 → 786.8 (-4%), writing flat, power the same.** Neither the fixes nor the base touch the GPU prompt
    path (same ROCm files), so marvin drift (heat soak, RAM: 12 GB free while serving) is as likely as a build cause.
    Not yet separated: needs the previous images run back to back with this one.
+13. **marvin is not drifting** (2026-10-30 19:00, MLflow bd592a58): upstream Strata p16m, unchanged software, same test:
+   reading **822.1** (17:21: 821.9), writing **53.7** (53.5), GPU 138 W average. So the fork's reading drop is in our
+   builds: 821.6 (fork 4149027, PR #19) → 811.4 (02c9904: main merged + 3 fixes) → 786.8 (cc2a9ca: + Ubuntu
+   resolute-20261024.1). Writing flat at 49.5-49.7 in all three. The merge-only build (a185402) was checked but not
+   speed-tested. Next: the builds back to back to find which change costs reading.
