@@ -22,4 +22,7 @@ script: `marvin/fan/ec-module.sh`. Sources: commits, command output, marvin logs
 | --- | --- | --- | --- |
 | 15:20 | marvin up after Daniel's second reboot | — | `uptime -s` |
 | 15:2x | Fix: one `enrolled()` check reads mokutil's text, not its exit code (3 places); copied to marvin | `check`: MOK enrolled yes, module not loaded | this commit |
-| next | Daniel: tells the port agent; `prepare` (password), reboot at the screen, MOK enroll, `install`, `check`; restart llama-swap | — | — |
+| 15:23 | Daniel: `install` | built, **signed by `marvin Secure Boot Module Signature key`**, loaded; power mode **performance**; EC 42 C vs GPU 39 C; fans auto 1,613 / 1,893 / 822 rpm | marvin/SETUP.md |
+| 15:24 | llama-swap back (`marvin/big`), Beszel agent up; baseline sampler started, 10 h, every 5 s | `~/fan-samples/2026-10-31-baseline.csv` on marvin | — |
+| next | Read the sampler after load: does the clock fall as temperature passes ~95 C, and do the fans reach full speed? Then decide on a curve (plan step 3) | — | — |
+| (done) | Daniel: tells the port agent; `prepare` (password), reboot at the screen, MOK enroll, `install`, `check`; restart llama-swap | — | — |
