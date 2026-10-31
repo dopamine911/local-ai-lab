@@ -89,4 +89,9 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 19:32 | Speed test, full image + new table | reading **818.5**, writing 49.6 | not logged (diagnostic) |
 | 19:35 | Tuner baseline in the slim image on the crash shape | rocBLAS works there (42 ms) | |
 | 19:37 | Speed test, slim 10.1 image + new table | reading **818.9**, writing 49.3, no crash | not logged (diagnostic) |
-| 19:41 | Back-to-back series of all six builds started (A1 B C D E A2) | running | MLflow |
+| 19:40-19:50 | Back-to-back series of all six builds (A1 B C D E A2) | **5 of 6 lost** to a bug in my `fork.sh` edit (`RELAY_IMG` only set with a table option); E (10.1 + table, from disk): reading 805.0, writing 50.2 | MLflow 09d4af82 |
+| 19:52 | Bug found with `bash -x`; fixed | plain `fork.sh start` works again | 2dc8d92 |
+| 19:47-19:53 | 10.1 table shipped in the fork (+ docs, tuner in the tests image); images rebuilt | 8 min | fork 9223872 |
+| 19:53 | `fork.sh` check: GEMM test must show fallbacks=0; HCD skip on 10.1 is a note | | 25cceee |
+| 19:54:05 | marvin check, ROCm 10.1 + its table | **passed** (fallbacks=0, HCD skip noted, MMQ, 19 switches, 2+3 = 5) | results.txt |
+| 19:56 | Series rerun with the fixed script (A1 B C D F A2) | running | MLflow |

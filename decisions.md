@@ -142,3 +142,14 @@ longer need to wait; marvin being free is the remaining condition.
     while writing the timeline. All recorded results are at medium.
 30. **Timeline kept** (Daniel 2026-10-30: "document all the times and what was done"): `plans/strix-strata-timeline.md`,
     from commits and machine logs; updated with every step.
+31. **ROCm 10.1 kept, with its own hipBLASLt table** (Daniel 2026-10-30 night: keep experimenting within the repo goals).
+    10.1's hipBLASLt has the same version number as 7.14.1's but other solution ids, so the shipped 7.14.1 table does
+    not fit (356 tok/s or a crash). The fork's own tuner (`tools/hip/tune_hipblaslt`) wrote a table for it on marvin
+    (818.9 tok/s); it is a separate file (`gfx1151-hipblaslt-100401-rocm10.1.0.txt`) so 7.14.1 users keep theirs.
+    `HCD_EXACT` stays declined on 10.1 (no engine change: the kernel copies 7.14.1's solutions; hipBLASLt runs the GEMM,
+    same speed). No answer-changing switch was turned on. `fork.sh check` now requires fallbacks=0, which would have
+    caught the mismatch at once. Final choice of ROCm waits for the back-to-back series.
+32. **Bug of mine: `RELAY_IMG` was set only when a table option was given** (my 19:16 edit). Plain `fork.sh start`
+    failed after the engine was ready; the first build series lost 5 of 6 runs. Fixed (2dc8d92). Same class as the
+    earlier slips: an edit checked with `bash -n` but not run in its plain form. From now on each `fork.sh` change is
+    run once without options before use.
