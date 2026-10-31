@@ -124,6 +124,15 @@ MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 (Chicago tim
 (last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild.
 On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly backup back on.
 
+### GitHub repo settings (issue #8)
+Secret scanning and push protection on the public repo (enabled 2026-10-30; free for public repos):
+```
+gh api -X PATCH repos/dopamine911/local-ai-lab -F 'security_and_analysis[secret_scanning][status]=enabled' \
+  -F 'security_and_analysis[secret_scanning_push_protection][status]=enabled'
+```
+Good: `gh api repos/dopamine911/local-ai-lab --jq .security_and_analysis` shows both `enabled`. (Generic "non-provider
+patterns" are not available on this plan: they stay disabled.) The local gitleaks hook stays the first layer.
+
 ### Restore from marvin (after section 5, before starting the hub)
 1. See the snapshots: `~/homelab/setup/backup-to-marvin.sh list`. Pick the newest, e.g. `2026-10-29_0417`.
 2. Stop the hub: `cd ~/homelab/hub && docker compose down`.
