@@ -55,6 +55,16 @@ zaphod only: `gh auth login` (GitHub CLI, installed by host.sh; used to open iss
 Firewall: ufw is installed but inactive (zaphod checked 2026-10-29; marvin is a fresh install, where Ubuntu leaves it inactive), so there are no rules to restore.
 Protection comes from where services listen: 127.0.0.1, or the Tailscale IP. Keep it that way in every compose file.
 
+marvin only, with its screen and keyboard attached (fan-chip module, read-only; Secure Boot needs its key enrolled):
+1. `sudo ~/homelab/marvin/fan/ec-module.sh prepare`: installs dkms, makes the signing key, asks for a one-time
+   password (5 characters or fewer, remember it for one minute).
+2. `sudo systemctl reboot`. At the blue MOK Manager screen: press a key, Enroll MOK, Continue, Yes, the password,
+   Reboot.
+3. `sudo ~/homelab/marvin/fan/ec-module.sh install`. Good result: `signed by: ...`, `module loaded`, then the check
+   says BIOS power mode `performance` and every fan mode `auto`.
+4. After the reboot nothing on marvin restarts by itself: `cd ~/homelab/marvin/llama-swap && docker compose start
+   llama-swap`, and check the Beszel agent is up.
+
 ## 4. Models (script, takes hours)
 
 ```

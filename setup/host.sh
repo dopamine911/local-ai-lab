@@ -59,6 +59,12 @@ if [ "$H" = marvin ]; then
   if [ "$(tuned-adm active 2>/dev/null | sed 's/.*: //')" != accelerator-performance ]; then
     tuned-adm profile accelerator-performance; fi
   tuned-adm active
+
+  step "9. marvin: fan-chip module ec_su_axb35 (read-only; reads fans, EC temp and BIOS power mode)"
+  # Not automatic: it needs a module-signing key enrolled at marvin's screen (Secure Boot). Run by hand, in order:
+  #   sudo ~/homelab/marvin/fan/ec-module.sh prepare   (asks a 5-character password) -> reboot -> blue MOK screen
+  #   sudo ~/homelab/marvin/fan/ec-module.sh install   ; then ~/homelab/marvin/fan/ec-module.sh check
+  ~/homelab/marvin/fan/ec-module.sh check 2>/dev/null | grep -E '^(module|BIOS power mode)' || echo "fan module: see marvin/fan/ec-module.sh"
 fi
 
 step "done. Log out and back in (new groups), then continue with setup/REBUILD.md"
