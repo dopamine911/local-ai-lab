@@ -79,3 +79,6 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:50 | Dockerfile: ROCm stage = signed packages, pinned; `.kpack` copy removed; full rebuild started | running | |
 | 19:00:02 | Upstream Strata recheck (p16m, medium), while the ROCm 10.1 rebuild runs on zaphod | reading 822.1, writing 53.7: **marvin is not drifting**; the fork's drop is in our builds | MLflow bd592a58 |
 | 19:03:55 | Upstream stopped; llama-swap back (`big` online) | | strata-test log |
+| 18:50-19:04 | ROCm 10.1 rebuild; `make test` | 13 min; pass; clang 24, hipBLASLt 1.4.1 | fork fbfb29f |
+| 19:05:44 | marvin check on ROCm 10.1 | **stopped**: HCD exact test skipped: 10.1's hipBLASLt numbers solutions differently (same version 100401); table entry → -1 | results.txt |
+| 19:05:58 | llama-swap back (`big` online) | | results.txt |

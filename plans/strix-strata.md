@@ -397,3 +397,14 @@ Decisions made while Daniel was away: `decisions.md`.
    builds: 821.6 (fork 4149027, PR #19) → 811.4 (02c9904: main merged + 3 fixes) → 786.8 (cc2a9ca: + Ubuntu
    resolute-20261024.1). Writing flat at 49.5-49.7 in all three. The merge-only build (a185402) was checked but not
    speed-tested. Next: the builds back to back to find which change costs reading.
+14. **ROCm 10.1.0** (Daniel 2026-10-30: latest; signed apt packages chosen over the tarball, which has no published
+   checksum; fork `fbfb29f`): AMD's Ubuntu 26.04 repo `stable.repo.amd.com/rocm/core/packages/ubuntu2604/`, key pinned
+   by sha256 (fingerprint D0F0 04A0 025A 1145 C780 7FCD 0701 EAC4 D5E0 2107), `amdrocm-core-dev10.1-gfx1151=10.1.0-3`
+   (49 packages, all 10.1.0-3). Rebuild 13 min; AMD clang 23 → **24**; hipBLASLt **1.4.1** (version 100401 as before);
+   `make test` passes. Images: runtime `b3780eb0…`, tests `a3c9f0bd…`. **marvin check (19:05) stopped at
+   `hip_prefill_hcd_exact_parity`: skipped (77).** The 100401 table loads, but 10.1's hipBLASLt numbers its solutions
+   differently from 7.14.1's build with the same version number: the table sends the hyper-connection down projection
+   (N 320, K 10240) to solution -1 (not in this library), so `STRATA_HCD_EXACT` declines and hipBLASLt runs it. The
+   GEMM smoke test matches hipBLASEx bit for bit (answers correct; solution ids not verified). The table's version check
+   cannot catch this. The fork has the tuner (`tools/hip/tune_hipblaslt.cpp`) to write a table for this library; the
+   HCD exact kernel itself reproduces 7.14.1's solutions 1176 / 1177 only.
