@@ -153,3 +153,5 @@ longer need to wait; marvin being free is the remaining condition.
     failed after the engine was ready; the first build series lost 5 of 6 runs. Fixed (2dc8d92). Same class as the
     earlier slips: an edit checked with `bash -n` but not run in its plain form. From now on each `fork.sh` change is
     run once without options before use.
+33. **Keep ROCm 10.1** (from the side-by-side series, plan 17): same reading and writing as 7.14.1, newest, signed and
+    pinned, check passes. The reading "drop" seen during the day was heat and run order, not the builds.

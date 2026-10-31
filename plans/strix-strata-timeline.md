@@ -94,4 +94,5 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 19:47-19:53 | 10.1 table shipped in the fork (+ docs, tuner in the tests image); images rebuilt | 8 min | fork 9223872 |
 | 19:53 | `fork.sh` check: GEMM test must show fallbacks=0; HCD skip on 10.1 is a note | | 25cceee |
 | 19:54:05 | marvin check, ROCm 10.1 + its table | **passed** (fallbacks=0, HCD skip noted, MMQ, 19 switches, 2+3 = 5) | results.txt |
-| 19:56 | Series rerun with the fixed script (A1 B C D F A2) | running | MLflow |
+| 19:55-20:17 | Series rerun with the fixed script (A1 B C D F A2) | A read 822.7 first, 808.5 last: heat, not builds; ROCm 10.1 = 7.14.1 | MLflow 1c00c9a8 … df74c6f7 |
+| 20:20 | Decision: keep ROCm 10.1; fork branch pushed | | fork 9223872 |

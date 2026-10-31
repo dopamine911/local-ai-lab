@@ -421,3 +421,21 @@ Decisions made while Daniel was away: `decisions.md`.
      only), so hipBLASLt itself runs that GEMM: no speed loss measured.
    - The slim image runs rocBLAS on that same shape fine (tuner baseline, 42 ms): the crash came from another
      fallback call, not from a missing kernel file; not reproduced in isolation.
+16. **ROCm 10.1 shipped with its own table** (fork `9223872`; images runtime `b0b96606…`, tests `326d8da2…`; the tests
+   image also carries `tune_hipblaslt`). `fork.sh check` (19:54) passed: GEMM test `fallbacks=0`, HCD exact skip
+   noted (expected), MMQ pass, 19 switches, 2+3 = 5.
+17. **Back-to-back series, all builds** (19:55-20:17, same test, medium, p16m; MLflow 1c00c9a8, 2215c772, 46f2c8cd,
+   d530cd8b, 6aa2cd2b, df74c6f7):
+   | Order | Build | 32K reading | writing (3 runs) | GPU W | peak C |
+   | --- | --- | ---: | --- | ---: | ---: |
+   | 1 | A 4149027 (PR #19, 7.14.1, base 0927) | 822.7 | 49.6 / 48.1 / 49.7 | 137 | 93 |
+   | 2 | B a185402 (+ main) | 817.0 | 49.5 / 48.1 / 49.7 | 136 | 94 |
+   | 3 | C 02c9904 (+ 3 fixes) | 809.8 | 50.1 / 48.8 / 49.6 | 135 | 95 |
+   | 4 | D cc2a9ca (+ Ubuntu 1024.1) | 813.7 | 49.7 / 48.5 / 49.7 | 135 | 95 |
+   | 5 | F 9223872 (+ ROCm 10.1 + its table) | 808.4 | 49.7 / 48.4 / 46.2 | 134 | 96 |
+   | 6 | A again | 808.5 | 49.4 / 48.1 / 49.5 | 135 | 95 |
+   The same image A read 822.7 first and 808.5 last: marvin warms over back-to-back runs (-1.7% in 20 min, GPU
+   93 → 96 C), and the third read of every set is the slowest. So **no build lost reading speed**; the earlier
+   821.6 → 811.4 → 786.8 was run order and heat (D read 786.8 at 18:32 and 813.7 here). **ROCm 10.1 = 7.14.1**
+   (808.4 vs 808.5 side by side; writing about 49.5 on both, one 46.2 outlier at 96 C). Decision: keep ROCm 10.1.
+   Method note: compare builds only side by side in one series, never against a run from another hour.
