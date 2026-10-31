@@ -105,3 +105,5 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | --- | --- | --- | --- |
 | 15:24 | (fan work, other session) marvin fan module installed read-only; 10 h baseline recorder started (fans auto) | | `plans/marvin-fan-timeline.md` |
 | 15:28 | Daniel: continue. Tool use x3 on the fork restarted (same three settings as upstream's medium series); its load feeds the fan recorder | running (~1 h) | MLflow |
+| 15:29-16:26 | Tool use x3 on the fork | common score **92.3** (upstream 94.0, llama.cpp 91.7); gap = TC-45 `tool_choice=required` not enforced (unconstrained sampling, by design) | MLflow 181dec1b, cc54669c, f91b3677 |
+| 16:26 | Fork stopped; llama-swap back (`big` online) | | |

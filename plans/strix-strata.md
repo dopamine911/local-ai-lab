@@ -439,3 +439,14 @@ Decisions made while Daniel was away: `decisions.md`.
    821.6 → 811.4 → 786.8 was run order and heat (D read 786.8 at 18:32 and 813.7 here). **ROCm 10.1 = 7.14.1**
    (808.4 vs 808.5 side by side; writing about 49.5 on both, one 46.2 outlier at 96 C). Decision: keep ROCm 10.1.
    Method note: compare builds only side by side in one series, never against a run from another hour.
+18. **Tool use x3 on the fork at medium** (2026-10-31 15:29-16:26, series `fork-strix-iq4xs-medium`, same three settings
+   as upstream's `strata-strix-iq4xs-medium`: temp 0 seed 42, temp 1.0 seeds 1 and 2; MLflow 181dec1b, cc54669c,
+   f91b3677): common score **92.3** (91-94; raw 93 / 90 / 90) vs upstream Strata **94.0** (93-96) and llama.cpp 91.7.
+   Attacker echo 0.3 (upstream 0, llama.cpp 1.0), made-up query 0.7 (upstream 0), looping 0. Points per run out of 136:
+   upstream 129 / 125 / 125, fork 126 / 123 / 122. **6 of the 8-point gap is one scenario, TC-45 `tool_choice=required`
+   compliance: upstream 2/2/2, fork 0/0/0.** The fork's front end does not constrain sampling (log: "a grammar was
+   requested; this engine does not constrain sampling, parsing only"), so `tool_choice: required` is not enforced and
+   the probe sees prose. Without TC-45: upstream 127 / 123 / 123, fork 126 / 123 / 122 of 134: the same. The rest is
+   scenario noise both ways (fork loses TC-40 4 points, wins TC-03 / TC-62 2 each). No engine errors in the run.
+   Open for Daniel: enforce `tool_choice: required` in the fork's front end (e.g. a retry when the reply has no tool
+   call) or leave it as the documented unconstrained design.
