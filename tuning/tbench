@@ -13,6 +13,7 @@
 #   MODEL=coder-2 ./tbench smoke "card 2"
 #   TARGET=marvin ./tbench smoke "flash-next"     (marvin's model, labelled as marvin)
 #   TARGET=marvin-strata ./tbench full "strata"   (Strata on marvin; start it first: marvin's strata-test.sh start)
+#   TARGET=marvin-fork ./tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
 #
 # With a skill (instruction file added to the agent's prompt; frontmatter stripped):
 #   SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"
@@ -33,6 +34,14 @@ if [ "${TARGET:-zaphod}" = marvin-strata ]; then
   MODEL="${MODEL:-qwen3.8-flash-next-unsloth-ud-iq4_xs}"; MODEL_NAME="${MODEL_NAME:-Qwen3.8-Flash-Next}"; QUANT="${QUANT:-UD-IQ4_XS}"
   PROFILE="${PROFILE:-strata0.2.7-mtp-128k-np2}"; PLATFORM=strixhalo; PLATFORM_NAME="marvin, Radeon 8060S (Strix Halo)"
   CONTEXT_LENGTH="${CONTEXT_LENGTH:-131072}"; ENDPOINT=http://marvin:8099/v1; ENGINE=strata; BACKEND=hip; BACKEND_VERSION=rocm-gfx1151
+  export MACHINE=marvin
+fi
+# TARGET=marvin-fork: our UnbiasedStrata gfx1151 build on marvin (plans/strix-strata.md Phase 3), started with
+# marvin's ~/homelab/marvin/strata-fork/fork.sh start (thinking level medium, Phase 1's p16m engine settings)
+if [ "${TARGET:-zaphod}" = marvin-fork ]; then
+  MODEL="${MODEL:-big-fork}"; MODEL_NAME="${MODEL_NAME:-Qwen3.8-Flash-Next}"; QUANT="${QUANT:-UD-IQ4_XS}"
+  PROFILE="${PROFILE:-unbiasedstrata-gfx1151-mtp-128k-np2-medium}"; PLATFORM=strixhalo; PLATFORM_NAME="marvin, Radeon 8060S (Strix Halo)"
+  CONTEXT_LENGTH="${CONTEXT_LENGTH:-131072}"; ENDPOINT=http://marvin:8099/v1; ENGINE=unbiasedstrata; BACKEND=hip; BACKEND_VERSION=rocm-10.1.0
   export MACHINE=marvin
 fi
 ENDPOINT="${ENDPOINT:-http://127.0.0.1:8080/v1}"; ENGINE="${ENGINE:-llama.cpp}"; BACKEND="${BACKEND:-vulkan}"
@@ -59,6 +68,7 @@ else
 fi
 key() {
   if [ "$ENGINE" = strata ]; then export TBENCH_API_KEY="$(ssh marvin cat strata-test/key)"   # made per Strata start
+  elif [ "$ENGINE" = unbiasedstrata ]; then export TBENCH_API_KEY="$(ssh marvin cat strata-fork/key)"   # fork.sh start
   else set -a; . ~/llama-swap/.env; set +a; export TBENCH_API_KEY="$ZAPHOD_KEY"; fi
 }
 
