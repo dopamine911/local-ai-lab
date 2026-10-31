@@ -96,4 +96,5 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 19:54:05 | marvin check, ROCm 10.1 + its table | **passed** (fallbacks=0, HCD skip noted, MMQ, 19 switches, 2+3 = 5) | results.txt |
 | 19:55-20:17 | Series rerun with the fixed script (A1 B C D F A2) | A read 822.7 first, 808.5 last: heat, not builds; ROCm 10.1 = 7.14.1 | MLflow 1c00c9a8 … df74c6f7 |
 | 20:20 | Decision: keep ROCm 10.1; fork branch pushed | | fork 9223872 |
-| 20:24 | Tool use x3 on the fork (series `fork-strix-iq4xs-medium`, same three settings as upstream's medium series) started | running (~1 h) | MLflow |
+| 20:19 | Tool use x3 on the fork (series `fork-strix-iq4xs-medium`, same three settings as upstream's medium series) started | | |
+| 20:29-20:30 | **Stopped** during run 1 (Daniel is testing a fan patch on marvin: no more runs); fork stopped, llama-swap back (`big` online) | no score; partial engine log on marvin | `~/strata-fork/engine-quality3-partial.log` |
