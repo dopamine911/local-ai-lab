@@ -448,5 +448,4 @@ Decisions made while Daniel was away: `decisions.md`.
    requested; this engine does not constrain sampling, parsing only"), so `tool_choice: required` is not enforced and
    the probe sees prose. Without TC-45: upstream 127 / 123 / 123, fork 126 / 123 / 122 of 134: the same. The rest is
    scenario noise both ways (fork loses TC-40 4 points, wins TC-03 / TC-62 2 each). No engine errors in the run.
-   Open for Daniel: enforce `tool_choice: required` in the fork's front end (e.g. a retry when the reply has no tool
-   call) or leave it as the documented unconstrained design.
+   Daniel (2026-10-31): stay true to the fork: TC-45 stays a known 0, no front-end change (decisions.md 34).

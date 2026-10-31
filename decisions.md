@@ -155,3 +155,8 @@ longer need to wait; marvin being free is the remaining condition.
     run once without options before use.
 33. **Keep ROCm 10.1** (from the side-by-side series, plan 17): same reading and writing as 7.14.1, newest, signed and
     pinned, check passes. The reading "drop" seen during the day was heat and run order, not the builds.
+34. **Stay true to the fork** (Daniel 2026-10-31: "lets stay true to the fork so we can push upstream"): no
+    `tool_choice: required` enforcement or other front-end additions of our own. The fork keeps its documented
+    unconstrained sampling; TC-45 stays a known 0 and is reported as such. Our changes stay limited to what upstream
+    would take: the gfx1151 container, the ROCm 10.1 table, upstream's own bug fixes. (Upstream submissions are still
+    on hold until proven with live sessions and stats, decision 7.)
