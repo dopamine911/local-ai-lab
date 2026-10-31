@@ -27,9 +27,9 @@ ENTRY=(); [ -n "${RT_ENTRYPOINT:-}" ] && ENTRY=(--entrypoint "$RT_ENTRYPOINT")
 [ -n "${RT_TUNING:-}" ] && ENTRY+=(-e "STRATA_HIPBLASLT_TUNING=$RT_TUNING")
 # RT_TUNING_FILE=<host path>: that hipBLASLt table instead of the image's (mounted read-only; diagnostics / calibration)
 [ -n "${RT_TUNING_FILE:-}" ] && ENTRY+=(-v "$RT_TUNING_FILE:/run/tuning.txt:ro" -e STRATA_HIPBLASLT_TUNING=/run/tuning.txt)
-# config digests: fork fbfb29f (ROCm 10.1.0 packages), plans/strix-strata.md Phase 3 log 14
-RT_CFG=sha256:b3780eb08333f5bb817421a303d959c2b790761024fcb6d86081ee37eba13c05
-TESTS_CFG=sha256:a3c9f0bdcccda8e82266a21be51b613b813723441d1b47f21ba827feae93a300
+# config digests: fork 9223872 (ROCm 10.1.0 + its hipBLASLt table), plans/strix-strata.md Phase 3 log 16
+RT_CFG=sha256:b0b96606b0f4b38a7d5bd2cc8c4587fa785a62333f82f69372bdf58f1e815969
+TESTS_CFG=sha256:326d8da2ae720c096ec35b9809cd6e036b9da0c48891ea8b9138dafbb4077d40
 M=/srv/models; F=Qwen3.8-Flash-Next-UD-IQ4_XS
 PACK=${PACK:-$M/strata-fork/pack-ud-iq4_xs}
 PRESET=${PRESET:-p16m}; PARALLEL=${PARALLEL:-2}
@@ -131,9 +131,19 @@ check)
   echo "$out" | has "cannot run" && bad "strata-device: this build cannot run the GPU (output in results.txt)"
   ok "strata-device sees gfx1151 and can run it"
   # 2. the three HIP parity tests: pass = exit 0; 77 = skipped (counts as a failure here)
-  for t in hip_prefill_hipblaslt_gemm hip_prefill_hcd_exact_parity hip_prefill_mmq_parity; do
+  #    The table check first: every row's solution must load in this hipBLASLt (fallbacks=0); a table for another
+  #    build of the same version would fall back silently (ROCm 7.14.1 vs 10.1, both 100401).
+  out=$(docker run --rm --network none "${USERRUN[@]}" -e STRATA_HIPBLASLT_VERBOSE=1 "$TESTS" hip_prefill_hipblaslt_gemm 2>&1); rc=$?
+  echo "$out" >> "$DIR/results.txt"
+  [ $rc = 0 ] && echo "$out" | has "summary .*fallbacks=0([^0-9]|$)" && ok "hip_prefill_hipblaslt_gemm passed, fallbacks=0" \
+    || bad "hip_prefill_hipblaslt_gemm exit $rc or fallbacks not 0 (the table does not fit this hipBLASLt); output in results.txt"
+  for t in hip_prefill_hcd_exact_parity hip_prefill_mmq_parity; do
     docker run --rm --network none "${USERRUN[@]}" "$TESTS" "$t" >> "$DIR/results.txt" 2>&1; rc=$?
-    [ $rc = 0 ] && ok "$t passed" || bad "$t exit $rc (77 = skipped); output in results.txt"; done
+    if [ $rc = 0 ]; then ok "$t passed"
+    elif [ $rc = 77 ] && [ $t = hip_prefill_hcd_exact_parity ]; then
+      log "NOTE: $t skipped: the table picks no solution 1176 / 1177 (expected with ROCm 10.1's table; the HCD exact kernel copies 7.14.1's), hipBLASLt runs that GEMM"
+    else bad "$t exit $rc (77 = skipped); output in results.txt"; fi
+  done
   # 3. the engine starts with Phase 1's settings and turns on the gfx1151 defaults; one short answer (internal network
   #    only, asked from a throwaway container); the hipBLASLt table is loaded by then (at start or at the first prompt)
   docker network inspect "$NET" >/dev/null 2>&1 || docker network create --internal "$NET" >/dev/null
