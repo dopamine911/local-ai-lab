@@ -20,7 +20,11 @@
 set -uo pipefail
 # marvin only (stop/start run marvin's llama-swap compose); `args` is a dry run and works anywhere the images are
 [ "${1:-}" = args ] || [ "$(hostname)" = marvin ] || { echo "run this on marvin (this is $(hostname))"; exit 1; }
-RT=unbiased-strata:gfx1151; TESTS=unbiased-strata-tests:gfx1151; RELAY_IMG=python:3.13-slim-trixie
+RT=${RT_IMAGE:-unbiased-strata:gfx1151}; TESTS=unbiased-strata-tests:gfx1151;
+# Diagnostics only (plan 5b.5): RT_IMAGE=unbiased-strata-build:gfx1151 RT_ENTRYPOINT=/src/build/bin/unbiased-strata
+# RT_TUNING=/src/tools/hip/gfx1151-hipblaslt-100401.txt runs the full-ROCm build image instead (digest not checked).
+ENTRY=(); [ -n "${RT_ENTRYPOINT:-}" ] && ENTRY=(--entrypoint "$RT_ENTRYPOINT")
+[ -n "${RT_TUNING:-}" ] && ENTRY+=(-e "STRATA_HIPBLASLT_TUNING=$RT_TUNING") RELAY_IMG=python:3.13-slim-trixie
 # config digests: fork fbfb29f (ROCm 10.1.0 packages), plans/strix-strata.md Phase 3 log 14
 RT_CFG=sha256:b3780eb08333f5bb817421a303d959c2b790761024fcb6d86081ee37eba13c05
 TESTS_CFG=sha256:a3c9f0bdcccda8e82266a21be51b613b813723441d1b47f21ba827feae93a300
@@ -48,7 +52,9 @@ DATA=(-v "$PACK:/pack:ro" -v strata-data:/sd:ro)
 preflight() {
   [ "$(hostname)" = marvin ] || bad "run this on marvin"
   docker ps --format '{{.Names}}' | has -x strata && bad "upstream Strata is running: ~/strata-test/strata-test.sh stop first"
-  for i in "$RT $RT_CFG" "$TESTS $TESTS_CFG"; do set -- $i
+  [ -n "${RT_IMAGE:-}" ] && log "DIAGNOSTIC: engine image $RT_IMAGE (digest not checked)"
+  CHK=("$TESTS $TESTS_CFG"); [ -z "${RT_IMAGE:-}" ] && CHK=("$RT $RT_CFG" "${CHK[@]}")
+  for i in "${CHK[@]}"; do set -- $i
     docker image inspect "$1" --format '{{.Id}} {{json .Descriptor}}' 2>/dev/null | has "$2" \
       && ok "image $1 is the one built on zaphod ($2)" || bad "image $1 missing or not $2 (load it from zaphod)"; done
   [ -f "$PACK/native_experts.txt" ] && [ -f "$PACK/expert-profile.bin" ] || bad "no finished pack with expert-profile.bin in $PACK"
@@ -96,7 +102,7 @@ engine_start() {  # $1 = network; the engine in the background as $NAME
   log "engine arguments: ${EA[*]}"
   docker rm -f "$NAME" >/dev/null 2>&1
   docker run -d --name "$NAME" --network "$1" --restart no --stop-timeout 120 "${USERRUN[@]}" "${MODELS[@]}" "${DATA[@]}" \
-    ${KEYF_MOUNT[@]+"${KEYF_MOUNT[@]}"} "$RT" --engine strata -m "/models/$F-00001-of-00003.gguf" \
+    ${KEYF_MOUNT[@]+"${KEYF_MOUNT[@]}"} ${ENTRY[@]+"${ENTRY[@]}"} "$RT" --engine strata -m "/models/$F-00001-of-00003.gguf" \
     --host 0.0.0.0 --port 8080 --alias big-fork ${FRONT[@]+"${FRONT[@]}"} -- "${EA[@]}" >/dev/null || bad "docker run failed"
   t0=$(date +%s)
   for i in $(seq 1 360); do   # up to 1 hour
