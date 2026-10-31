@@ -408,3 +408,16 @@ Decisions made while Daniel was away: `decisions.md`.
    GEMM smoke test matches hipBLASEx bit for bit (answers correct; solution ids not verified). The table's version check
    cannot catch this. The fork has the tuner (`tools/hip/tune_hipblaslt.cpp`) to write a table for this library; the
    HCD exact kernel itself reproduces 7.14.1's solutions 1176 / 1177 only.
+15. **ROCm 10.1 needs its own hipBLASLt table** (Daniel: marvin for the night, keep to the repo goals):
+   - 19:13, slim 10.1 image, old table: short answers fine (49.6), but the 32K read **crashed** (`rocBLAS error ...
+     hipErrorInvalidKernelFile` → `cublasGemmEx status 6` → engine exit) after the table sent the HC down projection
+     to solution -1 (hipBLAS fallback).
+   - 19:21, full 10.1 build image (`fork.sh` diagnostic `RT_IMAGE`), old table: no crash, but reading **356 tok/s**
+     (writing 49.6): the mismatched table sends the prompt GEMMs to slow fallbacks.
+   - 19:28, `tools/hip/tune_hipblaslt` (built from the 10.1 tree) on marvin with the 90 cases of the 100401 table,
+     `--workspace-mib 32`: 156 s, new 90-row table (e.g. 1177 → 1254).
+   - 19:32, full image + new table: reading **818.5**, writing 49.6. 19:37, slim image + new table: reading **818.9**,
+     writing 49.3, no crash. `HCD_EXACT` still declines (the table picks 1253; the kernel copies 7.14.1's 1176/1177
+     only), so hipBLASLt itself runs that GEMM: no speed loss measured.
+   - The slim image runs rocBLAS on that same shape fine (tuner baseline, 42 ms): the crash came from another
+     fallback call, not from a missing kernel file; not reproduced in isolation.

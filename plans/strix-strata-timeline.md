@@ -82,3 +82,11 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:50-19:04 | ROCm 10.1 rebuild; `make test` | 13 min; pass; clang 24, hipBLASLt 1.4.1 | fork fbfb29f |
 | 19:05:44 | marvin check on ROCm 10.1 | **stopped**: HCD exact test skipped: 10.1's hipBLASLt numbers solutions differently (same version 100401); table entry → -1 | results.txt |
 | 19:05:58 | llama-swap back (`big` online) | | results.txt |
+| 19:13 | Speed test, ROCm 10.1 slim image, old table | writing 49.6; **32K read crashed** (rocBLAS fallback error, engine exit) | engine log in this file's plan entry 15 |
+| 19:16-19:20 | Full 10.1 build image copied to marvin (12 GB, 231 s); `fork.sh` diagnostic option | | 142791e |
+| 19:21 | Speed test, full 10.1 image, old table | no crash; reading **356**, writing 49.6 | not logged (diagnostic) |
+| 19:28-19:30 | `tune_hipblaslt` for ROCm 10.1 on marvin (90 cases) | 156 s; new table | `~/strata-fork/tune101/` on marvin |
+| 19:32 | Speed test, full image + new table | reading **818.5**, writing 49.6 | not logged (diagnostic) |
+| 19:35 | Tuner baseline in the slim image on the crash shape | rocBLAS works there (42 ms) | |
+| 19:37 | Speed test, slim 10.1 image + new table | reading **818.9**, writing 49.3, no crash | not logged (diagnostic) |
+| 19:41 | Back-to-back series of all six builds started (A1 B C D E A2) | running | MLflow |
