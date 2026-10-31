@@ -55,7 +55,8 @@ check() {
 prepare() {
   root; board_check
   [ -t 0 ] || { echo "prepare is interactive (mokutil asks for a password): run it in your own ssh session"; exit 1; }
-  apt-get update -q && apt-get install -y -q dkms openssl build-essential "linux-headers-$(uname -r)"
+  # shim-signed provides update-secureboot-policy: without it dkms neither makes the key nor signs (tested in a container)
+  apt-get update -q && apt-get install -y -q dkms openssl build-essential shim-signed "linux-headers-$(uname -r)"
   dpkg -s dkms build-essential | awk '/^(Package|Version)/{printf "%s ", $2} END{print ""}'
   if [ ! -e $MOK_CERT ]; then dkms generate_mok; fi
   [ -e $MOK_KEY ] && [ -e $MOK_CERT ] || { echo "MOK key missing after dkms generate_mok"; exit 1; }
