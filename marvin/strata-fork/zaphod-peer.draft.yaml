@@ -1,4 +1,5 @@
-# DRAFT, not in use. Lets zaphod's llama-swap (and so Open WebUI and agents) reach the fork on marvin as `big-fork`,
+# LIVE since 2026-10-31 20:27: the block below is in zaphod/llama-swap/config/config.yaml; the model shows as
+# `marvin-fork/big-fork` (llama-swap adds the peer name). Kept as the how-to. Lets zaphod's llama-swap (and so Open WebUI and agents) reach the fork on marvin as `big-fork`,
 # for the live-session test (plans/strix-strata.md: upstream only after live sessions and plenty of stats).
 # Only while `./fork.sh start` runs on marvin; then llama-swap on marvin is stopped and `marvin/big` is offline.
 #

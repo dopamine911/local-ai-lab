@@ -115,3 +115,8 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 19:57 | Auto-log to MLflow picked the wrong summary (upstream's) | wrong run d5abbd02 | `~/tbench-fork-2026-10-31.log` |
 | 19:58 | `fork.sh stop`: fork and relay stopped, llama-swap started | `big` back; test request answered | |
 | 19:59-20:00 | `tbench` fixed (pick result by model id + profile); fork result re-logged; image tags corrected; d5abbd02 soft-deleted | MLflow 1c4aa4b7 | decisions.md 35 |
+| ~20:25 | Daniel: go ahead with live sessions | | |
+| 20:25-20:26 | `fork.sh start` on marvin (medium); llama-swap on marvin stopped | ready in 61 s; API OK; internet blocked | |
+| 20:26 | MARVIN_FORK_KEY into zaphod `.env` (from marvin, not printed); zaphod llama-swap recreated | key present in container | |
+| 20:27 | Peer `marvin-fork` added to zaphod config | listed as `marvin-fork/big-fork`. Side effect: the hot reload ran during the restart's preload; `coder` failed to bind port 5801 | decisions.md 36 |
+| 20:27-20:28 | `coder` loaded with one request; all 7 zaphod models ready; fork answered through zaphod (391) and shows in Open WebUI | live | |

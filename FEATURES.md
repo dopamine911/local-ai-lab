@@ -31,6 +31,7 @@ not here.
 | Speech-to-text `stt` (Qwen3-ASR), `stt-whisper` (99 languages); text-to-speech `tts` (Kokoro), `tts-qwen` | working | [zaphod/llama-swap/config/](zaphod/llama-swap/config/) |
 | marvin's llama-swap: `big` = Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3 (24.7 → 39.6 tok/s) | working | [marvin/llama-swap/config/config.yaml](marvin/llama-swap/config/config.yaml), [marvin/SETUP.md](marvin/SETUP.md) |
 | marvin linked to zaphod as a peer: appears everywhere as `marvin/big` | working | [README.md](README.md) |
+| Live test of our UnbiasedStrata fork on marvin: appears as `marvin-fork/big-fork` while `fork.sh start` runs (`marvin/big` offline then) | testing (from 2026-10-31) | [plans/strix-strata.md](plans/strix-strata.md) |
 | The slow-card fix (Resizable BAR off → `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1`, 3-10x faster) | working | [tuning/results.md](tuning/results.md) "The slow-card fix" |
 
 ## 3. Web services on zaphod (the hub)

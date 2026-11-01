@@ -166,3 +166,8 @@ longer need to wait; marvin being free is the remaining condition.
     Re-logged as 1c4aa4b7; set its env.image tags to the fork image (the machine record reads llama-swap's stopped
     container, which is wrong for fork and upstream-Strata runs; not changed here). d5abbd02 marked WRONG in its note
     and soft-deleted (restore in MLflow if wanted). Lesson: after every auto-log, check the logged profile matches.
+36. **Live sessions on the fork** (Daniel 2026-10-31: go ahead). Model name is `marvin-fork/big-fork`, not
+    `big-fork` as the draft said: llama-swap prefixes the peer name. Slip of mine: I edited config.yaml while the
+    recreated llama-swap was still preloading; the hot reload started a second preload and `coder` lost its port
+    (5801). Fixed by loading `coder` with one request; nothing else affected. Lesson: after `docker compose up -d`,
+    wait until /running shows every preload ready before editing config.yaml.

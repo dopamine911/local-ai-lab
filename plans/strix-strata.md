@@ -460,3 +460,11 @@ Decisions made while Daniel was away: `decisions.md`.
    MLflow log (d5abbd02) held upstream's 17/19 under the fork's note. Fixed `tbench` (match model id + profile),
    re-logged as 1c4aa4b7 with the image tags set to the fork's image, and soft-deleted d5abbd02 (restorable;
    decisions.md 35). Fork stopped 19:58; `big` back and answering.
+20. **Live sessions on the fork started** (2026-10-31 20:25, Daniel: "go ahead and make the changes and start").
+   marvin: `fork.sh start` (medium, p16m settings, sealed; ready in 61 s; no internet from inside); `marvin/big` is
+   offline while it runs. zaphod: MARVIN_FORK_KEY in `.env` (mode 600; never printed), llama-swap recreated, peer
+   `marvin-fork` added. The model appears as **`marvin-fork/big-fork`** (llama-swap adds the peer name) on zaphod's
+   API, the public URL and Open WebUI; test answer correct (17x23 = 391). To do (Daniel): copy the key into Proton
+   Pass (`ssh marvin cat strata-fork/key`). Caveats: the fork runs with `--restart no`, so after a marvin reboot
+   nothing serves until `fork.sh start` or `fork.sh stop` is run; agents and people set to `marvin/big` get errors
+   until they switch to `marvin-fork/big-fork`. Stats to collect: errors, speed in real use, Daniel's impressions.
