@@ -74,9 +74,16 @@ key() {
 
 log_latest() {
   local note="$1" f
-  f=$(find "$DIR/results/suites" -path "*$PLATFORM*" -name summary.json -printf '%T@ %p\n' 2>/dev/null \
-      | sort -n | tail -1 | cut -d' ' -f2-)
-  [ -n "$f" ] || { echo "No finished $PLATFORM result found yet."; exit 1; }
+  # The suite rewrites every summary.json when a run ends, so file times can't tell which run this was:
+  # pick the summary whose model id and profile are this run's.
+  f=$(find "$DIR/results/suites" -path "*$PLATFORM*" -name summary.json 2>/dev/null \
+      | python3 -I -c 'import json,sys
+m,p=sys.argv[1:]
+for f in sys.stdin.read().split():
+    d=json.load(open(f))
+    if d["model"]["id"]==m and d["inference_profile"]==p: print(f)' "$MODEL" "$PROFILE")
+  [ -n "$f" ] || { echo "No finished $PLATFORM result for $MODEL / $PROFILE found yet."; exit 1; }
+  [ "$(printf '%s\n' "$f" | wc -l)" = 1 ] || { echo "More than one result for $MODEL / $PROFILE:"; echo "$f"; exit 1; }
   echo "== logging $f"
   ./log "${MACHINE:-zaphod}" "$MODEL" "$note" "$f"
 }
