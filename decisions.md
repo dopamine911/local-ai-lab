@@ -160,3 +160,9 @@ longer need to wait; marvin being free is the remaining condition.
     unconstrained sampling; TC-45 stays a known 0 and is reported as such. Our changes stay limited to what upstream
     would take: the gfx1151 container, the ROCm 10.1 table, upstream's own bug fixes. (Upstream submissions are still
     on hold until proven with live sessions and stats, decision 7.)
+35. **Bug of mine (2026-10-31): `tbench` logged the wrong result.** It chose the newest summary.json by file time,
+    but the suite rewrites every summary at the end of a run, so the fork's run was logged with upstream's 17/19
+    (MLflow d5abbd02). Fix: pick the summary whose model id and profile match the run, refuse if none or several.
+    Re-logged as 1c4aa4b7; set its env.image tags to the fork image (the machine record reads llama-swap's stopped
+    container, which is wrong for fork and upstream-Strata runs; not changed here). d5abbd02 marked WRONG in its note
+    and soft-deleted (restore in MLflow if wanted). Lesson: after every auto-log, check the logged profile matches.

@@ -449,3 +449,14 @@ Decisions made while Daniel was away: `decisions.md`.
    the probe sees prose. Without TC-45: upstream 127 / 123 / 123, fork 126 / 123 / 122 of 134: the same. The rest is
    scenario noise both ways (fork loses TC-40 4 points, wins TC-03 / TC-62 2 each). No engine errors in the run.
    Daniel (2026-10-31): stay true to the fork: TC-45 stays a known 0, no front-end change (decisions.md 34).
+19. **Terminal-Bench full (Core-19) on the fork at medium** (2026-10-31 16:37-19:54, Daniel: "you can launch"; image
+   F 9223872, ROCm 10.1 + its table, p16m settings, sealed; MLflow 1c4aa4b7): **19/19, all on the first attempt, in
+   3.29 h**. Same settings, upstream Strata 0.2.7: 17/19 in 4.39 h (openssl-selfsigned-cert and extract-elf failed
+   both attempts; both passed on the fork). llama.cpp `big`: 19/19 in 5.5 h, but that ran in BIOS Quiet mode, so its
+   time doesn't compare. Tokens: fork 2.26 M in / 213 K out; upstream 2.73 M / 355 K. Caveat: one run each, and
+   Terminal-Bench varies; two tasks' difference is a hint, not proof. The fork's answer-changing switches are off, so
+   the accuracy cost we feared from leaving them off didn't show here.
+   Logging slip: `tbench` picked the newest summary.json, but the suite rewrites all of them at the end, so the first
+   MLflow log (d5abbd02) held upstream's 17/19 under the fork's note. Fixed `tbench` (match model id + profile),
+   re-logged as 1c4aa4b7 with the image tags set to the fork's image, and soft-deleted d5abbd02 (restorable;
+   decisions.md 35). Fork stopped 19:58; `big` back and answering.
