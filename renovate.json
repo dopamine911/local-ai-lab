@@ -158,6 +158,14 @@
       "prBodyNotes": [
         "Manual part: bun needs the new sha256 in agents/enso/Dockerfile; Enso: check its supported pi range and run `lab enso check`; ec module: marvin/fan/ec-module.sh install and `check` (reboot not needed, measure fans)."
       ]
+    },
+    {
+      "matchPackageNames": [
+        "mcp-proxy"
+      ],
+      "prBodyNotes": [
+        "Check: rebuild hub/memory/mcp-localrecall.Dockerfile, update its image tag in hub/compose.yaml (\u2026-proxyX.Y.Z), then a `memory` search through MCPJungle and `lab enso check` (36 tools). 0.13.3 added a Host-header check (`--allowed-host`)."
+      ]
     }
   ],
   "postUpdateOptions": [

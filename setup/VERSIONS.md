@@ -28,7 +28,7 @@ Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBU
 | Caddy | hub/caddy/Dockerfile | 2.11.7 (latest; digest added: Docker republished the tag, takes effect at the next Caddy rebuild) | every `*.ai.<domain>` page |
 | ComfyUI | hub/comfyui/Dockerfile | v0.43.0 (latest); Python base pinned 3.13.18 at next build | image mode |
 | LocalRecall + Postgres | hub/compose.yaml | v0.6.6 (latest) | `memory` search |
-| LocalRecall MCP / mcp-proxy | hub/memory/mcp-localrecall.Dockerfile | mcps v0.0.4, mcp-proxy 0.13.0 (latest); Python 3.12.16 | same |
+| LocalRecall MCP / mcp-proxy | hub/memory/mcp-localrecall.Dockerfile | mcps v0.0.4, mcp-proxy 0.13.3 (Renovate #25, 2026-11-02; needs `--allowed-host mcp-localrecall:8080` since 0.13.3); Python 3.12.16 | `memory` search through MCPJungle |
 | Mnemosyne | hub/memory/mnemosyne.Dockerfile | 4.0.0 (latest); Python 3.12.16 | `recall` finds the REBUILD rule |
 | Python (relays, sync, stats, webui drift) | compose files, hub/openwebui/drift.sh, cli/internal/webui | 3.13.18-slim-trixie, 3.12.16-slim (were floating `3.13-slim-trixie` / a bare digest) | containers up |
 | Enso image | agents/enso/Dockerfile | Ubuntu resolute-20261024.1, snapshot 2026-10-30, bun 1.4.4 (from 1.4.0), Enso 537559a, pi 1.1.0 | `agents/enso/enso.sh check` |

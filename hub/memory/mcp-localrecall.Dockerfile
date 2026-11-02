@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir mcp-proxy==0.13.3
 COPY --from=lrmcp /app/main /usr/local/bin/localrecall-mcp
 USER 65534:65534
 # --pass-environment: the LOCALRECALL_* variables reach the stdio server
-ENTRYPOINT ["mcp-proxy", "--host", "0.0.0.0", "--port", "8080", "--pass-environment", "--", "/usr/local/bin/localrecall-mcp"]
+# mcp-proxy 0.13.3 checks the Host header (DNS-rebinding protection): allow only the name MCPJungle uses on the
+# Docker network (found 2026-11-02 after the Renovate bump: "Invalid Host header: mcp-localrecall:8080").
+ENTRYPOINT ["mcp-proxy", "--host", "0.0.0.0", "--port", "8080", "--allowed-host", "mcp-localrecall:8080", "--pass-environment", "--", "/usr/local/bin/localrecall-mcp"]
