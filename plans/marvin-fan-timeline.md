@@ -55,7 +55,8 @@ Baseline, busy samples (>=90%) by GPU temperature:
 | 09:52 | Cooled to EC 40 / GPU 39 C (close to A's start) | — | — |
 | 09:53 | Daniel: `sudo curve.sh apply` | all 3 fans mode curve, level 0 at EC 38 C; under load they stepped 0 -> 3 -> 4 within 40 s | — |
 | 09:54-10:17 | **B, curve** (up 50,58,65,72,78): same 4 runs | see table | MLflow "fan test B curve 78C run 1-4" |
-| — | Decision: **keep** (Daniel to confirm with `sudo curve.sh boot on`) | GPU **9-10 C cooler**, clock +2%, reading +1%, same watts | — |
+| — | Decision: **keep** | GPU **9-10 C cooler**, clock +2%, reading +1%, same watts | — |
+| ~10:25 | Daniel: `sudo curve.sh boot on` | unit marvin-fan-curve enabled, `active`: the curve is re-applied at every boot | setup/REBUILD.md marvin step 5 |
 
 Result, busy samples (>=90%), 265 each:
 
