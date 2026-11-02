@@ -5,7 +5,8 @@
 // compares the two settings tables. Go does the orchestration; the comparison is the script's Python, unchanged and
 // run in a pinned Python image, because its output (Python's JSON formatting) is the output to match.
 // Secrets are never printed: settings whose name holds key/secret/token/password show as <set>.
-// The --sync half of drift.sh (changes the live database) stays in the script until step 3 (hub operations).
+// --sync (step 3): makes the running Open WebUI match compose.yaml for the settings it manages (managed-keys.txt):
+// stops Open WebUI for a few seconds and saves a copy of its database first (data/open-webui/webui.db.before-sync-<date>).
 package webui
 
 import (
@@ -22,7 +23,7 @@ import (
 // Python image for the comparison: the one compose already pins (drift.sh used the floating 3.13-slim-trixie tag).
 const PyImage = "python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5"
 
-// compare: drift.sh's Python, read-only part (SYNC branch removed), word for word otherwise.
+// compare: drift.sh's Python, word for word (its SYNC branch runs only with SYNC=yes).
 const compare = `import json, os, re, shutil, sqlite3
 def load(p):
     c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)
@@ -45,6 +46,15 @@ diff = sorted(k for k in set(live) | set(fresh) if norm(live.get(k)) != norm(fre
 print(f"{len(diff)} setting(s) differ between the running Open WebUI and compose.yaml")
 for k in diff:
     print(f"  {'in compose   ' if k in managed else 'web page only'}  {k}\n      running: {show(k, live.get(k))}\n      compose: {show(k, fresh.get(k))}")
+if os.environ["SYNC"] == "yes":
+    todo = [k for k in diff if k in managed]
+    if todo:
+        shutil.copy2("/live/webui.db", f"/live/webui.db.before-sync-{os.environ['STAMP']}")
+        c = sqlite3.connect("/live/webui.db")
+        for k in todo:
+            c.execute("update config set value = ? where key = ?", (json.dumps(fresh[k]), k))
+        c.commit(); c.close()
+    print(f"== synced {len(todo)} managed setting(s); 'web page only' ones were left alone")
 `
 
 func docker(args ...string) (string, error) {
@@ -52,8 +62,9 @@ func docker(args ...string) (string, error) {
 	return string(b), err
 }
 
-// Drift prints the differences; repo is the lab repo (hub/ inside it).
-func Drift(repo string) error {
+// Drift prints the differences; repo is the lab repo (hub/ inside it). sync: also make the running one match
+// (managed settings only); dryRun: say what would happen.
+func Drift(repo string, sync, dryRun bool) error {
 	hub := filepath.Join(repo, "hub")
 	cfgCmd := exec.Command("docker", "compose", "config", "--format", "json")
 	cfgCmd.Dir = hub
@@ -97,6 +108,14 @@ func Drift(repo string) error {
 		return err
 	}
 
+	if dryRun {
+		fmt.Printf("would: start a throwaway %s (no network) from compose's environment, compare its settings with the running one", svc.Image)
+		if sync {
+			fmt.Print("; then stop open-webui, copy webui.db to webui.db.before-sync-<date>, write the differing managed settings, start open-webui")
+		}
+		fmt.Println()
+		return nil
+	}
 	fmt.Printf("== building a fresh Open WebUI from compose.yaml (%s, no network, about a minute)\n", svc.Image)
 	if out, err := docker("volume", "create", vol); err != nil {
 		return fmt.Errorf("volume: %v %s", err, out)
@@ -123,8 +142,30 @@ func Drift(repo string) error {
 	time.Sleep(5 * time.Second)
 	docker("stop", vol)
 
-	c := exec.Command("docker", "run", "--rm", "-i", "--network", "none",
-		"-v", filepath.Join(hub, "data", "open-webui")+":/live:ro", "-v", vol+":/fresh:ro",
+	syncEnv, live := "no", ":/live:ro"
+	if sync {
+		syncEnv, live = "yes", ":/live" // the script's mount: writable for the update
+		fmt.Println("== stopping open-webui")
+		stop := exec.Command("docker", "compose", "stop", "open-webui")
+		stop.Dir = hub
+		stop.Stderr = os.Stderr // compose's progress lines, as the script shows them
+		if err := stop.Run(); err != nil {
+			return fmt.Errorf("stop open-webui: %v", err)
+		}
+		defer func() {
+			start := exec.Command("docker", "compose", "start", "open-webui")
+			start.Dir = hub
+			start.Stderr = os.Stderr
+			if err := start.Run(); err == nil {
+				fmt.Println("== open-webui started")
+			} else {
+				fmt.Printf("== open-webui did NOT start: %v (cd hub && docker compose start open-webui)\n", err)
+			}
+		}()
+	}
+	c := exec.Command("docker", "run", "--rm", "-i", "--network", "none", "-e", "SYNC="+syncEnv,
+		"-e", "STAMP="+time.Now().Format("2006-01-02-1504"),
+		"-v", filepath.Join(hub, "data", "open-webui")+live, "-v", vol+":/fresh:ro",
 		"-v", filepath.Join(hub, "openwebui", "managed-keys.txt")+":/managed.txt:ro",
 		PyImage, "python3", "-")
 	c.Stdin = strings.NewReader(compare)

@@ -14,17 +14,21 @@ type Machine struct {
 	SSH                string `yaml:"ssh"`
 	LlamaSwapPort      int    `yaml:"llama_swap_port"`
 	LlamaSwapContainer string `yaml:"llama_swap_container"`
+	LlamaSwapEnv       string `yaml:"llama_swap_env"`
+	ImageCardPCI       string `yaml:"image_card_pci"`
 }
 
 type Config struct {
 	Repo      string             `yaml:"-"`
 	Machines  map[string]Machine `yaml:"machines"`
 	MCPJungle struct {
+		Version  string `yaml:"version"`
 		Bin      string `yaml:"bin"`
 		Registry string `yaml:"registry"`
 	} `yaml:"mcpjungle"`
 	Enso struct {
 		Container string `yaml:"container"`
+		Image     string `yaml:"image"`
 	} `yaml:"enso"`
 }
 

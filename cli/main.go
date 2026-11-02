@@ -11,11 +11,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
 	"github.com/dopamine911/local-ai-lab/cli/internal/config"
 	"github.com/dopamine911/local-ai-lab/cli/internal/enso"
+	"github.com/dopamine911/local-ai-lab/cli/internal/hub"
 	"github.com/dopamine911/local-ai-lab/cli/internal/mcp"
 	"github.com/dopamine911/local-ai-lab/cli/internal/webui"
 	"github.com/dopamine911/local-ai-lab/cli/internal/manifest"
@@ -52,7 +54,7 @@ func main() {
 			return cmd.Execute()
 		},
 	}
-	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd())
+	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -149,6 +151,27 @@ func mcpCmd() *cobra.Command {
 			return nil
 		},
 	}
+	var dry bool
+	setup := &cobra.Command{
+		Use:   "setup",
+		Short: "Register tool servers and agent logins from hub/mcp (port of hub/mcp/setup.sh); --dry-run",
+		Long: "Install the pinned mcpjungle CLI (checksum checked), create the admin once, register every tool server in\n" +
+			"hub/mcp/servers/*.json, keep only the tools in <name>.tools, and recreate every agent login in\n" +
+			"hub/mcp/clients/*.json (tokens from hub/.env, never printed). Safe to run again; agents lose their login for\n" +
+			"a few seconds while it is recreated.\n" +
+			"Good result: a line per tool server and per client, no FAILED; then `lab mcp status` says \"Matches the repo\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			s := &mcp.Setup{Bin: config.Expand(cfg.MCPJungle.Bin), Registry: cfg.MCPJungle.Registry,
+				Version: cfg.MCPJungle.Version, Repo: cfg.Repo, DryRun: dry}
+			return s.Run()
+		},
+	}
+	setup.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+	m.AddCommand(setup)
 	st.Flags().BoolVar(&asJSON, "json", false, "one JSON object (for agents)")
 	st.Flags().BoolVar(&tools, "tools", false, "list every tool, on and off")
 	m.AddCommand(st)
@@ -156,7 +179,60 @@ func mcpCmd() *cobra.Command {
 }
 
 func ensoCmd() *cobra.Command {
-	e := &cobra.Command{Use: "enso", Short: "The Enso agent container: check"}
+	e := &cobra.Command{Use: "enso", Short: "The Enso agent container: build, setup, up, check, tui, shell, down"}
+	var dry bool
+	ops := func() (*enso.Ops, error) {
+		cfg, err := config.Load()
+		if err != nil {
+			return nil, err
+		}
+		o := &enso.Ops{Repo: cfg.Repo, Image: cfg.Enso.Image, Container: cfg.Enso.Container, DryRun: dry}
+		if o.Container == "" {
+			o.Container = "enso"
+		}
+		if o.Image == "" {
+			o.Image = "enso-agent:537559a"
+		}
+		return o, nil
+	}
+	sub := func(use, short, long string, f func(o *enso.Ops, args []string) error) {
+		c := &cobra.Command{Use: use, Short: short, Long: long,
+			RunE: func(cmd *cobra.Command, args []string) error {
+				o, err := ops()
+				if err != nil {
+					return err
+				}
+				return f(o, args)
+			}}
+		c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+		e.AddCommand(c)
+	}
+	sub("build", "Build the Enso image (network at build time only)", "Good result: the image tag from cli/lab.yaml exists (docker images).",
+		func(o *enso.Ops, _ []string) error { return o.Build() })
+	sub("setup", "Make ~/agents/enso-home (keys, pi config) and ~/agents/work (enso-harness clone); safe to rerun",
+		"Keys are copied (mode 600, never printed); configs are overwritten from the repo.\nGood result: \"setup done: ... (keys: mcp-token zaphod-key ), ... at <commit>\".",
+		func(o *enso.Ops, _ []string) error { return o.Setup() })
+	sub("up", "Start Enso and the relay; web page on http://localhost:5178 (zaphod only)", "Good result: \"Enso: http://localhost:5178\".",
+		func(o *enso.Ops, _ []string) error { return o.Up() })
+	sub("down", "Stop Enso and the relay", "Good result: both containers gone (docker ps).",
+		func(o *enso.Ops, _ []string) error { return o.Down() })
+	e.AddCommand(&cobra.Command{Use: "tui [pi options]", Short: "Enso's terminal on the workspace, with the lab's MCP tools (e.g. --model lab/coder)",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			o, err := ops()
+			if err != nil {
+				return err
+			}
+			return o.TUI(args)
+		}})
+	e.AddCommand(&cobra.Command{Use: "shell", Short: "A shell inside the Enso container",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			o, err := ops()
+			if err != nil {
+				return err
+			}
+			return o.Shell()
+		}})
 	e.AddCommand(&cobra.Command{
 		Use:   "check",
 		Short: "Enso reaches the models and its tools, and not the internet (port of agents/enso/enso.sh check)",
@@ -182,23 +258,122 @@ func ensoCmd() *cobra.Command {
 
 func webuiCmd() *cobra.Command {
 	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift"}
-	w.AddCommand(&cobra.Command{
+	var apply bool
+	mc := &cobra.Command{
+		Use:   "models",
+		Short: "Per-model settings in Open WebUI vs hub/openwebui/models.yaml (port of models.sh); --apply writes them",
+		Long: "Names, native function calling, abilities (vision only where listed) and hidden models, from\n" +
+			"hub/openwebui/models.yaml and the llama-swap configs. Read-only unless --apply. Needs OPENWEBUI_API_KEY in hub/.env.\n" +
+			"Good result: \"0 model(s) differ from models.yaml\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			key, err := hub.EnvValue(filepath.Join(cfg.Repo, "hub", ".env"), "OPENWEBUI_API_KEY")
+			if err != nil {
+				return fmt.Errorf("add OPENWEBUI_API_KEY to hub/.env: %w", err)
+			}
+			return webui.Models(cfg.Repo, key, apply)
+		},
+	}
+	mc.Flags().BoolVar(&apply, "apply", false, "write the settings (Open WebUI models/import)")
+	w.AddCommand(mc)
+	var syncDrift, dryDrift bool
+	dc := &cobra.Command{
 		Use:   "drift",
 		Short: "Settings changed by hand in the web page vs hub/compose.yaml (read-only; port of drift.sh)",
 		Long: "Compare the running Open WebUI's settings with what hub/compose.yaml would give a fresh install\n" +
 			"(a throwaway Open WebUI, no network, about 30-60 s). Read-only. Secrets show as <set>.\n" +
 			"\"in compose\" = managed by compose; \"web page only\" = changed by hand: add it to compose.yaml or undo it.\n" +
-			"To make the running one match: hub/openwebui/drift.sh --sync (moves into lab in step 3).\n" +
+			"--sync makes the running one match for the settings compose manages: stops Open WebUI for a few seconds,\n" +
+			"saves a copy of its database first (data/open-webui/webui.db.before-sync-<date>). --dry-run shows the steps.\n" +
 			"Good result: \"0 setting(s) differ\".",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load()
 			if err != nil {
 				return err
 			}
-			return webui.Drift(cfg.Repo)
+			return webui.Drift(cfg.Repo, syncDrift, dryDrift)
 		},
-	})
+	}
+	dc.Flags().BoolVar(&syncDrift, "sync", false, "make the running Open WebUI match (managed settings only)")
+	dc.Flags().BoolVar(&dryDrift, "dry-run", false, "show, change nothing")
+	w.AddCommand(dc)
 	return w
+}
+
+func memoryCmd() *cobra.Command {
+	m := &cobra.Command{Use: "memory", Short: "Shared memory (LocalRecall): sync the lab's notes"}
+	var install, dry bool
+	s := &cobra.Command{
+		Use:   "sync",
+		Short: "Upload changed Markdown to LocalRecall now (port of hub/memory/sync.sh); --install: hourly cron",
+		Long: "Upload the lab's changed Markdown notes to LocalRecall (the `memory` tool).\n" +
+			"--install puts the hourly line (at :41) in your crontab, replacing an older one (run it yourself).\n" +
+			"--dry-run shows what it would do.\n" +
+			"Good result ends with \"sync: N uploaded, M removed, K unchanged\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			if install {
+				return hub.MemorySyncInstall(cfg.Repo, dry)
+			}
+			return hub.MemorySync(cfg.Repo, dry)
+		},
+	}
+	s.Flags().BoolVar(&install, "install", false, "put the hourly sync in your crontab")
+	s.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+	m.AddCommand(s)
+	return m
+}
+
+func imageModeCmd() *cobra.Command {
+	var dry bool
+	c := &cobra.Command{
+		Use:       "image-mode on|off|status",
+		Short:     "Lend zaphod's card 2 to ComfyUI, or give it back (port of hub/image-mode)",
+		ValidArgs: []string{"on", "off", "status"},
+		Args:      cobra.MatchAll(cobra.MaximumNArgs(1), cobra.OnlyValidArgs),
+		Long: "on: card 2's chat models off (coder-2 requests go to coder), ComfyUI started.\n" +
+			"off: ComfyUI stopped (frees all its memory), card 2 back to llama-swap.\n" +
+			"status (default): what is on card 2. Card 1 and the speech helpers keep running.\n" +
+			"A llama-swap config reload switches the profile off: run `lab image-mode on` again then.\n" +
+			"Good result: on -> \"ComfyUI ready\"; off -> \"profile off\"; status shows profile, ComfyUI, card 2 memory.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			z := cfg.Machines["zaphod"]
+			env, pci := z.LlamaSwapEnv, z.ImageCardPCI
+			if env == "" {
+				env = "~/llama-swap/.env"
+			}
+			if pci == "" {
+				pci = "0000:0b:00.0"
+			}
+			m, err := hub.NewImageMode(cfg.Repo, config.Expand(env), pci, dry)
+			if err != nil {
+				return err
+			}
+			what := "status"
+			if len(args) == 1 {
+				what = args[0]
+			}
+			switch what {
+			case "on":
+				return m.On()
+			case "off":
+				return m.Off()
+			}
+			return m.Status()
+		},
+	}
+	c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing (on/off)")
+	return c
 }
 
 func isTerminal(f *os.File) bool {

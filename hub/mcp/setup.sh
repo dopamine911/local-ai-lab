@@ -12,7 +12,10 @@ REG=http://127.0.0.1:8085
 MJ=~/.local/bin/mcpjungle
 cd "$HUB"
 
-if ! "$MJ" version 2>/dev/null | grep -q "v$V"; then
+# mcpjungle prints its version on stderr, and `| grep -q` under pipefail fails when grep stops early: read the text
+# first, then check it (it re-downloaded the CLI on every run until 2026-11-02; same trap as marvin/fan/ec-module.sh)
+have=$("$MJ" version 2>&1 || true)
+if [[ $have != *"v$V"* ]]; then
   t=$(mktemp -d); trap 'rm -rf "$t"' EXIT
   base=https://github.com/mcpjungle/MCPJungle/releases/download/$V
   curl -sSfL "$base/mcpjungle_Linux_x86_64.tar.gz" -o "$t/mcpjungle_Linux_x86_64.tar.gz"
@@ -20,7 +23,7 @@ if ! "$MJ" version 2>/dev/null | grep -q "v$V"; then
   (cd "$t" && grep ' mcpjungle_Linux_x86_64.tar.gz$' checksums.txt | sha256sum -c -)
   tar -xzf "$t/mcpjungle_Linux_x86_64.tar.gz" -C "$t" mcpjungle && install -m 755 "$t/mcpjungle" "$MJ"
 fi
-echo "== CLI $("$MJ" version 2>/dev/null | grep -m1 -o 'v[0-9.]*')"
+echo "== CLI $("$MJ" version 2>&1 | grep -m1 -o 'v[0-9.]*')"
 
 curl -sf "$REG/health" >/dev/null || { echo "MCPJungle not answering on $REG: docker compose up -d mcpjungle"; exit 1; }
 if [ ! -s ~/.mcpjungle.conf ]; then
@@ -39,7 +42,7 @@ for tf in mcp/servers/*.tools; do   # not $t: the EXIT trap deletes "$t"
   [ -f "$tf" ] || continue
   srv=$(basename "$tf" .tools); keep=$(grep -v "^#" "$tf" | sed "s/^/${srv}__/")
   "$MJ" list tools 2>&1 | grep -oE "${srv}__[A-Za-z0-9_]+" | sort -u | while read -r tool; do
-    if echo "$keep" | grep -qx "$tool"; then "$MJ" enable tool "$tool" >/dev/null; else "$MJ" disable tool "$tool" >/dev/null; fi
+    if echo "$keep" | grep -qx "$tool"; then "$MJ" enable tool "$tool" >/dev/null 2>&1; else "$MJ" disable tool "$tool" >/dev/null 2>&1; fi
   done
   echo "== tool server: $srv: on: $(echo $keep | tr ' ' ',')"
 done
