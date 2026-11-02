@@ -49,7 +49,8 @@ Baseline, busy samples (>=90%) by GPU temperature:
 | 90-94 C | 17 | 2,874 (2,829) | 134 (118) | 2,767 / 2,970 / 2,346 |
 | 19:40 | Module source read (f62c2c2): the 60/70/83/95/97 curve is the **module's default for its own curve mode** (believed to copy the factory curve), not read from the chip; in auto the chip's curve is not readable. Curve mode = the module steps each fan one level per second from the EC temperature; unloading the module returns fans to auto | "fans never above ~60%" is an inference from rpm (jump at EC 70 C, ~3,100 rpm max), not a direct reading; `maxrpm` measures the real top speed | src/ec_su_axb35.c |
 | 19:45 | `marvin/fan/curve.sh` (check / maxrpm / apply / auto / boot on\|off); test curve up 50,58,65,72,78 / down 45,53,60,67,74 (full speed from EC 78 C; Daniel: noise doesn't matter) | dry run on a fake folder: apply, auto, restore pass; **found and fixed**: maxrpm left fans at 100% (saved modes were a local, gone when the restore ran); Ctrl-C restores too; refuses on zaphod's board; `check` on marvin (read-only) OK | this commit |
-| next | The test, after the port agent finishes (it would change their conditions). Steps below | — | — |
+| 2026-11-02 07:10 | Read the 4 h recording of the agent's Terminal-Bench re-run (19:08-23:08; run ended ~00:25, 18/19) | busy 2.4 h; max GPU **89 C** (0 samples at 90 C+), EC 87 C; busy clock median 2,876-2,898 MHz in every band, power mode performance, no busy sample under 100 W. Fans max **3,138 / 3,291 / 2,492 rpm**, the same ceiling as 2026-10-31 (3,129 / 3,281 / 2,481): either the auto curve's top step or the fans' real 100%; `maxrpm` decides | `~/fan-samples/2026-11-01-full-power.csv` on marvin |
+| next | The curve test (port agent done; marvin idle). Steps below | — | — |
 
 ### Curve test procedure (one change: factory auto -> curve)
 1. Port agent done; nothing else running on marvin. Daniel pushes; on marvin `cd ~/homelab && git pull`.
