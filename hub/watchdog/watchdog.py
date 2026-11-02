@@ -199,8 +199,8 @@ class Watchdog:
         t = int(self.now())
         for cid, c in CHECKS.items():
             verdict, value = c["verdict"](readings)
+            s = self.row(cid)  # creates the row first, so the first reading is kept too
             self.save(cid, value=value)
-            s = self.row(cid)
             snoozed = (s["snoozed_until"] or 0) > t
             if verdict == "unknown":
                 continue
@@ -318,6 +318,8 @@ def test():
     good = {"marvin_reach": True, "marvin_busy": "0", "marvin_watts": "9", "marvin_edge": "45",
             "marvin_power_mode": "performance", "marvin_health": "200", "zaphod_card1_junction": 40,
             "zaphod_card2_junction": 40, "zaphod_health": "200"}
+    global LOG
+    LOG = os.path.join(STATE, "test.log")  # the test's lines stay out of the service log
     path = os.path.join(STATE, "test.db")
     if os.path.exists(path):
         os.remove(path)
@@ -371,6 +373,8 @@ def test():
     n = len(sent); sent.clear()
     results.append(("rate limit: 20 alerts in a minute -> 12 sent", n == 12, n))
     os.remove(path)
+    if os.path.exists(LOG):
+        os.remove(LOG)
     width = max(len(r[0]) for r in results)
     for name, ok, got in results:
         print(f"{'PASS' if ok else 'FAIL'}  {name:{width}s}" + ("" if ok else f"   got {got}"))
