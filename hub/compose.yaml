@@ -260,7 +260,7 @@ services:
 
   # GPU load, memory, temperature and power for the Homepage start page (read-only, from /sys).
   gpu-stats:
-    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
+    image: python:3.13.18-slim-trixie@sha256:ae14d4ce8771606477a81446e7ef429edd6762305fc50c84507c1041fa8285d1
     container_name: gpu-stats
     restart: unless-stopped
     network_mode: host
@@ -276,7 +276,7 @@ services:
 
   # Agent statistics for the Homepage start page (read-only): requests, tokens, speeds (24 h), slots, context use.
   agent-stats:
-    image: python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5
+    image: python:3.13.18-slim-trixie@sha256:ae14d4ce8771606477a81446e7ef429edd6762305fc50c84507c1041fa8285d1
     container_name: agent-stats
     restart: unless-stopped
     network_mode: host
