@@ -35,7 +35,7 @@ sleep 5; docker stop "$VOL" >/dev/null
 [ $SYNC = yes ] && { echo "== stopping open-webui"; docker compose stop open-webui >/dev/null; }
 docker run --rm -i --network none -e SYNC=$SYNC -e STAMP="$(date +%F-%H%M)" \
   -v "$HUB/data/open-webui":/live -v "$VOL":/fresh:ro -v "$HUB/openwebui/managed-keys.txt":/managed.txt:ro \
-  python:3.13-slim-trixie python3 - <<'EOF'
+  python:3.13.18-slim-trixie@sha256:76baad6037690d6e8c4397fbcaef17bca6f19eecef822b708fe8fa3417d30bb5 python3 - <<'EOF'
 import json, os, re, shutil, sqlite3
 def load(p):
     c = sqlite3.connect(f"file:{p}?mode=ro", uri=True)

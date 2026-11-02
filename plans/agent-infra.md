@@ -101,11 +101,13 @@ keys in Proton Pass.
 
 Good result: adding a tool once makes it available in every agent.
 
-To do (Daniel 2026-10-30): `hub/mcp/status.sh`, read-only, one screen: registered tool servers, their tools, and
+**Done 2026-11-02 as `lab mcp status`** (issue #6 step 2; exit 1 and a list when the gateway differs from the repo).
+Was a to-do (Daniel 2026-10-30): `hub/mcp/status.sh`, read-only, one screen: registered tool servers, their tools, and
 which agent (client) may use which. MCPJungle's web dashboard (docs.mcpjungle.com/guides/dashboard) is Beta and
 "only supported when running mcpjungle in development mode" (no per-agent tokens or allowed lists, no login
 described); our 0.4.6 in enterprise mode answers 404 there. Re-check at each MCPJungle update: use it only once it
-works in enterprise mode with a login, behind Caddy on Tailscale, and is at least 2 weeks old.
+works in enterprise mode with a login, behind Caddy on Tailscale (pinned to its latest version; the old
+"2 weeks old" rule was withdrawn 2026-10-30, decisions.md).
 Good result: one command shows every tool and who may use it, with no secrets printed.
 
 ### 4. Shared memory: LocalRecall (or similar)

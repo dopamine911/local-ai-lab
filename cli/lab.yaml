@@ -8,3 +8,8 @@ machines:
     ssh: marvin
     llama_swap_port: 8080
     llama_swap_container: llama-swap
+mcpjungle:                      # the MCP gateway (hub/mcp/setup.sh)
+  bin: ~/.local/bin/mcpjungle
+  registry: http://127.0.0.1:8085
+enso:
+  container: enso

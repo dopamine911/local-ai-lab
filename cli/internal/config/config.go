@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"go.yaml.in/yaml/v3"
 )
@@ -16,8 +17,24 @@ type Machine struct {
 }
 
 type Config struct {
-	Repo     string             `yaml:"-"`
-	Machines map[string]Machine `yaml:"machines"`
+	Repo      string             `yaml:"-"`
+	Machines  map[string]Machine `yaml:"machines"`
+	MCPJungle struct {
+		Bin      string `yaml:"bin"`
+		Registry string `yaml:"registry"`
+	} `yaml:"mcpjungle"`
+	Enso struct {
+		Container string `yaml:"container"`
+	} `yaml:"enso"`
+}
+
+// Expand turns a leading ~/ into the home folder.
+func Expand(p string) string {
+	if rest, ok := strings.CutPrefix(p, "~/"); ok {
+		home, _ := os.UserHomeDir()
+		return filepath.Join(home, rest)
+	}
+	return p
 }
 
 // Repo is $LAB_REPO, else ~/homelab.

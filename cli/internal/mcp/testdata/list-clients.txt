@@ -1,0 +1,8 @@
+1. claude-code
+Allowed servers: search,browser,memory,recall
+
+2. enso
+Allowed servers: search,browser,memory,recall
+
+3. openwebui
+Allowed servers: search,browser

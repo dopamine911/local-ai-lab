@@ -15,6 +15,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/dopamine911/local-ai-lab/cli/internal/config"
+	"github.com/dopamine911/local-ai-lab/cli/internal/enso"
+	"github.com/dopamine911/local-ai-lab/cli/internal/mcp"
+	"github.com/dopamine911/local-ai-lab/cli/internal/webui"
 	"github.com/dopamine911/local-ai-lab/cli/internal/manifest"
 	"github.com/dopamine911/local-ai-lab/cli/internal/menu"
 )
@@ -49,7 +52,7 @@ func main() {
 			return cmd.Execute()
 		},
 	}
-	root.AddCommand(versionCmd(), manifestCmd())
+	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -112,6 +115,90 @@ func manifestCmd() *cobra.Command {
 	c.Flags().BoolVar(&asJSON, "json", false, "one JSON object (for agents)")
 	c.Flags().StringVar(&host, "host", "", "run on another machine over ssh (e.g. marvin)")
 	return c
+}
+
+func mcpCmd() *cobra.Command {
+	m := &cobra.Command{Use: "mcp", Short: "The MCP tool gateway (MCPJungle): status"}
+	var asJSON, tools bool
+	st := &cobra.Command{
+		Use:   "status",
+		Short: "Tool servers, their tools, which agent may use which; drift from the repo",
+		Long: "One read-only screen of the MCP gateway: registered tool servers (enabled / total tools), which agent may\n" +
+			"use which server, and any difference from the repo (hub/mcp/clients/*.json, hub/mcp/servers/*.tools).\n" +
+			"No secrets are read or printed. Exit 1 when the gateway differs from the repo.\n" +
+			"Good result: \"Matches the repo\" and every server with at least one tool enabled.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			s, err := mcp.Get(config.Expand(cfg.MCPJungle.Bin), cfg.MCPJungle.Registry, cfg.Repo)
+			if err != nil {
+				return err
+			}
+			if asJSON {
+				if err := json.NewEncoder(os.Stdout).Encode(s); err != nil {
+					return err
+				}
+			} else {
+				mcp.Print(s, tools)
+			}
+			if len(s.Drift) > 0 {
+				os.Exit(1)
+			}
+			return nil
+		},
+	}
+	st.Flags().BoolVar(&asJSON, "json", false, "one JSON object (for agents)")
+	st.Flags().BoolVar(&tools, "tools", false, "list every tool, on and off")
+	m.AddCommand(st)
+	return m
+}
+
+func ensoCmd() *cobra.Command {
+	e := &cobra.Command{Use: "enso", Short: "The Enso agent container: check"}
+	e.AddCommand(&cobra.Command{
+		Use:   "check",
+		Short: "Enso reaches the models and its tools, and not the internet (port of agents/enso/enso.sh check)",
+		Long: "Same three checks as agents/enso/enso.sh check, run inside the enso container.\n" +
+			"Good result: ok: models (llama-swap) / ok: no internet / ok: tools (mcpjungle): connected, N tools.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			c := cfg.Enso.Container
+			if c == "" {
+				c = "enso"
+			}
+			if !enso.Check(c) {
+				os.Exit(1)
+			}
+			return nil
+		},
+	})
+	return e
+}
+
+func webuiCmd() *cobra.Command {
+	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift"}
+	w.AddCommand(&cobra.Command{
+		Use:   "drift",
+		Short: "Settings changed by hand in the web page vs hub/compose.yaml (read-only; port of drift.sh)",
+		Long: "Compare the running Open WebUI's settings with what hub/compose.yaml would give a fresh install\n" +
+			"(a throwaway Open WebUI, no network, about 30-60 s). Read-only. Secrets show as <set>.\n" +
+			"\"in compose\" = managed by compose; \"web page only\" = changed by hand: add it to compose.yaml or undo it.\n" +
+			"To make the running one match: hub/openwebui/drift.sh --sync (moves into lab in step 3).\n" +
+			"Good result: \"0 setting(s) differ\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			return webui.Drift(cfg.Repo)
+		},
+	})
+	return w
 }
 
 func isTerminal(f *os.File) bool {
