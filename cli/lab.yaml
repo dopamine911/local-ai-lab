@@ -1,0 +1,10 @@
+# lab CLI config (issue #6). In git: no secrets. Secrets stay in the .env files (mode 600) and are read, never printed.
+machines:
+  zaphod:
+    ssh: zaphod                 # ssh alias (from marvin); on zaphod itself commands run locally
+    llama_swap_port: 8080
+    llama_swap_container: llama-swap
+  marvin:
+    ssh: marvin
+    llama_swap_port: 8080
+    llama_swap_container: llama-swap

@@ -179,3 +179,11 @@ longer need to wait; marvin being free is the remaining condition.
     under the new note (MLflow 5881856a, marked WRONG and soft-deleted). Fix: `RERUN=1` passes `--rerun`, and
     `tbench` logs only when the call made a new job folder. Old local results kept in
     `tuning/terminal-bench/results-archive/` (the rerun replaces that profile's folder; MLflow c145733e has them too).
+39. **The `lab` CLI uses Cobra and Bubble Tea (2026-11-02, issue #6).** Go, one static binary (`CGO_ENABLED=0`) built
+    in a pinned Go container (`cli/build.sh`), so nothing is installed on the machines. Cobra (spf13/cobra) for
+    commands and help: ~30 commands with flags and `--help` each would mean re-writing what Cobra already does; it
+    is the standard Go CLI library (kubectl, gh). Bubble Tea v2 (charm.land/bubbletea/v2, Daniel's choice) for the
+    interactive part: `lab` with no arguments on a terminal opens a menu; without a terminal (agents, cron, ssh) it
+    prints help, so scripts never hang. YAML: go.yaml.in/yaml/v3 (the maintained successor of gopkg.in/yaml.v3,
+    which has had no release since 2022). Each port must print exactly what the script printed (diff on both
+    machines) before the script becomes a wrapper.
