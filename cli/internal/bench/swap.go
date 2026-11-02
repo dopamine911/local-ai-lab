@@ -107,6 +107,12 @@ func (g *guard) run(c *exec.Cmd) error {
 	return err
 }
 
+func (g *guard) wasInterrupted() bool {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	return g.interrupted
+}
+
 // llamaSwapImage: the first image: line of ~/llama-swap/compose.yaml (the same image as llama-swap).
 func llamaSwapImage() (string, error) {
 	b, err := os.ReadFile(filepath.Join(swapDir(), "compose.yaml"))

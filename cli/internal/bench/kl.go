@@ -47,7 +47,7 @@ func KLBase(cfg *config.Config, dryRun bool) error {
 		var b strings.Builder // like `2>&1 | tail -4`: only the last 4 lines, and its exit status is not checked
 		c.Stdout, c.Stderr = &b, &b
 		runErr := g.run(c)
-		if _, sig := runErr.(ExitError); sig {
+		if g.wasInterrupted() {
 			return runErr
 		}
 		if s := lastLines(b.String(), 4); s != "" {
@@ -100,7 +100,7 @@ func KLTest(cfg *config.Config, dryRun bool, note string, extra []string) error 
 		runErr := g.run(c)
 		f.Close()
 		if runErr != nil {
-			if _, sig := runErr.(ExitError); sig {
+			if g.wasInterrupted() { // stopped by a signal: the guard says so, not a failure report
 				return runErr
 			}
 			fmt.Println("llama-perplexity failed:")

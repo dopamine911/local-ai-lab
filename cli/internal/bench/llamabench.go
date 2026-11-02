@@ -65,7 +65,7 @@ func Bench(cfg *config.Config, dryRun bool, card, note string, extra []string) e
 		of.Close()
 		ef.Close()
 		if runErr != nil {
-			if _, sig := runErr.(ExitError); sig {
+			if g.wasInterrupted() { // stopped by a signal: the guard says so, not a failure report
 				return runErr
 			}
 			fmt.Println("llama-bench failed:")
