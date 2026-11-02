@@ -174,3 +174,8 @@ longer need to wait; marvin being free is the remaining condition.
 37. **Live sessions on hold** (Daniel 2026-11-01). Fork stopped, `marvin/big` back, peer removed from zaphod's
     config. Kept: MARVIN_FORK_KEY in zaphod's `.env` (harmless while unused; saves a key round trip on restart).
     This time the config edit came while nothing was preloading (decision 36): the reload went clean.
+38. **Bug of mine (2026-11-01): `tbench` logged a run that never ran.** The suite skips tasks that already have
+    results for the same model and profile; the llama.cpp re-run did nothing and `tbench` logged the 10-29 result
+    under the new note (MLflow 5881856a, marked WRONG and soft-deleted). Fix: `RERUN=1` passes `--rerun`, and
+    `tbench` logs only when the call made a new job folder. Old local results kept in
+    `tuning/terminal-bench/results-archive/` (the rerun replaces that profile's folder; MLflow c145733e has them too).

@@ -129,3 +129,7 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | ~18:54 | Daniel: hold off on live testing | | decisions.md 37 |
 | 18:54 | `fork.sh stop` on marvin | llama-swap back | |
 | 18:55 | `marvin-fork` peer removed from zaphod config; reload | 7 models ready; `marvin/big` answers | |
+| ~18:57 | Daniel: re-run Terminal-Bench on llama.cpp `big` (10-29 run was BIOS Quiet) | checked: same image 1394eea8116f, llama.cpp 74bca39, BIOS 1.07, medium; only the power mode differs | |
+| 18:59 | First launch: suite skipped all 19 (results for this profile exist); tbench logged the old result as MLflow 5881856a | wrong run, soft-deleted | decisions.md 38 |
+| 19:00 | `tbench`: RERUN=1 (passes --rerun) and no log unless a new job ran; guard tested (smoke: nothing logged) | | tuning/tbench |
+| 19:01:10 | **Terminal-Bench full on llama.cpp `big` launched** (RERUN=1), tmux `tbench-big`; GPU 108-116 W busy (not the 55 W cap) | running | `~/tbench-big-2026-11-01.log` |
