@@ -4,7 +4,7 @@
 services:
   llama-swap:
     build: .                            # docker compose build
-    image: llama-swap-marvin:267
+    image: llama-swap-marvin:269   # issue #1; rollback: :267
     container_name: llama-swap
     restart: unless-stopped
     # Only marvin itself can reach 8080; `tailscale serve` exposes it to the tailnet.
