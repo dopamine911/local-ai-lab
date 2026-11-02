@@ -1,7 +1,7 @@
 # LocalRecall's MCP server (mudler/mcps, stdio only) behind mcp-proxy, so MCPJungle can reach it over streamable HTTP.
 #   docker compose --profile images build mcp-localrecall     (from hub/)
 # Pinned: the MCP server image by digest (v0.0.4, built 2026-02-20; a static binary), the Python base by digest
-# (3.12.16-slim), mcp-proxy 0.13.0 (latest).
+# (3.12.16-slim), mcp-proxy (the pip pin below; Renovate moves it: then update the image tag in hub/compose.yaml).
 FROM ghcr.io/mudler/mcps/localrecall:v0.0.4@sha256:53e635373eef4ec727a2fb65d25cc8c58e92015461e227e19763c74c4c3e415f AS lrmcp
 FROM docker.io/library/python:3.12.16-slim@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30
 RUN pip install --no-cache-dir mcp-proxy==0.14.0

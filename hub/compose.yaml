@@ -386,7 +386,7 @@ services:
 
   mcp-localrecall:
     build: {context: memory, dockerfile: mcp-localrecall.Dockerfile}
-    image: mcp-localrecall:0.0.4-proxy0.13.3
+    image: mcp-localrecall:0.0.4-proxy0.14.0
     container_name: mcp-localrecall
     restart: unless-stopped
     read_only: true
