@@ -30,4 +30,5 @@ What was done and when. Times are Chicago time (CST). Design: issue #12. Code: `
 | 15:20 | Found by Renovate #25: mcp-proxy 0.13.3 broke the `memory` tool ("Invalid Host header") and no check noticed: `mcp-tools` only sees that servers are registered | fixed (plans/renovate-timeline.md) | — |
 | 15:33 | Agent login `watchdog` (hub/mcp/clients/watchdog.json: memory + recall only; token `MCP_TOKEN_WATCHDOG` in hub/.env, Proton Pass) via `lab mcp setup` | 4 logins, `lab mcp status` matches | — |
 | 15:25 | Check 17 `mcp-calls`: one real `memory` search and one `recall` per minute through MCPJungle (MCP initialize + tools/call, the agents' path); bad = an error or 0 results for 3 min | test **25/25** (3 new cases); live: memory 1 result, recall 1 result | this commit |
-| next | Daniel: `sudo systemctl restart lab-watchdog` (loads check 17); later: `marvin/big` through the zaphod peer; reservations (#3) | — | — |
+| 15:26 | Daniel restarted lab-watchdog | "started: 17 checks"; first `mcp-calls`: memory 1 result, recall 1 result; 0 problems | watchdog.log |
+| next | Later checks (issue #12 list): `marvin/big` through the zaphod peer; reservations (#3) | — | — |
