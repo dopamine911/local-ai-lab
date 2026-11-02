@@ -14,4 +14,14 @@ What was done and when. Times are Chicago time (CST). Design: issue #12. Code: `
 | 11:22 | `lab-watchdog.service`, `setup/host.sh` step 6d, REBUILD.md "Phone notifications" step 8, FEATURES | — | 4934245 + this commit |
 | 11:23 | Daniel: restarted lab-actions (11:23:13), installed lab-watchdog (started 11:23:37); pushed | both active; from the 2nd loop (11:24:38) all 8 checks ok: marvin answers, performance, 0% / 9 W, 45 C; zaphod junctions 32 / 32 C; /health 200 on both | `watchdog.py status` |
 | 11:25 | Two small bugs: the first loop's readings weren't stored (value saved before its row existed; alerts unaffected); `watchdog.py test` wrote its practice "rate limit" lines into the service log | fixed; test 17/17; loads at the next `sudo systemctl restart lab-watchdog` | this commit |
-| next | Live test (issue's good result): marvin power mode -> quiet via the fan module, one alert within ~2 min; back to performance, one "Resolved" | — | — |
+| 11:25 | Live test "before" (Daniel: `curve.sh check`) | performance, fan curve active, idle 45 C | — |
+| 11:26 | Daniel: `echo quiet \| sudo tee /sys/class/ec_su_axb35/apu/power_mode` on marvin; I ran `tuning/speed marvin/big` (NOLOG) as load | marvin under load in quiet: **100% busy, 54 W, 2,085 MHz** = the "55 W problem" signature (CLAUDE.md Known issues) | — |
+| 11:28:41 | Watchdog: **two alerts** (~2.5 min after the switch): "power mode not performance" and "GPU busy but under 100 W" | as designed; no repeats afterwards | watchdog.log |
+| 11:30:39 | Daniel: **Run check** from the phone | 200, 814 bytes of `ec-module.sh check` + busy/watts came back | actions.log |
+| 11:33 | Quiet-mode speed (one run): writing 38.8 tok/s, reading 32K 251.5 | vs performance (fan test B) 44.7 / ~313: **-13% writing, -20% reading** | — |
+| 11:33:58 | Daniel: **Ack** from the phone (found in the app's lab-alert list; the shade had dropped both alerts after Run check, maybe grouped) | 200; acked_at set on marvin-low-power | actions.log |
+| ~11:33 | Daniel: back to `performance` | — | — |
+| 11:35:44 | Watchdog: **two "Resolved"** | the whole test sent exactly 4 messages (2 alerts, 2 resolved) | watchdog.log |
+| 11:37 | Full-power check: `tuning/speed marvin/big` (NOLOG) | 132-133 W, ~2,880 MHz, performance, fan curve active (~4,140 rpm); writing 44.4, reading 320.0; no watchdog message | — |
+| — | **Issue #12's good result met** (with the module's power-mode switch instead of a BIOS visit) | — | — |
+| next | Batch 2: disks, hub containers, MCPJungle tools, backup and memory-sync age, certificates | — | — |

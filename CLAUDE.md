@@ -39,9 +39,10 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 ## Known issues
 - marvin's GPU power limit can drop back to ~55 W (BIOS Quiet-like) after a BIOS visit (2026-10-30: happened after a
   fan change; cause not certain). Symptom: GPU 100% busy but 54-55 W, clock ~2,050 MHz, long prompts ~20% slower.
-  Watch: Beszel GPU power chart (recorded every minute) or Homepage tile; under load it should be ~130-140 W.
-  To do: `tuning/speed` records busy GPU watts to MLflow and warns under 100 W (Beszel alerts can't express
-  "busy and low power").
+  Watch: the watchdog alerts on it (`hub/watchdog`: power mode not performance, or busy under 100 W for 2 min; tested
+  2026-11-02 by setting quiet through the fan module: 54 W, 2,085 MHz, -20% reading). Under load it should be ~130-140 W.
+  Fix without a BIOS visit (likely the same setting; not yet tried on the real fault):
+  `echo performance | sudo tee /sys/class/ec_su_axb35/apu/power_mode` on marvin.
 - llama.cpp#27148 (open): the RAM prompt cache (`--cache-ram`, default 8 GB, + `--cache-idle-slots`, default on; both on in
   our build) can put text from an unrelated finished conversation into a new request under concurrent load. We share
   models between Daniel, Paul and agents. Planned fix, measured before/after: `--cache-ram 0 --no-cache-idle-slots`
