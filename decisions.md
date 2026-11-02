@@ -171,3 +171,6 @@ longer need to wait; marvin being free is the remaining condition.
     recreated llama-swap was still preloading; the hot reload started a second preload and `coder` lost its port
     (5801). Fixed by loading `coder` with one request; nothing else affected. Lesson: after `docker compose up -d`,
     wait until /running shows every preload ready before editing config.yaml.
+37. **Live sessions on hold** (Daniel 2026-11-01). Fork stopped, `marvin/big` back, peer removed from zaphod's
+    config. Kept: MARVIN_FORK_KEY in zaphod's `.env` (harmless while unused; saves a key round trip on restart).
+    This time the config edit came while nothing was preloading (decision 36): the reload went clean.

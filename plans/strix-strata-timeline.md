@@ -120,3 +120,12 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 20:26 | MARVIN_FORK_KEY into zaphod `.env` (from marvin, not printed); zaphod llama-swap recreated | key present in container | |
 | 20:27 | Peer `marvin-fork` added to zaphod config | listed as `marvin-fork/big-fork`. Side effect: the hot reload ran during the restart's preload; `coder` failed to bind port 5801 | decisions.md 36 |
 | 20:27-20:28 | `coder` loaded with one request; all 7 zaphod models ready; fork answered through zaphod (391) and shows in Open WebUI | live | |
+
+## 2026-11-01
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 18:52 | Fork status check | up 23 h, no errors, 0 requests besides the 20:28 test | |
+| ~18:54 | Daniel: hold off on live testing | | decisions.md 37 |
+| 18:54 | `fork.sh stop` on marvin | llama-swap back | |
+| 18:55-18:57 | `marvin-fork` peer removed from zaphod config; reload | 7 models ready; `marvin/big` answers | |

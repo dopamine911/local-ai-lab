@@ -468,3 +468,7 @@ Decisions made while Daniel was away: `decisions.md`.
    Pass (`ssh marvin cat strata-fork/key`). Caveats: the fork runs with `--restart no`, so after a marvin reboot
    nothing serves until `fork.sh start` or `fork.sh stop` is run; agents and people set to `marvin/big` get errors
    until they switch to `marvin-fork/big-fork`. Stats to collect: errors, speed in real use, Daniel's impressions.
+21. **Live sessions on hold** (Daniel 2026-11-01: "lets hold off on live testing"; he had misread the go-ahead
+   question). The fork ran 23 h (20:25 to 18:54) with no crash and no errors, but served only my one test request.
+   Stopped (`fork.sh stop`, `marvin/big` back and answering), peer removed from zaphod's config, all 7 zaphod models
+   ready. MARVIN_FORK_KEY stays in zaphod's `.env` so a restart needs only the config block and `fork.sh start`.
