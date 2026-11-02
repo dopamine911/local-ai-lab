@@ -3,8 +3,14 @@
 Rule (Daniel, 2026-10-30): pin every image, package and download to its **latest** version, exactly (digest, exact
 version or sha256). No minimum age. Read a new major version's changelog before switching.
 
-Last audit: **2026-10-30**. To audit: compare each row with its project's newest release; bump, rebuild or recreate
-one service at a time, and run its check.
+Last audit: **2026-10-30** by hand. From issue #7: **Renovate** (`renovate.json`) watches 90 pins and opens one PR per
+update, with this table's check in the PR body; held-back items wait for approval on its Dependency Dashboard issue.
+Merge one at a time and run the check. Dry run (changes nothing): see plans/renovate-timeline.md.
+
+**Not covered by Renovate (check by hand at each audit):** harbor (pinned in tuning/terminal-bench, not in git; #2);
+Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBUNTU_SNAPSHOT`); ComfyUI's torch/ROCm
+(`TORCH`, `ROCM`; torchvision unpinned); Caddy's Cloudflare plugin (`xcaddy --with`, unpinned); other apt packages
+(take the Ubuntu archive of the build day); images we build ourselves (their inputs are covered).
 
 | What | Where pinned | Version | Check after a bump |
 | --- | --- | --- | --- |

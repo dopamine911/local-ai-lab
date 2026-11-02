@@ -187,3 +187,7 @@ longer need to wait; marvin being free is the remaining condition.
     prints help, so scripts never hang. YAML: go.yaml.in/yaml/v3 (the maintained successor of gopkg.in/yaml.v3,
     which has had no release since 2022). Each port must print exactly what the script printed (diff on both
     machines) before the script becomes a wrapper.
+40. **Renovate runs as the hosted GitHub app (Mend Renovate), not self-hosted (2026-11-02, issue #7).** The repo is
+    public; the app only creates branches and PRs (Daniel merges each one); no repo-write token has to live on zaphod
+    and nothing to keep running. Installed for this repository only. Config in `renovate.json` (one change per PR,
+    approval for held-back items). Self-hosted stays the fallback if the app's access is ever a concern.

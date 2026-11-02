@@ -8,7 +8,7 @@
 #   ./agents/enso/enso.sh build
 #
 # Ubuntu 26.04, tag resolute-20261024.1
-FROM docker.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+FROM docker.io/library/ubuntu:resolute-20261024.1@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
 ENV DEBIAN_FRONTEND=noninteractive
 # The archive as it was on this date. The first install (ca-certificates alone) skips the TLS check because the base
 # image has no CA certificates and the snapshot server is HTTPS only; apt still checks every package's signature.
