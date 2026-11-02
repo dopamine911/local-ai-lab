@@ -24,5 +24,25 @@ script: `marvin/fan/ec-module.sh`. Sources: commits, command output, marvin logs
 | 15:2x | Fix: one `enrolled()` check reads mokutil's text, not its exit code (3 places); copied to marvin | `check`: MOK enrolled yes, module not loaded | this commit |
 | 15:23 | Daniel: `install` | built, **signed by `marvin Secure Boot Module Signature key`**, loaded; power mode **performance**; EC 42 C vs GPU 39 C; fans auto 1,613 / 1,893 / 822 rpm | marvin/SETUP.md |
 | 15:24 | llama-swap back (`marvin/big`), Beszel agent up; baseline sampler started, 10 h, every 5 s | `~/fan-samples/2026-10-31-baseline.csv` on marvin | — |
-| next | Read the sampler after load: does the clock fall as temperature passes ~95 C, and do the fans reach full speed? Then decide on a curve (plan step 3) | — | — |
+| (done) | Read the sampler after load (below, 2026-11-01) | — | — |
 | (done) | Daniel: tells the port agent; `prepare` (password), reboot at the screen, MOK enroll, `install`, `check`; restart llama-swap | — | — |
+
+## 2026-11-01 (CST from today)
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 19:08 | Port agent starts a full-power llama.cpp benchmark; second sampler started, 4 h | `~/fan-samples/2026-11-01-full-power.csv` on marvin (until ~23:08) | — |
+| 19:15 | Baseline read (10 h, 7,139 samples, 2.3 h busy at >=90%, the agent's tests) | **clock flat with temperature**: busy median 2,850-2,900 MHz in every 5 C band up to 90-94 C (min 2,659); power mode performance throughout; busy under 100 W 0.4%; max GPU 92 C, EC 87 C; fans max 3,129 / 3,281 / 2,481 rpm | table below |
+| 19:15 | Fan level under load | `level 5` = 100% (module README: 0-5, 5 = 100%) already in auto at EC 80 C: **fans are at full speed under load**, so a steeper curve cannot add cooling | `ec-module.sh check` |
+| — | Decision: **no fan change** (plan step 3 needs clocks under ~2,600 MHz at 95 C+; not seen). Re-check with tonight's full-power recording (it may reach the 93-97 C seen on 32K reads). Only physical options remain (PTM7950 pad, airflow), and only if a recording shows the clock dropping | — | — |
+
+Baseline, busy samples (>=90%) by GPU temperature:
+
+| GPU temp | samples | clock MHz median (min) | watts median (min) | fan1 / fan2 / fan3 rpm median |
+| --- | --- | --- | --- | --- |
+| 60-64 C | 13 | 2,859 (2,735) | 105 (98) | 1,765 / 2,032 / 885 |
+| 70-74 C | 110 | 2,885 (2,659) | 114 (100) | 1,998 / 2,256 / 963 |
+| 75-79 C | 256 | 2,898 (2,679) | 114 (95) | 2,171 / 2,390 / 998 |
+| 80-84 C | 967 | 2,898 (2,670) | 118 (103) | 2,645 / 2,852 / 2,097 |
+| 85-89 C | 264 | 2,882 (2,682) | 123 (109) | 2,678 / 2,867 / 2,406 |
+| 90-94 C | 17 | 2,874 (2,829) | 134 (118) | 2,767 / 2,970 / 2,346 |

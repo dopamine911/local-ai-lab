@@ -120,7 +120,7 @@ agents, not only benchmarks) and plenty of stats recorded (MLflow). Daniel decid
    table, machine details from `tuning/manifest.sh`), and what was NOT validated (Windows, other AMD chips).
 5. Small, reviewable commits; CUDA path untouched; no secrets or machine names beyond hardware in the PR.
 
-## Later: fan control on marvin (researched 2026-10-30; module installed 2026-10-31, read-only, power mode readable; step 2 (baseline sampler) running: marvin/fan/ec-module.sh, sample.sh, timeline plans/marvin-fan-timeline.md)
+## Later: fan control on marvin (researched 2026-10-30; module installed 2026-10-31, read-only, power mode readable; step 2 done 2026-11-01: no throttling up to 92 C and fans already at 100% under load, so no curve for now (timeline); marvin/fan/ec-module.sh, sample.sh, timeline plans/marvin-fan-timeline.md)
 
 marvin facts that decide it: board Sixunited AXB35-02, fan chip (EC) ITE IT5570 firmware 1.08, BIOS 1.07,
 **Secure Boot on, kernel lockdown = integrity**, kernel 7.0.0-42. Measured so far: GPU holds 2,800-2,890 MHz at
