@@ -54,4 +54,9 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 17:28-17:30 | Daniel: live check. `bench 1` and `kl test`, script then lab each (llama-swap stopped 4 times, ~25 s each), throwaway MLflow | bench: same 34 fields, only the measurements differ (pp512 1121 / 1115, tg128 28.6 / 28.6 tok/s); kl: **identical** 29/29 (mean KLD 0.008615 both); exit 0 all; llama-swap back each time (15 models answer after) | this commit |
 | 17:31 | Cleanup: the 3 parity files (bench 1728, kl 1729) moved out of tuning/ to the scratchpad; throwaway MLflow removed (`docker rm -f mlflow-parity`) | tuning/ holds only real results | this commit |
 | 17:32 | Daniel merged PR #26 (f607a66). Pulled and `cli/build.sh install` on both machines | `lab f607a66` on zaphod and marvin; marvin's `lab manifest` identical to tuning/manifest.sh; `lab --help` lists log, series, speed, quality, bench, kl | this commit |
-| next | Step 5 (machines: `setup host`, `models`, `backup`, `strata`, `fork`, `tbench`), when Daniel says go | — | — |
+
+## Step 5: machines (2026-11-02)
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 17:33 | Daniel: start step 5, trimmed scope. `setup/host.sh` stays bash (it installs Docker and builds lab on a fresh machine, as root: lab can't replace it); new read-only `lab setup check` reports which host.sh steps are done. Port `models`, `backup`, `tbench`. `strata-test.sh` and `fork.sh` stay as they are while Strata is on hold | plan: 5a models, 5b backup (nightly cron switches only after a compared run, with Daniel's OK), 5c tbench, 5d setup check | this commit |
