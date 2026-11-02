@@ -25,4 +25,6 @@ What was done and when. Times are Chicago time (CST). Design: issue #12. Code: `
 | 11:37 | Full-power check: `tuning/speed marvin/big` (NOLOG) | 132-133 W, ~2,880 MHz, performance, fan curve active (~4,140 rpm); writing 44.4, reading 320.0; no watchdog message | — |
 | — | **Issue #12's good result met** (with the module's power-mode switch instead of a BIOS visit) | — | — |
 | 11:45 | **Batch 2** (8 more checks): disk < 10% free and containers restarting/unhealthy on both machines; MCPJungle servers (hub/mcp/servers/*.json) without tools; nightly backup > 26 h (last `done:` line); memory sync last line not a success or log > 2.5 h old; certificate (`*.ai` wildcard, read over TLS) < 14 days | `watchdog.py test` **22/22** (5 new cases); `once`: all 16 ok (zaphod 28% free, marvin 92%; no bad containers; 4 MCP servers with tools; backup 8 h; sync 0.1 h; certificate 85 days); every new Run-check command ran | this commit |
-| next | Daniel: `sudo systemctl restart lab-watchdog` (loads batch 2 and the two fixes) | — | — |
+| 11:52 | Daniel: `sudo systemctl restart lab-watchdog` | "started: 16 checks"; all 16 stored on the **first** loop (fix works), all ok; no alert sent | `watchdog.py status` |
+| 11:53 | marvin checkout: hand-copied `curve.sh` restored, `git pull` (d77cd21) | clean; fan curve service active | — |
+| next | Later checks (issue #12 list): `marvin/big` through the zaphod peer; reservations (#3) | — | — |
