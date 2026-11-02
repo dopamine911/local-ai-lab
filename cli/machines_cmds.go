@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -75,5 +77,58 @@ func machineCmds() []*cobra.Command {
 		},
 	}
 	backup.Flags().BoolVar(&dry, "dry-run", false, "install: show the crontab it would write, change nothing")
-	return []*cobra.Command{models, backup}
+	var asJSON bool
+	check := &cobra.Command{
+		Use:   "check",
+		Short: "Is every step of setup/host.sh done on this machine? Read-only, no sudo",
+		Long: "Checks every step of setup/host.sh on this machine (packages, groups, SSH keys, Tailscale and its serve\n" +
+			"rule, /srv/models, ~/llama-swap, time zone; zaphod: lab-actions and lab-watchdog; marvin: GPU memory,\n" +
+			"tuned, fan-chip module, power mode, fan curve; both: lab installed and as new as the repo).\n" +
+			"Changes nothing. A step that is not done shows the fix to run (printed, never run).\n" +
+			"host.sh itself stays the way to set a machine up: it installs Docker and builds lab.\n" +
+			"Good result: every line \"ok\", exit 0.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			cs := machines.SetupCheck(cfg)
+			bad := 0
+			for _, c := range cs {
+				if !c.OK {
+					bad++
+				}
+			}
+			if asJSON {
+				json.NewEncoder(os.Stdout).Encode(cs)
+			} else {
+				h, _ := os.Hostname()
+				fmt.Printf("== %s: setup/host.sh steps\n", h)
+				for _, c := range cs {
+					mark := "ok "
+					if !c.OK {
+						mark = "BAD"
+					}
+					fmt.Printf("%s  %-44s %s\n", mark, c.Step, c.Detail)
+					if c.Fix != "" {
+						fmt.Printf("     fix: %s\n", c.Fix)
+					}
+				}
+				if bad == 0 {
+					fmt.Println("== all done")
+				} else {
+					fmt.Printf("== %d step(s) not done\n", bad)
+				}
+			}
+			if bad > 0 {
+				os.Exit(1)
+			}
+			return nil
+		},
+	}
+	check.Flags().BoolVar(&asJSON, "json", false, "one JSON list (for agents)")
+	setup := &cobra.Command{Use: "setup", Short: "Machine setup: check which setup/host.sh steps are done"}
+	setup.AddCommand(check)
+	return []*cobra.Command{models, backup, setup}
 }
