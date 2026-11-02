@@ -279,22 +279,27 @@ func webuiCmd() *cobra.Command {
 	}
 	mc.Flags().BoolVar(&apply, "apply", false, "write the settings (Open WebUI models/import)")
 	w.AddCommand(mc)
-	w.AddCommand(&cobra.Command{
+	var syncDrift, dryDrift bool
+	dc := &cobra.Command{
 		Use:   "drift",
 		Short: "Settings changed by hand in the web page vs hub/compose.yaml (read-only; port of drift.sh)",
 		Long: "Compare the running Open WebUI's settings with what hub/compose.yaml would give a fresh install\n" +
 			"(a throwaway Open WebUI, no network, about 30-60 s). Read-only. Secrets show as <set>.\n" +
 			"\"in compose\" = managed by compose; \"web page only\" = changed by hand: add it to compose.yaml or undo it.\n" +
-			"To make the running one match: hub/openwebui/drift.sh --sync (moves into lab in step 3).\n" +
+			"--sync makes the running one match for the settings compose manages: stops Open WebUI for a few seconds,\n" +
+			"saves a copy of its database first (data/open-webui/webui.db.before-sync-<date>). --dry-run shows the steps.\n" +
 			"Good result: \"0 setting(s) differ\".",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load()
 			if err != nil {
 				return err
 			}
-			return webui.Drift(cfg.Repo)
+			return webui.Drift(cfg.Repo, syncDrift, dryDrift)
 		},
-	})
+	}
+	dc.Flags().BoolVar(&syncDrift, "sync", false, "make the running Open WebUI match (managed settings only)")
+	dc.Flags().BoolVar(&dryDrift, "dry-run", false, "show, change nothing")
+	w.AddCommand(dc)
 	return w
 }
 
