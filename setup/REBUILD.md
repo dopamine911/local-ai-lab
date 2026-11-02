@@ -166,6 +166,12 @@ tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, sno
 nothing installed on the host). Good result: `lab version` prints a commit id and `lab manifest` prints the same
 lines as `tuning/manifest.sh`. Without a terminal `lab` prints help (safe in scripts).
 
+### Renovate (issue #7, decisions.md 40)
+After `renovate.json` is on main: https://github.com/apps/renovate → Install → **Only select repositories** →
+`local-ai-lab`. (Installing before the config is on main makes it open its own onboarding PR with default, grouped
+settings: close that PR.) Good result: within about an hour a "Dependency Dashboard" issue and the first update PRs
+(label `versions`, at most 2 an hour). Merge one at a time and run the check in its body.
+
 ### GitHub repo settings (issue #8)
 Secret scanning and push protection on the public repo (enabled 2026-10-30; free for public repos):
 ```
