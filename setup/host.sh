@@ -44,6 +44,15 @@ step "6b. time zone America/Chicago (Daniel's local time; was Ubuntu's default U
 [ "$(timedatectl show -p Timezone --value)" = America/Chicago ] || timedatectl set-timezone America/Chicago
 timedatectl | grep 'Time zone'
 
+if [ "$H" = zaphod ]; then
+  step "6c. zaphod: notification buttons service lab-actions (hub/actions; issue #11)"
+  # Needs ACTION_SECRET in hub/.env; until then it retries every 30 s. Check: curl -s http://127.0.0.1:2587/health -> ok
+  install -m 644 /home/$U/homelab/hub/actions/lab-actions.service /etc/systemd/system/lab-actions.service
+  systemctl daemon-reload
+  systemctl enable --now lab-actions
+  systemctl is-active lab-actions || true
+fi
+
 if [ "$H" = marvin ]; then
   step "7. marvin: let the GPU use 120 GB of the shared memory (default is about half)"
   f=/etc/default/grub.d/90-gpu-memory.cfg

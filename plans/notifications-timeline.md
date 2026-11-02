@@ -33,4 +33,14 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | ~18:40 | Daniel re-added the topics on our server; deleted the ntfy.sh ones | ntfy `subscribers=3`; the app's own test send is refused for `daniel` (read-only, as designed) | — |
 | 18:41 | `hub/notify` to lab-done, lab-alert (high), lab-research | **all three arrived on the phone** | this commit |
 | — | REBUILD.md "Phone notifications": set the app's default server first; check `subscribers=3`; the login fallback (`NTFY_ENABLE_LOGIN`) was not needed and is removed | — | this commit |
-| next | Phase 2: action buttons (issue #11); watchdog (issue #12) | — | — |
+
+### Phase 2: buttons (issue #11)
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 18:43 | Design: a host service on zaphod (actions run the same scripts Daniel runs: docker, ssh, git), not a container; Python stdlib only; the button carries only a signed one-time token, the action is stored on zaphod; Rerun only for zaphod runs until reservations (#3) exist | advisor review agreed | issue #11 |
+| 18:47 | `hub/actions/actiond.py` (serve / button / log), `ACTION_SECRET` in hub/.env, `hub/notify -a` (buttons go through the private file descriptor, not the process list) | 11 local checks pass: valid 200, again 403, bad signature 403, another button's signature 403, unknown 404, expired 403, GET 405, wrong path 404, 5 KB body 400, listens 127.0.0.1 only, LAN unreachable | this commit |
+| 18:48 | Caddy route `act.<DOMAIN>` -> 127.0.0.1:2587, reloaded | https health ok; notify and chat pages still 200 | this commit |
+| 18:53 | Phone test: notification with **Ack** + **Open MLflow** | Daniel tapped Ack; log: `100.64.122.73` (pixel-11-pro) ack 200; "Acknowledged" sent | `~/.local/state/lab-actions/actions.log` |
+| 18:56 | Daniel installed the system service `lab-actions` (setup/host.sh step 6c) | active, runs as daniel; over HTTPS: valid 200, again 403, bad signature 403 | this commit |
+| next | Step 2: **Rerun** and **Skip** on benchmark notifications (`tuning/log`); zaphod runs only | — | — |

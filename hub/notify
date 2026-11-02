@@ -10,19 +10,20 @@
 #   -g tags      comma-separated; emoji short codes show as icons (e.g. white_check_mark, warning)
 #   -c url       opened when the notification is tapped
 #   -m           message is Markdown
+#   -a actions   ntfy buttons, ";"-separated, made by hub/actions/actiond.py button (max 3)
 #
 # Good result: exit 0 and "sent: <title>". The token comes from hub/.env (NTFY_SENDER_TOKEN) and is never printed:
-# curl reads the Authorization header from a file descriptor, not from its arguments.
+# curl reads the Authorization (and Actions: button tokens) headers from a file descriptor, not from its arguments.
 # Works from any directory on zaphod. Not on marvin yet (it has no copy of the token).
 set -euo pipefail
 HUB=$(cd "$(dirname "$0")" && pwd)
 URL=${NTFY_URL:-http://127.0.0.1:2586}
-topic=lab-done prio=default tags="" click="" md=""
-while getopts "t:p:g:c:m" o; do
-  case $o in t) topic=$OPTARG;; p) prio=$OPTARG;; g) tags=$OPTARG;; c) click=$OPTARG;; m) md=yes;; *) sed -n 2,16p "$0"; exit 2;; esac
+topic=lab-done prio=default tags="" click="" md="" actions=""
+while getopts "t:p:g:c:ma:" o; do
+  case $o in t) topic=$OPTARG;; p) prio=$OPTARG;; g) tags=$OPTARG;; c) click=$OPTARG;; m) md=yes;; a) actions=$OPTARG;; *) sed -n 2,17p "$0"; exit 2;; esac
 done
 shift $((OPTIND - 1))
-[ $# -eq 2 ] || { sed -n 2,16p "$0"; exit 2; }
+[ $# -eq 2 ] || { sed -n 2,17p "$0"; exit 2; }
 title=$1 msg=$2
 case $topic in lab-done|lab-alert|lab-research) ;; *) echo "notify: topic must be lab-done, lab-alert or lab-research"; exit 2;; esac
 token=$(grep -m1 '^NTFY_SENDER_TOKEN=' "$HUB/.env" | cut -d= -f2-)
@@ -31,6 +32,6 @@ args=(-sS -o /dev/null -w '%{http_code}' -H @/dev/fd/3 -H "Title: $title" -H "Pr
 [ -n "$tags" ] && args+=(-H "Tags: $tags")
 [ -n "$click" ] && args+=(-H "Click: $click")
 [ -n "$md" ] && args+=(-H "Markdown: yes")
-code=$(curl "${args[@]}" --data-binary "$msg" "$URL/$topic" 3< <(printf 'Authorization: Bearer %s\n' "$token") || true)
+code=$(curl "${args[@]}" --data-binary "$msg" "$URL/$topic" 3< <(printf 'Authorization: Bearer %s\n' "$token"; [ -n "$actions" ] && printf 'Actions: %s\n' "$actions") || true)
 unset token
 [ "$code" = 200 ] && echo "sent: $title" || { echo "notify: failed (HTTP $code)"; exit 1; }

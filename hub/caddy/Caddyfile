@@ -16,6 +16,7 @@
 	@mlflow  host mlflow.{$DOMAIN}
 	@comfy   host comfy.{$DOMAIN}
 	@notify  host notify.{$DOMAIN}
+	@act     host act.{$DOMAIN}
 
 	# llama-swap UIs (each still asks for its own API key)
 	handle @zaphod {
@@ -41,6 +42,10 @@
 	# Notifications (ntfy): the phone app logs in as `daniel`; scripts send with a token. Access rules in compose.yaml.
 	handle @notify {
 		reverse_proxy 127.0.0.1:2586
+	}
+	# Notification buttons (hub/actions/actiond.py): each request needs a signed one-time token from a notification.
+	handle @act {
+		reverse_proxy 127.0.0.1:2587
 	}
 
 	# Models panel: Caddy adds the API keys, so the browser never sees them.

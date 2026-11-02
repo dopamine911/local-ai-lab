@@ -82,7 +82,7 @@ Restore the `.env` files from your password manager (or make new ones; each `.en
 | --- | --- | --- |
 | `zaphod/llama-swap/.env` | `ZAPHOD_KEY`, `MARVIN_KEY` (same as marvin's), `MARVIN_FORK_KEY` (only while the fork test runs: same as marvin:~/strata-fork/key, made by `fork.sh start`) | New one: `printf 'ZAPHOD_KEY=%s\n' "$(openssl rand -hex 24)"`; then update hub/.env and every app that uses it |
 | `marvin/llama-swap/.env` | `MARVIN_KEY`, `BESZEL_KEY`, `TAILSCALE_IP` | New `MARVIN_KEY` as above; `BESZEL_KEY` = same as hub/.env; `TAILSCALE_IP` = `tailscale ip -4` |
-| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `NTFY_PHONE_PASSWORD`, `NTFY_SENDER_TOKEN`, `NTFY_AUTH_USERS`, `NTFY_AUTH_TOKENS`, `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
+| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `NTFY_PHONE_PASSWORD`, `NTFY_SENDER_TOKEN`, `NTFY_AUTH_USERS`, `NTFY_AUTH_TOKENS`, `ACTION_SECRET` (notification buttons), `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
 
 Then build and start (each `compose.yaml` has its `build:` lines):
 
@@ -120,6 +120,11 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    `docker compose -f ~/homelab/hub/compose.yaml logs --tail 2 ntfy` shows `subscribers=3` (one per topic).
    "Send test notification" in the app fails with "not authorized" on purpose: `daniel` can only read.
    Messages are kept 24 h: a phone offline longer misses them.
+6. Buttons (`hub/actions/actiond.py`, service `lab-actions`, installed by `setup/host.sh` step 6c; needs
+   `ACTION_SECRET` in hub/.env). Check: `curl -s https://act.<DOMAIN>/health` -> `ok`, then
+   `b=$(~/homelab/hub/actions/actiond.py button ack Ack "rebuild check"); ~/homelab/hub/notify -a "$b" "test" "tap Ack"`.
+   Good result: tapping **Ack** clears it and "Acknowledged" arrives; `actiond.py log` shows the phone's
+   Tailscale address with `200 ok`.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 

@@ -1,0 +1,22 @@
+# Notification buttons (hub/actions/actiond.py, issue #11). Installed by setup/host.sh (zaphod) into
+# /etc/systemd/system/. Runs as daniel: actions start the same scripts Daniel runs. Listens on 127.0.0.1:2587 only;
+# Caddy serves it as https://act.<DOMAIN> on the tailnet. Log: ~/.local/state/lab-actions/actions.log
+[Unit]
+Description=Lab notification buttons (actiond)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+User=daniel
+Group=daniel
+ExecStart=/usr/bin/python3 /home/daniel/homelab/hub/actions/actiond.py serve
+Restart=on-failure
+RestartSec=30
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+[Install]
+WantedBy=multi-user.target
