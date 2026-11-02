@@ -55,6 +55,7 @@ func main() {
 		},
 	}
 	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
+	root.AddCommand(benchCmds()...)
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -120,7 +121,7 @@ func manifestCmd() *cobra.Command {
 }
 
 func mcpCmd() *cobra.Command {
-	m := &cobra.Command{Use: "mcp", Short: "The MCP tool gateway (MCPJungle): status"}
+	m := &cobra.Command{Use: "mcp", Short: "The MCP tool gateway (MCPJungle): status, setup"}
 	var asJSON, tools bool
 	st := &cobra.Command{
 		Use:   "status",
@@ -257,7 +258,7 @@ func ensoCmd() *cobra.Command {
 }
 
 func webuiCmd() *cobra.Command {
-	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift"}
+	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift (and --sync), per-model settings"}
 	var apply bool
 	mc := &cobra.Command{
 		Use:   "models",

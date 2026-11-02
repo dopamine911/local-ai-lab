@@ -30,7 +30,16 @@ type Config struct {
 		Container string `yaml:"container"`
 		Image     string `yaml:"image"`
 	} `yaml:"enso"`
+	Images struct {
+		MLflow   string `yaml:"mlflow"`
+		Python   string `yaml:"python"`
+		ToolEval string `yaml:"tool_eval"`
+		KL       string `yaml:"kl"`
+	} `yaml:"images"`
 }
+
+// Tuning is the repo's tuning/ folder: the benchmark commands run there, like the scripts (cd "$(dirname "$0")").
+func (c *Config) Tuning() string { return filepath.Join(c.Repo, "tuning") }
 
 // Expand turns a leading ~/ into the home folder.
 func Expand(p string) string {

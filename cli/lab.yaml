@@ -17,3 +17,8 @@ mcpjungle:                      # the MCP gateway (lab mcp setup / hub/mcp/setup
 enso:
   container: enso
   image: enso-agent:537559a     # same tag as agents/enso/compose.yaml and enso.sh (Enso commit 537559a)
+images:                        # containers the benchmark commands run (lab log/series/speed/quality/bench/kl); same as the tuning scripts
+  mlflow: ghcr.io/mlflow/mlflow:v3.17.2        # logging (tuning/log_run.py) and series; same version as hub/compose.yaml
+  python: python:3.13.18-slim-trixie@sha256:ae14d4ce8771606477a81446e7ef429edd6762305fc50c84507c1041fa8285d1  # activity (llama-swap request log); same as hub/compose.yaml
+  tool_eval: tool-eval-bench:3.0.0             # built locally (tuning/README.md)
+  kl: ghcr.io/ggml-org/llama.cpp:full-vulkan-b11913   # llama-perplexity for lab kl; official image
