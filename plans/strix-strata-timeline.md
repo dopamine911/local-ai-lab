@@ -128,4 +128,4 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:52 | Fork status check | up 23 h, no errors, 0 requests besides the 20:28 test | |
 | ~18:54 | Daniel: hold off on live testing | | decisions.md 37 |
 | 18:54 | `fork.sh stop` on marvin | llama-swap back | |
-| 18:55-18:57 | `marvin-fork` peer removed from zaphod config; reload | 7 models ready; `marvin/big` answers | |
+| 18:55 | `marvin-fork` peer removed from zaphod config; reload | 7 models ready; `marvin/big` answers | |
