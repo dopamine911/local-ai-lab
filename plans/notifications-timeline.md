@@ -43,4 +43,8 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | 18:48 | Caddy route `act.<DOMAIN>` -> 127.0.0.1:2587, reloaded | https health ok; notify and chat pages still 200 | this commit |
 | 18:53 | Phone test: notification with **Ack** + **Open MLflow** | Daniel tapped Ack; log: `100.64.122.73` (pixel-11-pro) ack 200; "Acknowledged" sent | `~/.local/state/lab-actions/actions.log` |
 | 18:56 | Daniel installed the system service `lab-actions` (setup/host.sh step 6c) | active, runs as daniel; over HTTPS: valid 200, again 403, bad signature 403 | this commit |
+| 19:02 | Does a tapped notification clear? ("Clear test", `clear=true`) | **No**: the tap ran (200, button shows a check mark, "Acknowledged" arrived) but the notification stays in the shade. ntfy stored `clear: true` correctly. A second tap -> 403 "already used" (as designed) | actions.log |
+| 19:03 | Server-side clear (`X-Sequence-ID` on send, then `PUT /lab-done/<id>/clear` with the sender token) | server 200 both, but the phone did **not** dismiss it | — |
+| 19:10 | App version | ntfy Android **1.25.2** = latest (2026-07-21); its notes list a `clear=true` fix in 1.23.0, nothing later; no matching open issue found | — |
+| — | Decision: live with it. A used button shows a check mark and the follow-up message confirms; repeated taps are refused. Re-test after an app update | — | — |
 | next | Step 2: **Rerun** and **Skip** on benchmark notifications (`tuning/log`); zaphod runs only | — | — |
