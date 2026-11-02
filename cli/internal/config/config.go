@@ -28,6 +28,7 @@ type Config struct {
 	} `yaml:"mcpjungle"`
 	Enso struct {
 		Container string `yaml:"container"`
+		Image     string `yaml:"image"`
 	} `yaml:"enso"`
 }
 

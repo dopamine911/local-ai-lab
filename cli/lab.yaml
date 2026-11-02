@@ -16,3 +16,4 @@ mcpjungle:                      # the MCP gateway (lab mcp setup / hub/mcp/setup
   registry: http://127.0.0.1:8085
 enso:
   container: enso
+  image: enso-agent:537559a     # same tag as agents/enso/compose.yaml and enso.sh (Enso commit 537559a)

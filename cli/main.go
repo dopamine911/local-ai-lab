@@ -179,7 +179,60 @@ func mcpCmd() *cobra.Command {
 }
 
 func ensoCmd() *cobra.Command {
-	e := &cobra.Command{Use: "enso", Short: "The Enso agent container: check"}
+	e := &cobra.Command{Use: "enso", Short: "The Enso agent container: build, setup, up, check, tui, shell, down"}
+	var dry bool
+	ops := func() (*enso.Ops, error) {
+		cfg, err := config.Load()
+		if err != nil {
+			return nil, err
+		}
+		o := &enso.Ops{Repo: cfg.Repo, Image: cfg.Enso.Image, Container: cfg.Enso.Container, DryRun: dry}
+		if o.Container == "" {
+			o.Container = "enso"
+		}
+		if o.Image == "" {
+			o.Image = "enso-agent:537559a"
+		}
+		return o, nil
+	}
+	sub := func(use, short, long string, f func(o *enso.Ops, args []string) error) {
+		c := &cobra.Command{Use: use, Short: short, Long: long,
+			RunE: func(cmd *cobra.Command, args []string) error {
+				o, err := ops()
+				if err != nil {
+					return err
+				}
+				return f(o, args)
+			}}
+		c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+		e.AddCommand(c)
+	}
+	sub("build", "Build the Enso image (network at build time only)", "Good result: the image tag from cli/lab.yaml exists (docker images).",
+		func(o *enso.Ops, _ []string) error { return o.Build() })
+	sub("setup", "Make ~/agents/enso-home (keys, pi config) and ~/agents/work (enso-harness clone); safe to rerun",
+		"Keys are copied (mode 600, never printed); configs are overwritten from the repo.\nGood result: \"setup done: ... (keys: mcp-token zaphod-key ), ... at <commit>\".",
+		func(o *enso.Ops, _ []string) error { return o.Setup() })
+	sub("up", "Start Enso and the relay; web page on http://localhost:5178 (zaphod only)", "Good result: \"Enso: http://localhost:5178\".",
+		func(o *enso.Ops, _ []string) error { return o.Up() })
+	sub("down", "Stop Enso and the relay", "Good result: both containers gone (docker ps).",
+		func(o *enso.Ops, _ []string) error { return o.Down() })
+	e.AddCommand(&cobra.Command{Use: "tui [pi options]", Short: "Enso's terminal on the workspace, with the lab's MCP tools (e.g. --model lab/coder)",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			o, err := ops()
+			if err != nil {
+				return err
+			}
+			return o.TUI(args)
+		}})
+	e.AddCommand(&cobra.Command{Use: "shell", Short: "A shell inside the Enso container",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			o, err := ops()
+			if err != nil {
+				return err
+			}
+			return o.Shell()
+		}})
 	e.AddCommand(&cobra.Command{
 		Use:   "check",
 		Short: "Enso reaches the models and its tools, and not the internet (port of agents/enso/enso.sh check)",
