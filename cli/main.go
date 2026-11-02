@@ -151,6 +151,27 @@ func mcpCmd() *cobra.Command {
 			return nil
 		},
 	}
+	var dry bool
+	setup := &cobra.Command{
+		Use:   "setup",
+		Short: "Register tool servers and agent logins from hub/mcp (port of hub/mcp/setup.sh); --dry-run",
+		Long: "Install the pinned mcpjungle CLI (checksum checked), create the admin once, register every tool server in\n" +
+			"hub/mcp/servers/*.json, keep only the tools in <name>.tools, and recreate every agent login in\n" +
+			"hub/mcp/clients/*.json (tokens from hub/.env, never printed). Safe to run again; agents lose their login for\n" +
+			"a few seconds while it is recreated.\n" +
+			"Good result: a line per tool server and per client, no FAILED; then `lab mcp status` says \"Matches the repo\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			s := &mcp.Setup{Bin: config.Expand(cfg.MCPJungle.Bin), Registry: cfg.MCPJungle.Registry,
+				Version: cfg.MCPJungle.Version, Repo: cfg.Repo, DryRun: dry}
+			return s.Run()
+		},
+	}
+	setup.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+	m.AddCommand(setup)
 	st.Flags().BoolVar(&asJSON, "json", false, "one JSON object (for agents)")
 	st.Flags().BoolVar(&tools, "tools", false, "list every tool, on and off")
 	m.AddCommand(st)

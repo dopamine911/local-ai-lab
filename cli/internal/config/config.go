@@ -22,6 +22,7 @@ type Config struct {
 	Repo      string             `yaml:"-"`
 	Machines  map[string]Machine `yaml:"machines"`
 	MCPJungle struct {
+		Version  string `yaml:"version"`
 		Bin      string `yaml:"bin"`
 		Registry string `yaml:"registry"`
 	} `yaml:"mcpjungle"`

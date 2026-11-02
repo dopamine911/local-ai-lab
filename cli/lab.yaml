@@ -10,7 +10,8 @@ machines:
     ssh: marvin
     llama_swap_port: 8080
     llama_swap_container: llama-swap
-mcpjungle:                      # the MCP gateway (hub/mcp/setup.sh)
+mcpjungle:                      # the MCP gateway (lab mcp setup / hub/mcp/setup.sh)
+  version: 0.4.7                # the CLI; same version as the mcpjungle image in hub/compose.yaml (Renovate moves both)
   bin: ~/.local/bin/mcpjungle
   registry: http://127.0.0.1:8085
 enso:

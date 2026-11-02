@@ -188,6 +188,18 @@
       "datasourceTemplate": "github-releases"
     },
     {
+      "description": "MCPJungle CLI version in cli/lab.yaml (mcpjungle.version), for `lab mcp setup`; grouped with the image.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^cli/lab\\.yaml$/"
+      ],
+      "matchStrings": [
+        "\\n  version: (?<currentValue>[0-9.]+)\\s+# the CLI"
+      ],
+      "depNameTemplate": "mcpjungle/MCPJungle",
+      "datasourceTemplate": "github-releases"
+    },
+    {
       "description": "pip pins inside Dockerfiles (pip install name==X or \"name[extras]==X\").",
       "customType": "regex",
       "managerFilePatterns": [
