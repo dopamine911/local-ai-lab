@@ -64,6 +64,8 @@ marvin only, with its screen and keyboard attached (fan-chip module, read-only; 
    says BIOS power mode `performance` and every fan mode `auto`.
 4. After the reboot nothing on marvin restarts by itself: `cd ~/homelab/marvin/llama-swap && docker compose start
    llama-swap`, and check the Beszel agent is up.
+5. Fan curve, only if the test in plans/marvin-fan-timeline.md kept it: `sudo ~/homelab/marvin/fan/curve.sh boot on`.
+   Good result: `active`, and `~/homelab/marvin/fan/curve.sh check` shows every fan in mode `curve`.
 
 ## 4. Models (script, takes hours)
 

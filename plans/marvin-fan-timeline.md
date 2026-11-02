@@ -47,3 +47,18 @@ Baseline, busy samples (>=90%) by GPU temperature:
 | 80-84 C | 967 | 2,898 (2,670) | 118 (103) | 2,645 / 2,852 / 2,097 |
 | 85-89 C | 264 | 2,882 (2,682) | 123 (109) | 2,678 / 2,867 / 2,406 |
 | 90-94 C | 17 | 2,874 (2,829) | 134 (118) | 2,767 / 2,970 / 2,346 |
+| 19:40 | Module source read (f62c2c2): the 60/70/83/95/97 curve is the **module's default for its own curve mode** (believed to copy the factory curve), not read from the chip; in auto the chip's curve is not readable. Curve mode = the module steps each fan one level per second from the EC temperature; unloading the module returns fans to auto | "fans never above ~60%" is an inference from rpm (jump at EC 70 C, ~3,100 rpm max), not a direct reading; `maxrpm` measures the real top speed | src/ec_su_axb35.c |
+| 19:45 | `marvin/fan/curve.sh` (check / maxrpm / apply / auto / boot on\|off); test curve up 50,58,65,72,78 / down 45,53,60,67,74 (full speed from EC 78 C; Daniel: noise doesn't matter) | dry run on a fake folder: apply, auto, restore pass; **found and fixed**: maxrpm left fans at 100% (saved modes were a local, gone when the restore ran); Ctrl-C restores too; refuses on zaphod's board; `check` on marvin (read-only) OK | this commit |
+| next | The test, after the port agent finishes (it would change their conditions). Steps below | — | — |
+
+### Curve test procedure (one change: factory auto -> curve)
+1. Port agent done; nothing else running on marvin. Daniel pushes; on marvin `cd ~/homelab && git pull`.
+2. On marvin: `sudo ~/homelab/marvin/fan/curve.sh maxrpm`. Good result: rpm well above ~3,100 (the headroom).
+3. On marvin: `~/homelab/marvin/fan/sample.sh 60 ~/fan-samples/2026-11-0x-curve-test.csv &`
+4. **A, factory:** on zaphod `cd ~/homelab/tuning; for i in 1 2 3 4; do ./speed marvin/big "fan test A factory auto run $i"; done`
+5. Cool down until `curve.sh check` shows EC under 55 C.
+6. On marvin: `sudo ~/homelab/marvin/fan/curve.sh apply`
+7. **B, curve:** the same loop as 4 with "fan test B curve 78C run $i".
+8. Compare from the CSV (same busy time in A and B): GPU temp, clock, watts, rpm; and the speed results.
+   Keep if GPU temperature is lower with the clock the same or higher: `sudo curve.sh boot on` (setup/REBUILD.md).
+   Otherwise `sudo curve.sh auto`.

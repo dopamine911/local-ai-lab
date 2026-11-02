@@ -73,6 +73,7 @@ if [ "$H" = marvin ]; then
   # Not automatic: it needs a module-signing key enrolled at marvin's screen (Secure Boot). Run by hand, in order:
   #   sudo ~/homelab/marvin/fan/ec-module.sh prepare   (asks a 5-character password) -> reboot -> blue MOK screen
   #   sudo ~/homelab/marvin/fan/ec-module.sh install   ; then ~/homelab/marvin/fan/ec-module.sh check
+  # Fan curve (only once the test in plans/marvin-fan-timeline.md keeps it): sudo ~/homelab/marvin/fan/curve.sh boot on
   ~/homelab/marvin/fan/ec-module.sh check 2>/dev/null | grep -E '^(module|BIOS power mode)' || echo "fan module: see marvin/fan/ec-module.sh"
 fi
 
