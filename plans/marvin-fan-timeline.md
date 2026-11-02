@@ -33,8 +33,9 @@ script: `marvin/fan/ec-module.sh`. Sources: commits, command output, marvin logs
 | --- | --- | --- | --- |
 | 19:08 | Port agent starts a full-power llama.cpp benchmark; second sampler started, 4 h | `~/fan-samples/2026-11-01-full-power.csv` on marvin (until ~23:08) | — |
 | 19:15 | Baseline read (10 h, 7,139 samples, 2.3 h busy at >=90%, the agent's tests) | **clock flat with temperature**: busy median 2,850-2,900 MHz in every 5 C band up to 90-94 C (min 2,659); power mode performance throughout; busy under 100 W 0.4%; max GPU 92 C, EC 87 C; fans max 3,129 / 3,281 / 2,481 rpm | table below |
-| 19:15 | Fan level under load | `level 5` = 100% (module README: 0-5, 5 = 100%) already in auto at EC 80 C: **fans are at full speed under load**, so a steeper curve cannot add cooling | `ec-module.sh check` |
-| — | Decision: **no fan change** (plan step 3 needs clocks under ~2,600 MHz at 95 C+; not seen). Re-check with tonight's full-power recording (it may reach the 93-97 C seen on 32K reads). Only physical options remain (PTM7950 pad, airflow), and only if a recording shows the clock dropping | — | — |
+| 19:15 | Fan level under load | ~~fans at full speed (`level 5`)~~ **wrong, corrected 19:25**: in auto mode `level` is not live (reads 5 with fans stopped at EC 45 C) | `ec-module.sh check` |
+| 19:25 | Factory curve read (`rampup_curve`, EC C for levels 1-5): fan1/2 **60, 70, 83, 95, 97**; fan3 20, 60, 83, 95, 97 (rampdown 40, 50, 80, 94, 96). EC max last night 87 C | **fans never above level 3 (~60%)**: max rpm by EC temp ~2,650 below 70 C, ~3,100 above (level 2 step); 80% only at 95 C, 100% at 97 C. **Headroom exists**: a steeper curve can lower temperature | sysfs |
+| — | Decision (corrected): no throttling seen, but Daniel wants lower temperature (92 C GPU, margin to 100 C Tjmax). Next: plan step 3, one curve change, measured with the same load. Not while the port agent benchmarks (it would change their conditions); Daniel decides when | — | — |
 
 Baseline, busy samples (>=90%) by GPU temperature:
 
