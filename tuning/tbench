@@ -14,6 +14,7 @@
 #   TARGET=marvin ./tbench smoke "flash-next"     (marvin's model, labelled as marvin)
 #   TARGET=marvin-strata ./tbench full "strata"   (Strata on marvin; start it first: marvin's strata-test.sh start)
 #   TARGET=marvin-fork ./tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
+#   RERUN=1 TARGET=marvin ./tbench full "again"   (same model and profile again: without RERUN=1 the suite skips it)
 #
 # With a skill (instruction file added to the agent's prompt; frontmatter stripped):
 #   SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"
@@ -53,7 +54,7 @@ MODEL_NAME="${MODEL_NAME:-Qwen3.8-27B}"
 QUANT="${QUANT:-UD-Q4_K_XL}"
 PROFILE="${PROFILE:-mtp2-256k-kvq8}"   # describe the setup: e.g. mtp3-256k-kvq8
 
-usage() { sed -n '2,17p' "$0"; exit 1; }
+usage() { sed -n '2,18p' "$0"; exit 1; }
 need_repo() { [ -d "$DIR" ] || { echo "Run ./tbench setup first."; exit 1; }; }
 if [ -n "$SKILL" ]; then
   [ -f "$SKILL" ] || { echo "SKILL file not found: $SKILL"; exit 1; }
@@ -92,11 +93,19 @@ run_tier() {
   local tier="$1" note="$2"
   need_repo; key
   export RUN_START=$(date +%s)   # ./log reads real-use speed for this window from llama-swap's request log
-  (cd "$DIR" && ./terminal_bench.py run --suite core19 --tier "$tier" \
+  # RERUN=1: run every task again even if this model / profile already has results (the suite skips them otherwise)
+  local rerun=(); [ "${RERUN:-0}" = 1 ] && rerun=(--rerun)
+  local mark; mark=$(mktemp)
+  (cd "$DIR" && ./terminal_bench.py run --suite core19 --tier "$tier" "${rerun[@]}" \
      --endpoint "$ENDPOINT" --model "$MODEL" "${CTX[@]}" \
      --platform "$PLATFORM" --platform-name "$PLATFORM_NAME" \
      --model-name "$MODEL_NAME" --engine "$ENGINE" --backend "$BACKEND" --backend-version "$BACKEND_VERSION" \
      --quant "$QUANT" --inference-profile "$PROFILE")
+  # Log only if this call made a new job; a skipped run would log the old result under the new note
+  if [ -z "$(find "$DIR/jobs" -mindepth 1 -maxdepth 1 -type d -newer "$mark" 2>/dev/null | head -1)" ]; then
+    rm -f "$mark"; echo "No new job ran (results for $MODEL / $PROFILE already exist?), so nothing logged. Again: RERUN=1"; exit 1
+  fi
+  rm -f "$mark"
   log_latest "$note"
 }
 
