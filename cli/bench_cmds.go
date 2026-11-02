@@ -169,7 +169,25 @@ func benchCmds() []*cobra.Command {
 			return exitWith(bench.ExitError{Code: 1})
 		},
 	}
-	return []*cobra.Command{log, series, speed, quality, benchC, kl}
+	tb := &cobra.Command{
+		Use:   "tbench setup|doctor|smoke <note>|full <note>|log <note>",
+		Short: "Terminal-Bench-Local (19 terminal tasks, pass@2), logged (port of tuning/tbench)",
+		Long: bench.TBenchHelp + "\nWith a skill: SKILL=instructions/the-craft@3c329d0.md lab tbench smoke \"the-craft\"\n" +
+			"(the profile gets \"+<skill>\" appended, so these runs never mix with plain ones).\n" +
+			"Good result: the suite's pass/fail table, then \"== logging ...summary.json\" and \"Logged run\".",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 0 && (args[0] == "-h" || args[0] == "--help") {
+				return cmd.Help()
+			}
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			return exitWith(bench.TBench(cfg, args))
+		},
+	}
+	return []*cobra.Command{log, series, speed, quality, benchC, kl, tb}
 }
 
 // cutDryRun takes a leading --dry-run off args (the rest pass through to the benchmark tool untouched).
