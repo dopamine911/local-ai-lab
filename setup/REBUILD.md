@@ -161,6 +161,11 @@ On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly
 Not backed up on purpose (rebuilt empty, nothing lost that matters): `~/.local/state/lab-actions/` (button tokens, 24 h;
 tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, snoozes; log).
 
+### lab CLI (issue #6)
+`setup/host.sh` step 10 builds and installs it on both machines (`~/homelab/cli/build.sh install`; pinned Go container,
+nothing installed on the host). Good result: `lab version` prints a commit id and `lab manifest` prints the same
+lines as `tuning/manifest.sh`. Without a terminal `lab` prints help (safe in scripts).
+
 ### GitHub repo settings (issue #8)
 Secret scanning and push protection on the public repo (enabled 2026-10-30; free for public repos):
 ```

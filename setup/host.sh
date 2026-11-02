@@ -84,4 +84,9 @@ if [ "$H" = marvin ]; then
   ~/homelab/marvin/fan/ec-module.sh check 2>/dev/null | grep -E '^(module|BIOS power mode)' || echo "fan module: see marvin/fan/ec-module.sh"
 fi
 
+step "10. lab CLI (cli/; issue #6): build in a pinned Go container, install to ~/.local/bin/lab (both machines)"
+# Needs Docker (step 1-2). Runs as $U, not root, so the build cache and binary belong to $U.
+# Check: lab version (a commit id), lab manifest (same lines as tuning/manifest.sh)
+sudo -u "$U" /home/$U/homelab/cli/build.sh install || echo "lab CLI build failed: run ~/homelab/cli/build.sh by hand"
+
 step "done. Log out and back in (new groups), then continue with setup/REBUILD.md"
