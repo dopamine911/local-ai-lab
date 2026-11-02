@@ -18,13 +18,15 @@ command; its output comes back as a notification). Nothing from the phone choose
 State: ~/.local/state/lab-watchdog/state.db. Log: ~/.local/state/lab-watchdog/watchdog.log.
 Good result of the service: `systemctl is-active lab-watchdog` and a "started" line in the log.
 """
-import os, sqlite3, subprocess, sys, time
+import datetime, glob, os, re, socket, sqlite3, ssl, subprocess, sys, time
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.expanduser(os.environ.get("LAB_WATCHDOG_STATE", "~/.local/state/lab-watchdog"))
 DB, LOG = os.path.join(STATE, "state.db"), os.path.join(STATE, "watchdog.log")
 REMIND_S = 4 * 3600
 MAX_PER_HOUR = 12  # all watchdog notifications together; more are logged, not sent
+MJ, MJ_REG = os.path.expanduser("~/.local/bin/mcpjungle"), "http://127.0.0.1:8085"  # hub/mcp/setup.sh
+CERT_HOST = "notify.ai.dopamine911.com"  # any *.ai name: Caddy holds one wildcard certificate
 MARVIN_SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "marvin"]
 
 # One read of marvin: key=value lines. Read-only (sysfs, curl to its own llama-swap).
@@ -35,6 +37,8 @@ echo watts=$(( $(cat $D/hwmon/hwmon*/power1_average 2>/dev/null || echo 0) / 100
 echo edge=$(( $(cat $D/hwmon/hwmon*/temp1_input 2>/dev/null || echo 0) / 1000 ))
 echo power_mode=$(cat $E/apu/power_mode 2>/dev/null)
 echo health=$(curl -s -o /dev/null -m 5 -w '%{http_code}' http://127.0.0.1:8080/health)
+echo disk_free=$(df -P / | awk 'NR==2{print 100-$5}')
+echo bad_containers=$(docker ps -a --format '{{.Names}}:{{.State}}:{{.Status}}' | grep -E ':restarting:|unhealthy' | cut -d: -f1 | paste -sd,)
 '''
 
 
@@ -59,6 +63,40 @@ def read_all():
                     r[f"zaphod_{name}_junction"] = int(open(os.path.join(hw, t[:-6] + "_input")).read()) // 1000
         except (OSError, IndexError, ValueError):
             pass
+    # batch 2: disk, containers, MCPJungle, backup and memory sync age, certificate
+    st = os.statvfs("/")
+    r["zaphod_disk_free"] = round(100 * st.f_bavail / st.f_blocks)
+    try:
+        p = subprocess.run(["docker", "ps", "-a", "--format", "{{.Names}}:{{.State}}:{{.Status}}"],
+                           capture_output=True, text=True, timeout=20)
+        if p.returncode == 0:
+            r["zaphod_bad_containers"] = ",".join(l.split(":")[0] for l in p.stdout.splitlines()
+                                                  if ":restarting:" in l or "unhealthy" in l)
+    except subprocess.TimeoutExpired:
+        pass
+    try:
+        p = subprocess.run([MJ, "--registry", MJ_REG, "list", "tools"], capture_output=True, text=True, timeout=30)
+        have = set(re.findall(r"^\d+\. ([a-z0-9_-]+)__", p.stdout + p.stderr, re.M))
+        want = {os.path.basename(f)[:-5] for f in glob.glob(os.path.join(HUB, "mcp", "servers", "*.json"))}
+        r["mcp_missing"] = ",".join(sorted(want - have)) if have or p.returncode == 0 else "list tools failed"
+    except (subprocess.TimeoutExpired, OSError):
+        r["mcp_missing"] = "list tools failed"
+    r["backup_age_h"] = log_age_h(os.path.expanduser("~/.cache/backup-to-marvin.log"),
+                                  r"^== (\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) done:")
+    sync = os.path.expanduser("~/.cache/memory-sync.log")
+    try:
+        last = open(sync).read().strip().splitlines()[-1]
+        r["sync_age_h"] = (time.time() - os.path.getmtime(sync)) / 3600
+        r["sync_last_ok"] = bool(re.match(r"^sync: \d+ uploaded", last))
+    except (OSError, IndexError):
+        pass
+    try:
+        ctx = ssl.create_default_context()
+        with socket.create_connection((CERT_HOST, 443), timeout=10) as sk, ctx.wrap_socket(sk, server_hostname=CERT_HOST) as t:
+            end = ssl.cert_time_to_seconds(t.getpeercert()["notAfter"])
+        r["cert_days"] = (end - time.time()) / 86400
+    except (OSError, ssl.SSLError, KeyError, ValueError):
+        r["cert_days"] = None
     try:
         p = subprocess.run(["curl", "-s", "-o", "/dev/null", "-m", "5", "-w", "%{http_code}",
                             "http://127.0.0.1:8080/health"], capture_output=True, text=True, timeout=10)
@@ -66,6 +104,18 @@ def read_all():
     except subprocess.TimeoutExpired:
         r["zaphod_health"] = "timeout"
     return r
+
+
+def log_age_h(path, pattern):
+    """Hours since the last line matching pattern (its timestamp, local time); None if none found."""
+    try:
+        stamps = re.findall(pattern, open(path).read(), re.M)
+    except OSError:
+        return None
+    if not stamps:
+        return None
+    t = datetime.datetime.strptime(stamps[-1], "%Y-%m-%d %H:%M:%S").timestamp()
+    return (time.time() - t) / 3600
 
 
 def num(r, k):
@@ -117,6 +167,54 @@ def v_health(key, needs_marvin):
     return v
 
 
+def v_disk(key, needs_marvin):
+    def v(r):
+        f = num(r, key)
+        if f is None or (needs_marvin and not marvin_known(r)):
+            return "unknown", "-"
+        return ("bad" if f < 10 else "ok"), f"/ {f:.0f}% free"
+    return v
+
+
+def v_containers(key, needs_marvin):
+    def v(r):
+        if key not in r or (needs_marvin and not marvin_known(r)):
+            return "unknown", "-"
+        bad = r[key] or ""
+        return ("bad" if bad else "ok"), (f"restarting or unhealthy: {bad}" if bad else "none restarting or unhealthy")
+    return v
+
+
+def v_mcp(r):
+    m = r.get("mcp_missing")
+    if m is None:
+        return "unknown", "-"
+    return ("bad" if m else "ok"), (f"no tools from: {m}" if m else "every server has tools")
+
+
+def v_backup(r):
+    a = num(r, "backup_age_h")
+    if a is None:
+        return "bad", "no successful backup in the log"
+    return ("bad" if a > 26 else "ok"), f"last success {a:.0f} h ago"
+
+
+def v_sync(r):
+    a = num(r, "sync_age_h")
+    if a is None:
+        return "unknown", "-"
+    if not r.get("sync_last_ok"):
+        return "bad", f"last run failed ({a:.1f} h ago)"
+    return ("bad" if a > 2.5 else "ok"), f"last success {a:.1f} h ago"
+
+
+def v_cert(r):
+    d = num(r, "cert_days")
+    if d is None:
+        return "bad", f"no certificate read from {CERT_HOST}"
+    return ("bad" if d < 14 else "ok"), f"expires in {d:.0f} days"
+
+
 ZAPHOD_TEMPS = r'''for h in /sys/class/drm/card*/device/hwmon/hwmon*; do echo "$(basename $(readlink -f $h/../..)): $(for t in $h/temp*_label; do printf '%s=%s ' "$(cat $t)" "$(( $(cat ${t%_label}_input)/1000 ))"; done)busy=$(cat $h/../../gpu_busy_percent)% $(( $(cat $h/power1_average 2>/dev/null || echo 0)/1000000 )) W"; done'''
 
 CHECKS = {
@@ -148,6 +246,41 @@ CHECKS = {
                          ok_after_s=60, good="/health 200",
                          first=MARVIN_SSH + ["curl -s -m 5 http://127.0.0.1:8080/health; echo; cd ~/homelab/marvin/llama-swap && "
                                              "docker compose ps --format '{{.Name}} {{.Status}}' && docker compose logs --tail 12 2>&1 | cut -c1-160"]),
+    # batch 2
+    "disk-zaphod": dict(title="zaphod disk under 10% free", verdict=v_disk("zaphod_disk_free", False), for_s=300,
+                        ok_after_s=120, good="10% or more free on / (models, hub data, Docker)",
+                        first=["bash", "-c", "df -h / /boot; docker system df"]),
+    "disk-marvin": dict(title="marvin disk under 10% free", verdict=v_disk("marvin_disk_free", True), for_s=300,
+                        ok_after_s=120, good="10% or more free on /",
+                        first=MARVIN_SSH + ["df -h / /boot; docker system df"]),
+    "containers-zaphod": dict(title="zaphod container restarting or unhealthy", for_s=180, ok_after_s=120,
+                              verdict=v_containers("zaphod_bad_containers", False), good="none restarting or unhealthy",
+                              first=["bash", "-c", "docker ps -a --format '{{.Names}} {{.Status}}' | grep -E 'Restarting|unhealthy' "
+                                     "|| echo 'none restarting or unhealthy now'; "
+                                     "for c in $(docker ps -a --filter status=restarting --format '{{.Names}}') "
+                                     "$(docker ps --filter health=unhealthy --format '{{.Names}}'); do echo \"== $c\"; "
+                                     "docker logs --tail 8 $c 2>&1 | cut -c1-160; done"]),
+    "containers-marvin": dict(title="marvin container restarting or unhealthy", for_s=180, ok_after_s=120,
+                              verdict=v_containers("marvin_bad_containers", True), good="none restarting or unhealthy",
+                              first=MARVIN_SSH + ["docker ps -a --format '{{.Names}} {{.Status}}'; "
+                                                  "for c in $(docker ps -a --filter status=restarting --format '{{.Names}}') "
+                                                  "$(docker ps --filter health=unhealthy --format '{{.Names}}'); do echo \"== $c\"; "
+                                                  "docker logs --tail 8 $c 2>&1 | cut -c1-160; done"]),
+    "mcp-tools": dict(title="MCPJungle: a tool server has no tools", verdict=v_mcp, for_s=300, ok_after_s=120,
+                      good="every server in hub/mcp/servers/ lists tools",
+                      first=["bash", "-c", f"{MJ} --registry {MJ_REG} list servers | grep -E '^[0-9]+\\.'; "
+                             "docker logs --tail 10 mcpjungle 2>&1 | cut -c1-160"]),
+    "backup": dict(title="nightly backup older than 26 h", verdict=v_backup, for_s=60, ok_after_s=60,
+                   good="a success every night at 04:17 (setup/backup-to-marvin.sh)",
+                   first=["bash", "-c", "tail -6 ~/.cache/backup-to-marvin.log; crontab -l | grep backup"]),
+    "memory-sync": dict(title="memory sync failed or late", verdict=v_sync, for_s=60, ok_after_s=60,
+                        good="a success every hour at :41 (hub/memory/sync.sh)",
+                        first=["bash", "-c", "tail -6 ~/.cache/memory-sync.log; crontab -l | grep memory"]),
+    "certificate": dict(title="HTTPS certificate expires within 14 days", verdict=v_cert, for_s=60, ok_after_s=60,
+                        good="Caddy renews about 30 days before expiry",
+                        first=["bash", "-c", f"echo | openssl s_client -connect {CERT_HOST}:443 -servername {CERT_HOST} "
+                               "2>/dev/null | openssl x509 -noout -subject -enddate; "
+                               "docker logs --since 72h caddy 2>&1 | grep -iE 'certificate|tls|error' | tail -6 | cut -c1-200"]),
 }
 
 
@@ -317,7 +450,9 @@ def test():
     sent = []
     good = {"marvin_reach": True, "marvin_busy": "0", "marvin_watts": "9", "marvin_edge": "45",
             "marvin_power_mode": "performance", "marvin_health": "200", "zaphod_card1_junction": 40,
-            "zaphod_card2_junction": 40, "zaphod_health": "200"}
+            "zaphod_card2_junction": 40, "zaphod_health": "200", "marvin_disk_free": "90", "zaphod_disk_free": 30,
+            "marvin_bad_containers": "", "zaphod_bad_containers": "", "mcp_missing": "", "backup_age_h": 5,
+            "sync_age_h": 0.5, "sync_last_ok": True, "cert_days": 60}
     global LOG
     LOG = os.path.join(STATE, "test.log")  # the test's lines stay out of the service log
     path = os.path.join(STATE, "test.db")
@@ -348,7 +483,7 @@ def test():
     tick(quiet, 1); tick(good, 1); expect("flaps back: still no resolved, no new alert", [])
     tick(good, 3); expect("good 3 min: one resolved per check",
                           [("resolved", "marvin-power-mode"), ("resolved", "marvin-low-power")])
-    unreachable = dict(good, marvin_reach=False)
+    unreachable = dict(good, marvin_reach=False)  # every marvin_* reading unknown
     for k in list(unreachable):
         if k.startswith("marvin_") and k != "marvin_reach":
             unreachable[k] = None
@@ -362,6 +497,14 @@ def test():
     tick(hot, 240); expect("4 h unresolved, not acked: one reminder", [("reminder", "zaphod-card2-temp")])
     tick(hot, 300); expect("after the reminder: nothing more", [])
     tick(good, 3); expect("cools: resolved", [("resolved", "zaphod-card2-temp")])
+    tick(dict(good, zaphod_disk_free=7), 6); expect("disk 7% free for 6 min: one alert", [("alert", "disk-zaphod")])
+    tick(good, 3); expect("disk freed: resolved", [("resolved", "disk-zaphod")])
+    tick(dict(good, backup_age_h=30, sync_last_ok=False), 2)
+    expect("backup 30 h old and sync failed: two alerts", [("alert", "backup"), ("alert", "memory-sync")])
+    tick(good, 2); expect("both fine again: two resolved", [("resolved", "backup"), ("resolved", "memory-sync")])
+    tick(dict(good, zaphod_bad_containers="ntfy", mcp_missing="recall"), 6)
+    expect("container restarting + MCP server without tools: two alerts", [("alert", "containers-zaphod"), ("alert", "mcp-tools")])
+    tick(good, 3); sent.clear()
     hot1 = dict(good, zaphod_card1_junction=104)
     tick(hot1, 6); sent.clear()
     w.c.execute("update checks set acked_at=? where id='zaphod-card1-temp'", (int(clock[0]),))

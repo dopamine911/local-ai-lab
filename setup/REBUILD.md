@@ -135,9 +135,10 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    Benchmark notifications from `tuning/log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
    time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
    After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
-8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 8 read-only checks
-   every minute (marvin reachable, power mode, busy under 100 W, GPU temperature; zaphod card junctions; llama-swap on
-   both). One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
+8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 16 read-only
+   checks every minute: marvin reachable, power mode, busy under 100 W, GPU temperature; zaphod card junctions;
+   llama-swap on both; disk under 10% free and containers restarting/unhealthy on both; MCPJungle servers without
+   tools; nightly backup older than 26 h; memory sync failed or late; HTTPS certificate within 14 days. One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
    ends, one reminder after 4 h unless acked; at most 12 messages an hour. Install after step 7 (its buttons need
    lab-actions). Check: `~/homelab/hub/watchdog/watchdog.py once` (every line `ok`), `systemctl is-active lab-watchdog`,
    `watchdog.py status`; log `~/.local/state/lab-watchdog/watchdog.log`. Thresholds and commands live in its CHECKS table.

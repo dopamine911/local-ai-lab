@@ -24,4 +24,5 @@ What was done and when. Times are Chicago time (CST). Design: issue #12. Code: `
 | 11:35:44 | Watchdog: **two "Resolved"** | the whole test sent exactly 4 messages (2 alerts, 2 resolved) | watchdog.log |
 | 11:37 | Full-power check: `tuning/speed marvin/big` (NOLOG) | 132-133 W, ~2,880 MHz, performance, fan curve active (~4,140 rpm); writing 44.4, reading 320.0; no watchdog message | — |
 | — | **Issue #12's good result met** (with the module's power-mode switch instead of a BIOS visit) | — | — |
-| next | Batch 2: disks, hub containers, MCPJungle tools, backup and memory-sync age, certificates | — | — |
+| 11:45 | **Batch 2** (8 more checks): disk < 10% free and containers restarting/unhealthy on both machines; MCPJungle servers (hub/mcp/servers/*.json) without tools; nightly backup > 26 h (last `done:` line); memory sync last line not a success or log > 2.5 h old; certificate (`*.ai` wildcard, read over TLS) < 14 days | `watchdog.py test` **22/22** (5 new cases); `once`: all 16 ok (zaphod 28% free, marvin 92%; no bad containers; 4 MCP servers with tools; backup 8 h; sync 0.1 h; certificate 85 days); every new Run-check command ran | this commit |
+| next | Daniel: `sudo systemctl restart lab-watchdog` (loads batch 2 and the two fixes) | — | — |
