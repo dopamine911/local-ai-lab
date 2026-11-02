@@ -47,4 +47,6 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | 19:03 | Server-side clear (`X-Sequence-ID` on send, then `PUT /lab-done/<id>/clear` with the sender token) | server 200 both, but the phone did **not** dismiss it | — |
 | 19:10 | App version | ntfy Android **1.25.2** = latest (2026-07-21); its notes list a `clear=true` fix in 1.23.0, nothing later; no matching open issue found | — |
 | — | Decision: live with it. A used button shows a check mark and the follow-up message confirms; repeated taps are refused. Re-test after an app update | — | — |
+| 2026-11-02 ~09:40 | Daniel: desktop client Notify (github.com/ranfdev/Notify) gets 403 | server side fine for `daniel` (lab-* read 200; other topics and sending 403 by design). Notify's source matches the login to a subscription by the exact server text, and adding an account sends nothing, so a different server string (trailing `/`, http) = no login = 403. Pending (Daniel: fix later) | — |
+| 2026-11-02 ~09:40 | My endpoint test `POST /v1/account/token` created a login token for `daniel` | deleted (0 tokens left). Note: anyone with the daniel password can create read-only tokens | — |
 | next | Step 2: **Rerun** and **Skip** on benchmark notifications (`tuning/log`); zaphod runs only | — | — |

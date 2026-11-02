@@ -51,7 +51,23 @@ Baseline, busy samples (>=90%) by GPU temperature:
 | 19:45 | `marvin/fan/curve.sh` (check / maxrpm / apply / auto / boot on\|off); test curve up 50,58,65,72,78 / down 45,53,60,67,74 (full speed from EC 78 C; Daniel: noise doesn't matter) | dry run on a fake folder: apply, auto, restore pass; **found and fixed**: maxrpm left fans at 100% (saved modes were a local, gone when the restore ran); Ctrl-C restores too; refuses on zaphod's board; `check` on marvin (read-only) OK | this commit |
 | 2026-11-02 07:10 | Read the 4 h recording of the agent's Terminal-Bench re-run (19:08-23:08; run ended ~00:25, 18/19) | busy 2.4 h; max GPU **89 C** (0 samples at 90 C+), EC 87 C; busy clock median 2,876-2,898 MHz in every band, power mode performance, no busy sample under 100 W. Fans max **3,138 / 3,291 / 2,492 rpm**, the same ceiling as 2026-10-31 (3,129 / 3,281 / 2,481): either the auto curve's top step or the fans' real 100%; `maxrpm` decides | `~/fan-samples/2026-11-01-full-power.csv` on marvin |
 | 2026-11-02 ~07:40 | Daniel: `sudo curve.sh maxrpm` (step 2) | fans 1/2 at 100%: **~4,750 / ~4,700 rpm**; fan3 (system fan) ~2,300. Under load in auto they peaked at 3,138 / 3,291 (**~66-70% of top speed**); fan3 reached ~2,490, so it is already at full under load. Headroom is on the two CPU fans. Restore to auto after 30 s checked | `curve.sh check` |
-| next | Curve test steps 3-8 (needs marvin free ~40 min) | — | — |
+| 09:26-09:49 | **A, factory auto**: 4 x `tuning/speed marvin/big` back to back, from cold (EC 34 C) | see table | MLflow "fan test A factory auto run 1-4"; `~/fan-samples/2026-11-02-curve-test.csv` |
+| 09:52 | Cooled to EC 40 / GPU 39 C (close to A's start) | — | — |
+| 09:53 | Daniel: `sudo curve.sh apply` | all 3 fans mode curve, level 0 at EC 38 C; under load they stepped 0 -> 3 -> 4 within 40 s | — |
+| 09:54-10:17 | **B, curve** (up 50,58,65,72,78): same 4 runs | see table | MLflow "fan test B curve 78C run 1-4" |
+| — | Decision: **keep** (Daniel to confirm with `sudo curve.sh boot on`) | GPU **9-10 C cooler**, clock +2%, reading +1%, same watts | — |
+
+Result, busy samples (>=90%), 265 each:
+
+| | GPU C median / 90th pct / max | EC max | clock MHz median (min) | watts | fan1 / fan2 / fan3 rpm median |
+| --- | --- | --- | --- | --- | --- |
+| A factory auto | 82 / 85 / 88 | 87 | 2,808 (2,708) | 120 | 3,075 / 3,247 / 1,561 |
+| B curve | **73 / 76 / 78** | 76 | 2,859 (2,718) | 119 | 4,138 / 4,083 / 2,272 |
+
+Speed (4 runs each): reading 32K A 315.5, 310.0, 310.3, 310.5 tok/s -> B 319.7, 313.5, 313.4, 313.4 (median +1%,
+runs 2-4 consistently ~3 tok/s higher: small, possibly heat); writing A 45.1, 44.7, 45.6, 45.3 -> B 44.7, 46.2, 44.7,
+44.7 (no change). Fans 1/2 stayed at level 4 (80%): EC never reached 78 C, so level 5 was not needed; a steeper curve
+has a little more room, not tested.
 
 ### Curve test procedure (one change: factory auto -> curve)
 1. Port agent done; nothing else running on marvin. Daniel pushes; on marvin `cd ~/homelab && git pull`.
