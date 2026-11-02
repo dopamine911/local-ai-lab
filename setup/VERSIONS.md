@@ -26,13 +26,14 @@ one service at a time, and run its check.
 | Mnemosyne | hub/memory/mnemosyne.Dockerfile | 4.0.0 (latest); Python 3.12.16 | `recall` finds the REBUILD rule |
 | Python (relays, sync, stats) | compose files | 3.13.18-slim-trixie, 3.12.16-slim (were floating `3.13-slim-trixie` / a bare digest) | containers up |
 | Enso image | agents/enso/Dockerfile | Ubuntu resolute-20261024.1, snapshot 2026-10-30, bun 1.4.4 (from 1.4.0), Enso 537559a, pi 1.1.0 | `agents/enso/enso.sh check` |
-| Ubuntu base of llama-swap images | zaphod/ and marvin/llama-swap/Dockerfile | resolute-20261024.1 (was the floating `ubuntu:26.04`); takes effect at the next llama-swap build | — |
+| Ubuntu base of llama-swap images | zaphod/ and marvin/llama-swap/Dockerfile | resolute-20261024.1 (was the floating `ubuntu:26.04`); in zaphod's 269-media build (2026-11-02; the comment on the FROM line had broken builds until then) | — |
+| Mesa (Vulkan driver) in the llama-swap images | zaphod/llama-swap/Dockerfile | 26.0.8-1ubuntu0.3 (pinned 2026-11-02, = current Ubuntu 26.04; was unpinned) | `tuning/speed` before/after a bump |
 
 ## Behind on purpose (each needs a measured before/after; Daniel decides when)
 
 | What | Pinned | Latest | Why not bumped in the audit |
 | --- | --- | --- | --- |
-| llama-swap (and the llama.cpp build inside it), issue #1 | 267 (llama.cpp b11870) | v268 (2026-10-28) | Changes every speed and quality baseline in tuning/results.md; marvin is busy with the port. Bump as its own change: speed + tool-use before/after, re-test the grammar bug (CLAUDE.md Known issues) |
+| llama-swap (and the llama.cpp build inside it), issue #1 | **zaphod 269** (llama.cpp b12020, 2026-11-02, measured: tuning/results.md); marvin 267 (b11870) | v269 (2026-11-01) | marvin next: same before/after on `big` |
 | harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | Results would no longer compare with the 19/19 and 17/19 runs; bump with a fresh baseline run |
 | pi (inside Enso) | 1.1.0 | 1.4.0 | Enso supports only pi >=1.1.0 <1.2.0 (`SUPPORTED_PI_VERSIONS`); moves when Enso does |
 | tool-eval-bench | 3.0.0 | 3.0.0 | current |

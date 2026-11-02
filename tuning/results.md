@@ -162,6 +162,21 @@ Published full runs in the benchmark repo (other people's machines, for referenc
 (EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
 Qwen3.8-27B UD-Q4_K_XL (our `coder` model) on Strix Halo 18/19. A smoke pass shows the setup works; only full runs compare.
 
+## llama-swap 267 -> 269 on zaphod (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
+
+Same `coder` (card 1), same settings; only the image changed (Mesa pinned, same version). Before/after back to back.
+
+| | 267 (b11870) | 269 (b12020) |
+| --- | --- | --- |
+| writing (tuning/speed, median of 3) | 54.0 tok/s | 54.2 tok/s (+0.4%) |
+| reading 32K | 764.6 tok/s | 770.9 tok/s (+0.8%) |
+| tool use, full suite, temp 0.6, seeds 1/2/3 | 94 / 94 / 94 | 96 / 93 / 94 |
+| "failed to parse grammar" (TC-65, 66, 67, 69) | 4 per run | 4 per run: **not fixed** |
+
+Within the issue's limits (speed ±3%, tool use within the seed spread): kept. TC-14 and TC-68 fail in all six runs;
+the other misses move between seeds. MLflow series `coder-ls267`, `coder-ls269`; speed 431518f5 (267) and the 13:15
+run (269). Rollback: `image: llama-swap-zaphod:267-media`. marvin still on 267 (next step of #1).
+
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
 | Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |

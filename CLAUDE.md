@@ -21,7 +21,7 @@ Overview of every feature with links: `FEATURES.md` (keep it updated when adding
 | `setup/` | Rebuild a machine: REBUILD.md, host.sh, models.sh, models-<machine>.txt |
 
 ## llama-swap on zaphod
-- Image `llama-swap-zaphod:267-media`: official llama-swap 267 programs (llama.cpp b11870, plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa, built from the Dockerfile. Previous image `:267` (text only) is kept for rollback. Models in /srv/models.
+- Image `llama-swap-zaphod:269-media` (since 2026-11-02, issue #1): official llama-swap 269 programs (llama.cpp b12020, plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa (pinned 26.0.8), built from the Dockerfile. `:267-media` (b11870) kept for rollback; speed and tool use were the same (tuning/results.md). Models in /srv/models.
 - Models: `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context. `coder-tb`: card 1, 256K context, q8_0 KV, MTP, for Terminal-Bench; swaps with `coder`. Card 2, swapping with `coder-2`, 256K q8_0 context: `ornith` (Ornith-1.5 35B-A3B Q4_K_M + vision; best tool-use score so far), `chat` (Gemma 4 31B, Google QAT Q4_0 + vision, 128K, general chat), `north`, `flint` (on hold). Speech: `stt` (Qwen3-ASR), `stt-whisper`, `tts` (Kokoro) stay loaded on card 2; `tts-qwen` only next to `coder-2`. Preload logs 404 for the audio.cpp models; harmless. `embed` + `rerank` (document search) stay loaded on card 1. `coder-long`: both cards, 256K, not yet tested.
 - Listens on 127.0.0.1:8080 only; `tailscale serve --bg --tcp=8080 tcp://localhost:8080` exposes it on the tailnet. Also https://zaphod.ai.dopamine911.com via Caddy.
 - Config edits reload automatically. Check with `cd ~/llama-swap && docker compose logs --tail 20`.
@@ -48,7 +48,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
   also one user sending two unrelated long prompts in a row (upstream reports, re-checked 2026-11-02; not fixed in
   b12020). We share models between Daniel, Paul and agents. Fix, verified upstream, planned measured (issue #10):
   `--cache-ram 0 --no-cache-idle-slots` together on every model on both machines (either alone still leaks).
-- llama.cpp b11870 (the build inside llama-swap 267) rejects Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
+- llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
 
 ## Results
 `tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `tuning/bench`, `quality`, `kl`, `tbench`, `compare-skill`; see tuning/README.md.
