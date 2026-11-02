@@ -178,7 +178,26 @@ Note: the official `unified-vulkan-N` images are nightly builds; the "269" image
 
 Within the issue's limits (speed ±3%, tool use within the seed spread): kept. TC-14 and TC-68 fail in all six runs;
 the other misses move between seeds. MLflow series `coder-ls267`, `coder-ls269`; speed 431518f5 (267) and the 13:15
-run (269). Rollback: `image: llama-swap-zaphod:267-media`. marvin still on 267 (next step of #1).
+run (269). Rollback: `image: llama-swap-zaphod:267-media`. marvin: next section.
+
+## llama-swap 267 -> 269 on marvin (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
+
+Same `big` (Qwen3.8-Flash-Next UD-IQ4_XS, 128K, MTP draft 3), same settings, fan curve on, BIOS Performance; only the
+image changed (Mesa pinned 26.0.8-1ubuntu0.3). Before 14:07-15:10, after 15:23-16:39, back to back.
+
+| | 267 (b11870) | 269 (b12020) |
+| --- | --- | --- |
+| writing (tuning/speed, median of 3) | 44.6 tok/s | 44.3 tok/s (-0.7%) |
+| reading 32K | 319.6 tok/s | 318.4 tok/s (-0.4%) |
+| tool use, full suite, temp 0.6, seeds 1/2/3 | 89 / 95 / 92 (mean 92.0) | 94 / 91 / 88 (mean 91.0) |
+| "failed to parse grammar" (TC-65, 66, 67, 69) | 4 per run | 4 per run: **not fixed** |
+
+Speed is within ±3%. Tool use: seed 3 (88) is 1 point under the before range (89-95); the mean moved 1 point while
+single seeds swing 4-6 points in both sets, and matching seeds do not give matching answers (89 -> 94, 95 -> 91).
+Read as noise, kept on 269; a 4th seed pair would settle it if needed. TC-14, TC-55 and TC-68 fail in all six runs;
+the other misses move between seeds (TC-03, TC-29, TC-38 only in the 88 run). Runs: tool-eval
+`2026-11-02-{1412,1439,1455}` (267) and `{1529,1545,1612}` (269), MLflow series `big-ls267`, `big-ls269`; speed
+f88af8a8 (269). Rollback: `image: llama-swap-marvin:267` in marvin/llama-swap/compose.yaml.
 
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 

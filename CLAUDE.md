@@ -9,7 +9,7 @@ Overview of every feature with links: `FEATURES.md` (keep it updated when adding
   - Card 1: PCI 06:00.0, /dev/dri/renderD128, on an OCuLink dock via an M.2 adapter in the back (chipset) M.2 slot, PCIe 3.0 x4.
   - Card 2: PCI 0b:00.0, /dev/dri/renderD129, in the x16 slot (links at x8), drives the screen.
   - llama.cpp numbers them the other way round: card 1 = `Vulkan1`, card 2 = `Vulkan0`. Check with `llama-server --list-devices` (free memory per card). Card 1 is ~10% slower with MTP (its PCIe 3.0 x4 link).
-- marvin: Bosgame M5, Ryzen AI Max+ 395, 128 GB (120 GB usable by the GPU). Ubuntu 26.04, llama-swap image `llama-swap-marvin:267`. Model `big` = Qwen3.8-Flash-Next UD-IQ4_XS, 128K, MTP draft 3, ~40 tok/s writing (also ~40 in agent use since BIOS Performance; 33 was in Quiet mode). Linked to zaphod as a llama-swap peer: appears there as `marvin/big`. Setup log: `marvin/SETUP.md`. On Wi-Fi.
+- marvin: Bosgame M5, Ryzen AI Max+ 395, 128 GB (120 GB usable by the GPU). Ubuntu 26.04, llama-swap image `llama-swap-marvin:269` (llama.cpp b12020, since 2026-11-02, issue #1; `:267` kept for rollback; speed and tool use the same). Model `big` = Qwen3.8-Flash-Next UD-IQ4_XS, 128K, MTP draft 3, ~40 tok/s writing (also ~40 in agent use since BIOS Performance; 33 was in Quiet mode). Linked to zaphod as a llama-swap peer: appears there as `marvin/big`. Setup log: `marvin/SETUP.md`. On Wi-Fi.
 
 ## Layout
 | Path | What |
