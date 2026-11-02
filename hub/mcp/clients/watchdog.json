@@ -1,0 +1,11 @@
+{
+  "name": "watchdog",
+  "description": "hub/watchdog: one real memory search and one recall per minute (issue #12); nothing else",
+  "allowed_servers": [
+    "memory",
+    "recall"
+  ],
+  "access_token_ref": {
+    "env": "MCP_TOKEN_WATCHDOG"
+  }
+}

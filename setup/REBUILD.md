@@ -84,7 +84,7 @@ Restore the `.env` files from your password manager (or make new ones; each `.en
 | --- | --- | --- |
 | `zaphod/llama-swap/.env` | `ZAPHOD_KEY`, `MARVIN_KEY` (same as marvin's), `MARVIN_FORK_KEY` (only while the fork test runs: same as marvin:~/strata-fork/key, made by `fork.sh start`) | New one: `printf 'ZAPHOD_KEY=%s\n' "$(openssl rand -hex 24)"`; then update hub/.env and every app that uses it |
 | `marvin/llama-swap/.env` | `MARVIN_KEY`, `BESZEL_KEY`, `TAILSCALE_IP` | New `MARVIN_KEY` as above; `BESZEL_KEY` = same as hub/.env; `TAILSCALE_IP` = `tailscale ip -4` |
-| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `NTFY_PHONE_PASSWORD`, `NTFY_SENDER_TOKEN`, `NTFY_AUTH_USERS`, `NTFY_AUTH_TOKENS`, `ACTION_SECRET` (notification buttons), `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
+| `hub/.env` | `DOMAIN`, `TS_IP`, `CF_API_TOKEN`, `ZAPHOD_KEY`, `MARVIN_KEY`, `BESZEL_KEY`, `BESZEL_USER`, `BESZEL_PASSWORD`, `MCP_SEARXNG_TOKEN`, `LOCALRECALL_API_KEY`, `LOCALRECALL_DB_PASSWORD`, `MNEMOSYNE_MCP_TOKEN`, `NTFY_PHONE_PASSWORD`, `NTFY_SENDER_TOKEN`, `NTFY_AUTH_USERS`, `NTFY_AUTH_TOKENS`, `ACTION_SECRET` (notification buttons), `MCP_TOKEN_*` (one per agent: `OPENWEBUI`, `CLAUDE_CODE`, `ENSO`, `WATCHDOG`), `OPENWEBUI_API_KEY`, `UNRAID_URL`, `UNRAID_KEY` (after NAS rebuild), `OPEN_TERMINAL_API_KEY`, `SEARXNG_SECRET`, `WEBUI_SECRET_KEY` | `CF_API_TOKEN`: new token in Cloudflare (Zone → DNS → Edit). `BESZEL_KEY`: shown in Beszel's "Add system". Others: `openssl rand -hex 32` |
 
 Then build and start (each `compose.yaml` has its `build:` lines):
 
@@ -135,10 +135,11 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    Benchmark notifications from `tuning/log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
    time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
    After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
-8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 16 read-only
+8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 17 read-only
    checks every minute: marvin reachable, power mode, busy under 100 W, GPU temperature; zaphod card junctions;
    llama-swap on both; disk under 10% free and containers restarting/unhealthy on both; MCPJungle servers without
-   tools; nightly backup older than 26 h; memory sync failed or late; HTTPS certificate within 14 days. One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
+   tools; a real `memory` search and `recall` through MCPJungle (agent login `watchdog`, memory+recall only, token
+   `MCP_TOKEN_WATCHDOG`); nightly backup older than 26 h; memory sync failed or late; HTTPS certificate within 14 days. One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
    ends, one reminder after 4 h unless acked; at most 12 messages an hour. Install after step 7 (its buttons need
    lab-actions). Check: `~/homelab/hub/watchdog/watchdog.py once` (every line `ok`), `systemctl is-active lab-watchdog`,
    `watchdog.py status`; log `~/.local/state/lab-watchdog/watchdog.log`. Thresholds and commands live in its CHECKS table.

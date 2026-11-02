@@ -18,7 +18,7 @@ command; its output comes back as a notification). Nothing from the phone choose
 State: ~/.local/state/lab-watchdog/state.db. Log: ~/.local/state/lab-watchdog/watchdog.log.
 Good result of the service: `systemctl is-active lab-watchdog` and a "started" line in the log.
 """
-import datetime, glob, os, re, socket, sqlite3, ssl, subprocess, sys, time
+import datetime, glob, json, os, re, socket, sqlite3, ssl, subprocess, sys, time, urllib.request
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.expanduser(os.environ.get("LAB_WATCHDOG_STATE", "~/.local/state/lab-watchdog"))
@@ -90,6 +90,8 @@ def read_all():
         r["sync_last_ok"] = bool(re.match(r"^sync: \d+ uploaded", last))
     except (OSError, IndexError):
         pass
+    for name, (ok, detail) in mcp_calls().items():
+        r[f"mcp_{name}_ok"], r[f"mcp_{name}_detail"] = ok, detail
     try:
         ctx = ssl.create_default_context()
         with socket.create_connection((CERT_HOST, 443), timeout=10) as sk, ctx.wrap_socket(sk, server_hostname=CERT_HOST) as t:
@@ -104,6 +106,63 @@ def read_all():
     except subprocess.TimeoutExpired:
         r["zaphod_health"] = "timeout"
     return r
+
+
+MCP_URL = "http://127.0.0.1:8085/mcp"
+MCP_CALLS = [("memory", "memory__search", {"query": "REBUILD", "max_results": 1}),
+             ("recall", "recall__mnemosyne_recall", {"query": "where does a machine change have to be recorded", "limit": 1})]
+
+
+def mcp_calls():
+    """One real call per tool through MCPJungle, as the `watchdog` agent login (hub/mcp/clients/watchdog.json: memory
+    and recall only). Returns {name: (ok, detail)}; {} when the token is missing (check unknown)."""
+    try:
+        tok = [l.split("=", 1)[1].strip().strip("'\"") for l in open(os.path.join(HUB, ".env"))
+               if l.startswith("MCP_TOKEN_WATCHDOG=")][0]
+    except (OSError, IndexError):
+        return {}
+
+    def post(body, sid=None):
+        h = {"Authorization": "Bearer " + tok, "Content-Type": "application/json",
+             "Accept": "application/json, text/event-stream"}
+        if sid:
+            h["Mcp-Session-Id"] = sid
+        with urllib.request.urlopen(urllib.request.Request(MCP_URL, json.dumps(body).encode(), h), timeout=30) as r:
+            raw, sid2 = r.read().decode(), r.headers.get("Mcp-Session-Id")
+        data = None
+        if raw.lstrip().startswith("{"):
+            data = json.loads(raw)
+        else:
+            for line in raw.splitlines():
+                if line.startswith("data:"):
+                    data = json.loads(line[5:])
+        return data, sid2
+
+    out = {}
+    try:
+        init, sid = post({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
+            "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "lab-watchdog", "version": "1"}}})
+        if not init or "result" not in init:
+            return {n: (False, "gateway initialize failed") for n, _, _ in MCP_CALLS}
+        post({"jsonrpc": "2.0", "method": "notifications/initialized"}, sid)
+    except Exception as e:
+        return {n: (False, f"gateway: {type(e).__name__}") for n, _, _ in MCP_CALLS}
+    for i, (name, tool, args) in enumerate(MCP_CALLS, 2):
+        try:
+            r, _ = post({"jsonrpc": "2.0", "id": i, "method": "tools/call", "params": {"name": tool, "arguments": args}}, sid)
+            res = (r or {}).get("result") or {}
+            text = " ".join(c.get("text", "") for c in res.get("content", []) if c.get("type") == "text")
+            m = re.search(r'"count":\s*(\d+)', text)
+            n = int(m.group(1)) if m else 0
+            if r and "error" in r:
+                out[name] = (False, (r["error"].get("message") or "error")[:80])
+            elif res.get("isError"):
+                out[name] = (False, text[:80] or "tool error")
+            else:
+                out[name] = (n > 0, f"{n} result(s)")
+        except Exception as e:
+            out[name] = (False, f"{type(e).__name__}: {str(e)[:60]}")
+    return out
 
 
 def log_age_h(path, pattern):
@@ -192,6 +251,14 @@ def v_mcp(r):
     return ("bad" if m else "ok"), (f"no tools from: {m}" if m else "every server has tools")
 
 
+def v_mcp_calls(r):
+    names = [n for n, _, _ in MCP_CALLS]
+    if not all(f"mcp_{n}_ok" in r for n in names):
+        return "unknown", "no MCP_TOKEN_WATCHDOG in hub/.env"
+    value = ", ".join(f"{n}: {r[f'mcp_{n}_detail']}" for n in names)
+    return ("ok" if all(r[f"mcp_{n}_ok"] for n in names) else "bad"), value
+
+
 def v_backup(r):
     a = num(r, "backup_age_h")
     if a is None:
@@ -270,6 +337,10 @@ CHECKS = {
                       good="every server in hub/mcp/servers/ lists tools",
                       first=["bash", "-c", f"{MJ} --registry {MJ_REG} list servers | grep -E '^[0-9]+\\.'; "
                              "docker logs --tail 10 mcpjungle 2>&1 | cut -c1-160"]),
+    "mcp-calls": dict(title="MCP tools don't answer (memory / recall)", verdict=v_mcp_calls, for_s=180, ok_after_s=60,
+                      good="a real memory search and recall through MCPJungle each return a result (the path agents use)",
+                      first=["bash", "-c", "~/.local/bin/lab mcp status | tail -3; for c in mcpjungle mcp-localrecall mnemosyne; "
+                             "do echo \"== $c\"; docker logs --since 10m $c 2>&1 | grep -iE 'error|invalid|warn' | tail -4 | cut -c1-160; done"]),
     "backup": dict(title="nightly backup older than 26 h", verdict=v_backup, for_s=60, ok_after_s=60,
                    good="a success every night at 04:17 (setup/backup-to-marvin.sh)",
                    first=["bash", "-c", "tail -6 ~/.cache/backup-to-marvin.log; crontab -l | grep backup"]),
@@ -452,7 +523,8 @@ def test():
             "marvin_power_mode": "performance", "marvin_health": "200", "zaphod_card1_junction": 40,
             "zaphod_card2_junction": 40, "zaphod_health": "200", "marvin_disk_free": "90", "zaphod_disk_free": 30,
             "marvin_bad_containers": "", "zaphod_bad_containers": "", "mcp_missing": "", "backup_age_h": 5,
-            "sync_age_h": 0.5, "sync_last_ok": True, "cert_days": 60}
+            "sync_age_h": 0.5, "sync_last_ok": True, "cert_days": 60,
+            "mcp_memory_ok": True, "mcp_memory_detail": "1 result(s)", "mcp_recall_ok": True, "mcp_recall_detail": "1 result(s)"}
     global LOG
     LOG = os.path.join(STATE, "test.log")  # the test's lines stay out of the service log
     path = os.path.join(STATE, "test.db")
@@ -505,6 +577,11 @@ def test():
     tick(dict(good, zaphod_bad_containers="ntfy", mcp_missing="recall"), 6)
     expect("container restarting + MCP server without tools: two alerts", [("alert", "containers-zaphod"), ("alert", "mcp-tools")])
     tick(good, 3); sent.clear()
+    clock[0] += 3601  # a new hour: the earlier made-up alerts filled the 12-per-hour cap
+    broken = dict(good, mcp_memory_ok=False, mcp_memory_detail="gateway: HTTPError")
+    tick(broken, 2); expect("memory call failing 2 min (< 3): nothing yet", [])
+    tick(broken, 2); expect("memory call failing 4 min: one alert", [("alert", "mcp-calls")])
+    tick(good, 2); expect("memory answers again: resolved", [("resolved", "mcp-calls")])
     hot1 = dict(good, zaphod_card1_junction=104)
     tick(hot1, 6); sent.clear()
     w.c.execute("update checks set acked_at=? where id='zaphod-card1-temp'", (int(clock[0]),))
