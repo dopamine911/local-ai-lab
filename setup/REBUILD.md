@@ -135,6 +135,12 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    Benchmark notifications from `tuning/log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
    time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
    After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
+8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 8 read-only checks
+   every minute (marvin reachable, power mode, busy under 100 W, GPU temperature; zaphod card junctions; llama-swap on
+   both). One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
+   ends, one reminder after 4 h unless acked; at most 12 messages an hour. Install after step 7 (its buttons need
+   lab-actions). Check: `~/homelab/hub/watchdog/watchdog.py once` (every line `ok`), `systemctl is-active lab-watchdog`,
+   `watchdog.py status`; log `~/.local/state/lab-watchdog/watchdog.log`. Thresholds and commands live in its CHECKS table.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 
@@ -151,6 +157,8 @@ Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open
 MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 (Chicago time) to marvin by `setup/backup-to-marvin.sh`
 (last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild.
 On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly backup back on.
+Not backed up on purpose (rebuilt empty, nothing lost that matters): `~/.local/state/lab-actions/` (button tokens, 24 h;
+tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, snoozes; log).
 
 ### GitHub repo settings (issue #8)
 Secret scanning and push protection on the public repo (enabled 2026-10-30; free for public repos):
