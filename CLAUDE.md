@@ -48,7 +48,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
   also one user sending two unrelated long prompts in a row (upstream reports, re-checked 2026-11-02; not fixed in
   b12020). We share models between Daniel, Paul and agents. Fix, verified upstream, planned measured (issue #10):
   `--cache-ram 0 --no-cache-idle-slots` together on every model on both machines (either alone still leaks).
-- llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
+- llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Cause found 2026-11-02: `common/parsers/qwen3-coder.cpp` makes the grammar lazy even with a response format, so it comes out empty; upstream issue #31342 open, fix PR #31395 closed unreviewed (plans/grammar-bug-timeline.md). Client workaround: `tool_choice` "required" or "none" with the format. Re-test with `tuning/grammar-repro.py` after a llama.cpp update.
 
 ## Results
 `tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `tuning/bench`, `quality`, `kl`, `tbench`, `compare-skill`; see tuning/README.md.
