@@ -148,12 +148,14 @@ func Drift(repo string, sync, dryRun bool) error {
 		fmt.Println("== stopping open-webui")
 		stop := exec.Command("docker", "compose", "stop", "open-webui")
 		stop.Dir = hub
+		stop.Stderr = os.Stderr // compose's progress lines, as the script shows them
 		if err := stop.Run(); err != nil {
 			return fmt.Errorf("stop open-webui: %v", err)
 		}
 		defer func() {
 			start := exec.Command("docker", "compose", "start", "open-webui")
 			start.Dir = hub
+			start.Stderr = os.Stderr
 			if err := start.Run(); err == nil {
 				fmt.Println("== open-webui started")
 			} else {
