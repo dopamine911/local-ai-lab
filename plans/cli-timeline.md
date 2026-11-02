@@ -44,3 +44,4 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | ~16:58 | `lab log` (activity.sh embedded, Python image from lab.yaml): same speed file and same marvin tool-use files logged by the script and by lab (NOTIFY=0, same RUN_START) | MLflow fields **identical**: 43/43 (zaphod speed), 85/85 (marvin/big with env.* from marvin and live_* real) | this commit |
 | ~16:58 | Notification parity in a copy of the repo with fake `hub/notify` and button maker: success (Rerun + Skip + Open) and failure (missing file) | every argument **identical** except the new run id; exit code 1 on failure for both | this commit |
 
+| 16:59 | `lab series [filter]` (the script's Python word for word, same MLflow image): output compared with tuning/series on the real MLflow (read-only), all series and filter `marvin` | **identical** (both) | this commit |

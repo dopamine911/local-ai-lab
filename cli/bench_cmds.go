@@ -38,5 +38,35 @@ func benchCmds() []*cobra.Command {
 			return nil
 		},
 	}
-	return []*cobra.Command{log}
+	series := &cobra.Command{
+		Use:   "series [filter]",
+		Short: "Average, lowest, highest of repeated runs (MLflow tag series; port of tuning/series)",
+		Long: "Summarize repeated runs of one setup (MLflow tag \"series\"): count, average, lowest, highest, spread.\n" +
+			"  lab series            every series\n" +
+			"  lab series marvin     only series whose name contains \"marvin\"\n" +
+			"Start a series: SERIES=<name> lab quality <model> \"<note>\" --full --seed 1 (same name for every repeat).\n" +
+			"Read-only. Good result: one block per series; if the gap between two settings is smaller than the spread\n" +
+			"of their own repeats, treat them as the same.",
+		Args: cobra.MaximumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			f := ""
+			if len(args) == 1 {
+				f = args[0]
+			}
+			return exitWith(bench.Series(cfg, f))
+		},
+	}
+	return []*cobra.Command{log, series}
+}
+
+// exitWith exits with a benchmark's own exit code (bench.ExitError); other errors go to cobra.
+func exitWith(err error) error {
+	if e, ok := err.(bench.ExitError); ok {
+		os.Exit(e.Code)
+	}
+	return err
 }
