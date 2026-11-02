@@ -4,6 +4,8 @@ machines:
     ssh: zaphod                 # ssh alias (from marvin); on zaphod itself commands run locally
     llama_swap_port: 8080
     llama_swap_container: llama-swap
+    llama_swap_env: ~/llama-swap/.env   # ZAPHOD_KEY (read, never printed)
+    image_card_pci: "0000:0b:00.0"      # card 2: lent to ComfyUI in image mode
   marvin:
     ssh: marvin
     llama_swap_port: 8080

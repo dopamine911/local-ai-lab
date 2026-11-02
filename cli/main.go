@@ -16,6 +16,7 @@ import (
 
 	"github.com/dopamine911/local-ai-lab/cli/internal/config"
 	"github.com/dopamine911/local-ai-lab/cli/internal/enso"
+	"github.com/dopamine911/local-ai-lab/cli/internal/hub"
 	"github.com/dopamine911/local-ai-lab/cli/internal/mcp"
 	"github.com/dopamine911/local-ai-lab/cli/internal/webui"
 	"github.com/dopamine911/local-ai-lab/cli/internal/manifest"
@@ -52,7 +53,7 @@ func main() {
 			return cmd.Execute()
 		},
 	}
-	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd())
+	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -199,6 +200,79 @@ func webuiCmd() *cobra.Command {
 		},
 	})
 	return w
+}
+
+func memoryCmd() *cobra.Command {
+	m := &cobra.Command{Use: "memory", Short: "Shared memory (LocalRecall): sync the lab's notes"}
+	var install, dry bool
+	s := &cobra.Command{
+		Use:   "sync",
+		Short: "Upload changed Markdown to LocalRecall now (port of hub/memory/sync.sh); --install: hourly cron",
+		Long: "Upload the lab's changed Markdown notes to LocalRecall (the `memory` tool).\n" +
+			"--install puts the hourly line (at :41) in your crontab, replacing an older one (run it yourself).\n" +
+			"--dry-run shows what it would do.\n" +
+			"Good result ends with \"sync: N uploaded, M removed, K unchanged\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			if install {
+				return hub.MemorySyncInstall(cfg.Repo, dry)
+			}
+			return hub.MemorySync(cfg.Repo, dry)
+		},
+	}
+	s.Flags().BoolVar(&install, "install", false, "put the hourly sync in your crontab")
+	s.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing")
+	m.AddCommand(s)
+	return m
+}
+
+func imageModeCmd() *cobra.Command {
+	var dry bool
+	c := &cobra.Command{
+		Use:       "image-mode on|off|status",
+		Short:     "Lend zaphod's card 2 to ComfyUI, or give it back (port of hub/image-mode)",
+		ValidArgs: []string{"on", "off", "status"},
+		Args:      cobra.MatchAll(cobra.MaximumNArgs(1), cobra.OnlyValidArgs),
+		Long: "on: card 2's chat models off (coder-2 requests go to coder), ComfyUI started.\n" +
+			"off: ComfyUI stopped (frees all its memory), card 2 back to llama-swap.\n" +
+			"status (default): what is on card 2. Card 1 and the speech helpers keep running.\n" +
+			"A llama-swap config reload switches the profile off: run `lab image-mode on` again then.\n" +
+			"Good result: on -> \"ComfyUI ready\"; off -> \"profile off\"; status shows profile, ComfyUI, card 2 memory.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			z := cfg.Machines["zaphod"]
+			env, pci := z.LlamaSwapEnv, z.ImageCardPCI
+			if env == "" {
+				env = "~/llama-swap/.env"
+			}
+			if pci == "" {
+				pci = "0000:0b:00.0"
+			}
+			m, err := hub.NewImageMode(cfg.Repo, config.Expand(env), pci, dry)
+			if err != nil {
+				return err
+			}
+			what := "status"
+			if len(args) == 1 {
+				what = args[0]
+			}
+			switch what {
+			case "on":
+				return m.On()
+			case "off":
+				return m.Off()
+			}
+			return m.Status()
+		},
+	}
+	c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing (on/off)")
+	return c
 }
 
 func isTerminal(f *os.File) bool {

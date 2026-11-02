@@ -14,6 +14,8 @@ type Machine struct {
 	SSH                string `yaml:"ssh"`
 	LlamaSwapPort      int    `yaml:"llama_swap_port"`
 	LlamaSwapContainer string `yaml:"llama_swap_container"`
+	LlamaSwapEnv       string `yaml:"llama_swap_env"`
+	ImageCardPCI       string `yaml:"image_card_pci"`
 }
 
 type Config struct {
