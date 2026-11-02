@@ -32,3 +32,15 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 15:11 | Daniel: run the disruptive tests now. `image-mode on`, `status`, `off` with the script, then with lab (15:11-15:12) | `on` and `off` **identical**; `status` differs only in ComfyUI's uptime seconds. Card 2 free after; coder-2/ornith/chat load on next request (no longer preloaded) | — |
 | 15:12 | `webui drift --sync` with the script, then with lab | both "0 differ, synced 0" (no backup copy made, nothing to write); only difference: compose's Stopping/Started lines (stderr) the port hid; now passed through: **identical** (15:14). Chat page back to 200 ~9 s after each start | this commit |
 | next | PR for step 3 | — | — |
+
+## Step 4: benchmarks (branch `cli-step4-bench`, 2026-11-02)
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 16:54 | Branch from main 12cdf04. Plan: `log` (Go around tuning/log_run.py, unchanged), `series` and `speed` (their Python embedded word for word: the 32K prompt is built from the host's Python files), `quality`, `bench`, `kl` (Go; Ctrl-C stops the container and restarts llama-swap). Parity against a throwaway MLflow (127.0.0.1:5099) | — | — |
+| ~16:55 | `tuning/log_run.py`: MLflow address from `MLFLOW_URL` (default unchanged, 127.0.0.1:5000); `tuning/log` passes it | tests only; nothing changes when unset | this commit |
+| ~16:56 | `cli/lab.yaml` `images:` (mlflow, python, tool_eval, kl): one place for the benchmark images. Python = hub/compose.yaml's current digest (ae14d4c); webui drift still has the older 76baad (follow-up). Renovate does not read these yet (follow-up) | — | this commit |
+| 16:57 | marvin had no `lab` (host.sh step 10 never run there): `cli/build.sh install` on marvin (main 12cdf04) | `lab 12cdf04`; `lab manifest` identical to tuning/manifest.sh | — |
+| ~16:58 | `lab log` (activity.sh embedded, Python image from lab.yaml): same speed file and same marvin tool-use files logged by the script and by lab (NOTIFY=0, same RUN_START) | MLflow fields **identical**: 43/43 (zaphod speed), 85/85 (marvin/big with env.* from marvin and live_* real) | this commit |
+| ~16:58 | Notification parity in a copy of the repo with fake `hub/notify` and button maker: success (Rerun + Skip + Open) and failure (missing file) | every argument **identical** except the new run id; exit code 1 on failure for both | this commit |
+

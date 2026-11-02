@@ -33,7 +33,7 @@ LLAMA_SWAP = {
     "zaphod": ("http://127.0.0.1:8080", "ZAPHOD_KEY"),
     "marvin": ("http://marvin:8080", "MARVIN_KEY"),
 }
-MLFLOW_URL = "http://127.0.0.1:5000"
+MLFLOW_URL = os.environ.get("MLFLOW_URL", "http://127.0.0.1:5000")  # override only for tests (a throwaway MLflow)
 EXPERIMENT = "llama-tuning"
 SKIP = {"port", "host"}  # change every run; not real settings
 BENCH_KEYS = ["build_commit", "model_filename", "n_batch", "n_ubatch", "type_k", "type_v",
