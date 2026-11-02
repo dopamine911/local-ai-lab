@@ -122,7 +122,12 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    `docker compose -f ~/homelab/hub/compose.yaml logs --tail 2 ntfy` shows `subscribers=3` (one per topic).
    "Send test notification" in the app fails with "not authorized" on purpose: `daniel` can only read.
    Messages are kept 24 h: a phone offline longer misses them.
-6. Buttons (`hub/actions/actiond.py`, service `lab-actions`, installed by `setup/host.sh` step 6c; needs
+6. Desktop (GNOME): Ntfyr (Flathub `io.github.tobagin.Ntfyr`, maintained fork of ranfdev/Notify):
+   `flatpak install flathub io.github.tobagin.Ntfyr`. Account: server `https://notify.<DOMAIN>` (no trailing `/`), user
+   `daniel`; subscriptions on that exact same server text. It checks a new account against the topic `stats`, so
+   compose gives `daniel` read on `stats` (nothing publishes there). Good result: `subscribers` in the ntfy log rises
+   by one per desktop topic.
+7. Buttons (`hub/actions/actiond.py`, service `lab-actions`, installed by `setup/host.sh` step 6c; needs
    `ACTION_SECRET` in hub/.env). Check: `curl -s https://act.<DOMAIN>/health` -> `ok`, then
    `b=$(~/homelab/hub/actions/actiond.py button ack Ack "rebuild check"); ~/homelab/hub/notify -a "$b" "test" "tap Ack"`.
    Good result: tapping **Ack** clears it and "Acknowledged" arrives; `actiond.py log` shows the phone's

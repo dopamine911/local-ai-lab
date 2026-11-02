@@ -334,7 +334,9 @@ services:
       NTFY_AUTH_DEFAULT_ACCESS: deny-all
       NTFY_AUTH_USERS: ${NTFY_AUTH_USERS:?set NTFY_AUTH_USERS in .env}
       NTFY_AUTH_TOKENS: ${NTFY_AUTH_TOKENS:?set NTFY_AUTH_TOKENS in .env}
-      NTFY_AUTH_ACCESS: "daniel:lab-*:ro,sender:lab-*:wo"
+      # daniel:stats:ro only for the desktop client Notify (ranfdev/Notify v0.1.6): it checks a new account against the
+      # topic "stats" (GET /stats/auth) and refuses on 403 (its issue #18). Nothing publishes to "stats".
+      NTFY_AUTH_ACCESS: "daniel:lab-*:ro,daniel:stats:ro,sender:lab-*:wo"
       NTFY_ENABLE_SIGNUP: "false"
       NTFY_ENABLE_LOGIN: "false"
       NTFY_WEB_ROOT: disable            # no web app; the phone app is the reader
