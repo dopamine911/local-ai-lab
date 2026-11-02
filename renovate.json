@@ -1,0 +1,255 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Issue #7. Lab rule: every image, package and download pinned to its latest version, exactly (setup/VERSIONS.md). One change per PR (nothing grouped, except two pins that must move together). Held-back items wait for approval on the Dependency Dashboard issue instead of opening a PR.",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    "docker:pinDigests",
+    ":pinVersions"
+  ],
+  "ignorePresets": [
+    "group:monorepos",
+    "group:recommended"
+  ],
+  "timezone": "America/Chicago",
+  "labels": [
+    "versions"
+  ],
+  "prConcurrentLimit": 6,
+  "prHourlyLimit": 2,
+  "ignorePaths": [
+    "plans/**",
+    "tuning/terminal-bench/**",
+    "marvin/strata-test/**",
+    "marvin/strata-fork/**"
+  ],
+  "prBodyNotes": [
+    "Lab rule: merge one at a time and run its check (setup/VERSIONS.md, \"Check after a bump\"); record it in the same commit."
+  ],
+  "packageRules": [
+    {
+      "description": "Images we build ourselves (not on a registry): nothing to look up.",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "llama-swap-zaphod",
+        "llama-swap-marvin",
+        "enso-agent",
+        "caddy-cloudflare",
+        "comfyui-zaphod",
+        "mnemosyne",
+        "mcp-localrecall"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "llama-swap (and the llama.cpp inside): changes every speed and quality baseline. Approve on the dashboard, then measure before/after (issue #1). Tags: unified-vulkan-N.",
+      "matchPackageNames": [
+        "ghcr.io/mostlygeek/llama-swap"
+      ],
+      "versioning": "regex:^unified-vulkan-(?<major>\\d+)$",
+      "dependencyDashboardApproval": true,
+      "prBodyNotes": [
+        "Held back (issue #1): before/after `tuning/speed` + tool use x3 on the machine's model; re-test the grammar bug (CLAUDE.md Known issues)."
+      ]
+    },
+    {
+      "description": "Ubuntu base: tags resolute-YYYYMMDD(.N).",
+      "matchPackageNames": [
+        "ubuntu",
+        "docker.io/library/ubuntu"
+      ],
+      "versioning": "regex:^resolute-(?<major>\\d{8})(\\.(?<minor>\\d+))?$"
+    },
+    {
+      "description": "SearXNG: tags YYYY.MM.DD-commit; it publishes almost daily, so only Monday mornings (one PR a week at most).",
+      "matchPackageNames": [
+        "searxng/searxng"
+      ],
+      "versioning": "regex:^(?<major>\\d{4})\\.(?<minor>\\d+)\\.(?<patch>\\d+)-[0-9a-f]+$",
+      "prBodyNotes": [
+        "Check: a search through the `search` tool (MCPJungle)."
+      ],
+      "schedule": [
+        "* 0-6 * * 1"
+      ]
+    },
+    {
+      "description": "Python minor or major (e.g. 3.12 -> 3.15) can break the packages built on it (Mnemosyne chose 3.12): approve on the dashboard. Same-minor updates and new digests are normal PRs.",
+      "matchPackageNames": [
+        "python",
+        "docker.io/library/python"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "major"
+      ],
+      "dependencyDashboardApproval": true,
+      "prBodyNotes": [
+        "Python minor/major: rebuild the images on it (hub/memory/*.Dockerfile, hub/comfyui) and run their checks; relays and stats only need `docker compose up -d`."
+      ]
+    },
+    {
+      "description": "Squid on Ubuntu: tags X.Y-26.04_edge.",
+      "matchPackageNames": [
+        "ubuntu/squid"
+      ],
+      "versioning": "regex:^(?<major>\\d+)\\.(?<minor>\\d+)-(?<compatibility>\\d+\\.\\d+_edge)$",
+      "prBodyNotes": [
+        "Check: browser tool loads a public page; `http://192.168.1.1/` gets 403; `squid-gnutls -k parse` OK."
+      ]
+    },
+    {
+      "description": "MCPJungle: the compose image and the CLI version in hub/mcp/setup.sh must stay the same version, so these two move together.",
+      "matchPackageNames": [
+        "ghcr.io/mcpjungle/mcpjungle",
+        "mcpjungle/MCPJungle"
+      ],
+      "groupName": "MCPJungle server + CLI",
+      "prBodyNotes": [
+        "Check: `hub/mcp/setup.sh` (every server and client line), then `lab mcp status` (\"Matches the repo\")."
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "ghcr.io/open-webui/open-webui"
+      ],
+      "prBodyNotes": [
+        "Check: `lab webui drift` and `hub/openwebui/models.sh`: 0 differ. Read the changelog first for a new major."
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "binwiederhier/ntfy"
+      ],
+      "prBodyNotes": [
+        "Check: `hub/notify \"test\" \"x\"` arrives on the phone and desktop; the 10 access checks (plans/notifications-timeline.md)."
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "mnemosyne-memory"
+      ],
+      "prBodyNotes": [
+        "Check: `recall` finds the REBUILD rule (plans/agent-infra.md 4b); rebuild hub/memory/mnemosyne.Dockerfile."
+      ]
+    },
+    {
+      "matchPackageNames": [
+        "golang",
+        "github.com/spf13/cobra",
+        "charm.land/bubbletea/v2",
+        "charm.land/lipgloss/v2",
+        "go.yaml.in/yaml/v3"
+      ],
+      "prBodyNotes": [
+        "Check: `cli/build.sh` (vet, tests, build) and `diff <(tuning/manifest.sh) <(cli/bin/lab manifest)`."
+      ]
+    },
+    {
+      "description": "Need a manual step Renovate can't do (a checksum, a measured kernel module, Enso's pi range): approve on the dashboard.",
+      "matchPackageNames": [
+        "oven-sh/bun",
+        "dopamine911/enso-harness",
+        "cmetz/ec-su_axb35-linux"
+      ],
+      "dependencyDashboardApproval": true,
+      "prBodyNotes": [
+        "Manual part: bun needs the new sha256 in agents/enso/Dockerfile; Enso: check its supported pi range and run `lab enso check`; ec module: marvin/fan/ec-module.sh install and `check` (reboot not needed, measure fans)."
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ],
+  "customManagers": [
+    {
+      "description": "Go build image in cli/build.sh (IMG=golang:X@sha256:...).",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^cli/build\\.sh$/"
+      ],
+      "matchStrings": [
+        "IMG=(?<depName>golang):(?<currentValue>[0-9.]+)@(?<currentDigest>sha256:[0-9a-f]{64})"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "description": "MCPJungle CLI version in hub/mcp/setup.sh (V=X.Y.Z).",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^hub/mcp/setup\\.sh$/"
+      ],
+      "matchStrings": [
+        "\\nV=(?<currentValue>[0-9.]+)"
+      ],
+      "depNameTemplate": "mcpjungle/MCPJungle",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "description": "pip pins inside Dockerfiles (pip install name==X or \"name[extras]==X\").",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)[^/]*Dockerfile$/"
+      ],
+      "matchStrings": [
+        "pip install [^\\n]*?\"?(?<depName>[A-Za-z0-9_.-]+)(\\[[^\\]]*\\])?==(?<currentValue>[0-9][0-9A-Za-z.]*)\"?"
+      ],
+      "datasourceTemplate": "pypi"
+    },
+    {
+      "description": "ComfyUI release in hub/comfyui/Dockerfile.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^hub/comfyui/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG COMFYUI_VERSION=(?<currentValue>v[0-9.]+)"
+      ],
+      "depNameTemplate": "Comfy-Org/ComfyUI",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "description": "bun download in agents/enso/Dockerfile (needs a new sha256 by hand: approval rule).",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^agents/enso/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "releases/download/bun-v(?<currentValue>[0-9.]+)/"
+      ],
+      "depNameTemplate": "oven-sh/bun",
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^bun-v(?<version>.*)$"
+    },
+    {
+      "description": "Enso commit in agents/enso/Dockerfile.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^agents/enso/Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG ENSO_COMMIT=(?<currentDigest>[0-9a-f]{40})"
+      ],
+      "depNameTemplate": "dopamine911/enso-harness",
+      "packageNameTemplate": "https://github.com/dopamine911/enso-harness",
+      "currentValueTemplate": "main",
+      "datasourceTemplate": "git-refs"
+    },
+    {
+      "description": "Fan-chip module source commit in marvin/fan/ec-module.sh.",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^marvin/fan/ec-module\\.sh$/"
+      ],
+      "matchStrings": [
+        "\\nSHA=(?<currentDigest>[0-9a-f]{40})"
+      ],
+      "depNameTemplate": "cmetz/ec-su_axb35-linux",
+      "packageNameTemplate": "https://github.com/cmetz/ec-su_axb35-linux",
+      "currentValueTemplate": "main",
+      "datasourceTemplate": "git-refs"
+    }
+  ]
+}
