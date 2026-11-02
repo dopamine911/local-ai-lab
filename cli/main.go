@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -183,6 +184,27 @@ func ensoCmd() *cobra.Command {
 
 func webuiCmd() *cobra.Command {
 	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift"}
+	var apply bool
+	mc := &cobra.Command{
+		Use:   "models",
+		Short: "Per-model settings in Open WebUI vs hub/openwebui/models.yaml (port of models.sh); --apply writes them",
+		Long: "Names, native function calling, abilities (vision only where listed) and hidden models, from\n" +
+			"hub/openwebui/models.yaml and the llama-swap configs. Read-only unless --apply. Needs OPENWEBUI_API_KEY in hub/.env.\n" +
+			"Good result: \"0 model(s) differ from models.yaml\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			key, err := hub.EnvValue(filepath.Join(cfg.Repo, "hub", ".env"), "OPENWEBUI_API_KEY")
+			if err != nil {
+				return fmt.Errorf("add OPENWEBUI_API_KEY to hub/.env: %w", err)
+			}
+			return webui.Models(cfg.Repo, key, apply)
+		},
+	}
+	mc.Flags().BoolVar(&apply, "apply", false, "write the settings (Open WebUI models/import)")
+	w.AddCommand(mc)
 	w.AddCommand(&cobra.Command{
 		Use:   "drift",
 		Short: "Settings changed by hand in the web page vs hub/compose.yaml (read-only; port of drift.sh)",
