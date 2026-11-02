@@ -22,3 +22,4 @@ images:                        # containers the benchmark commands run (lab log/
   python: python:3.13.18-slim-trixie@sha256:ae14d4ce8771606477a81446e7ef429edd6762305fc50c84507c1041fa8285d1  # activity (llama-swap request log); same as hub/compose.yaml
   tool_eval: tool-eval-bench:3.0.0             # built locally (tuning/README.md)
   kl: ghcr.io/ggml-org/llama.cpp:full-vulkan-b11913   # llama-perplexity for lab kl; official image
+  alpine: alpine:3.22                          # lab backup: empties its root-owned stage folder (same as setup/backup-to-marvin.sh)

@@ -35,6 +35,7 @@ type Config struct {
 		Python   string `yaml:"python"`
 		ToolEval string `yaml:"tool_eval"`
 		KL       string `yaml:"kl"`
+		Alpine   string `yaml:"alpine"`
 	} `yaml:"images"`
 }
 
