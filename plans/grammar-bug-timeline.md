@@ -34,3 +34,4 @@ the model always answers with the JSON.
 
 Workaround for clients now: send `tool_choice: "required"` or `"none"` together with a response format, or drop
 `tools` from the request that asks for the JSON answer.
+| 16:51 | Daniel: nothing upstream for now | keep the client workaround (tool_choice required/none with a format); re-test with `tuning/grammar-repro.py` after each llama.cpp update | this commit |
