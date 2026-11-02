@@ -20,6 +20,9 @@ Every request is logged with time, caller address (Caddy's X-Forwarded-For), id,
 Actions (KINDS below); only these exist:
   ack    log it and send "Acknowledged: <subject>" (lab-done). Proves the tap -> run -> notify path.
   skip   tag the MLflow run reviewed=skipped; "Marked reviewed".
+  wd_ack     watchdog alert: acknowledged, so no 4 h reminder (hub/watchdog/watchdog.py)
+  wd_snooze  watchdog alert: no alerts for this check for 1 h; if still bad after, it alerts again
+  wd_diag    watchdog alert: run the check's fixed read-only first command, send its output back
   rerun  start the same benchmark again: one of RERUN_SCRIPTS in tuning/, same arguments and settings, zaphod only
          (until reservations, #3), one at a time (lock file; "busy" leaves the button usable). Runs detached, output in
          ~/.local/state/lab-actions/jobs/<id>.log; the benchmark's own notification reports the result.
@@ -135,7 +138,30 @@ def do_rerun(args):
     return f"started {shown}"
 
 
-KINDS = {"ack": do_ack, "skip": do_skip, "rerun": do_rerun}
+sys.path.insert(0, os.path.join(HUB, "watchdog"))
+import watchdog  # noqa: E402  (the check table: buttons can only name a check, never a command)
+
+
+def do_wd_ack(args):
+    r = watchdog.ack(args["check"], args["incident"])
+    notify("-g", "ok_hand", "Acknowledged", f"{watchdog.CHECKS[args['check']]['title']}: {r}")
+    return r
+
+
+def do_wd_snooze(args):
+    r = watchdog.snooze(args["check"], 3600)
+    notify("-g", "zzz", "Snoozed 1 h", watchdog.CHECKS[args["check"]]["title"])
+    return r
+
+
+def do_wd_diag(args):
+    out = watchdog.diagnose(args["check"])
+    notify("-g", "mag", "Check: " + watchdog.CHECKS[args["check"]]["title"], out)
+    return f"ran first check ({len(out)} bytes back)"
+
+
+KINDS = {"ack": do_ack, "skip": do_skip, "rerun": do_rerun,
+         "wd_ack": do_wd_ack, "wd_snooze": do_wd_snooze, "wd_diag": do_wd_diag}
 
 
 # --- making a button ---------------------------------------------------------------------------------------------
@@ -237,6 +263,10 @@ if __name__ == "__main__":
         print(button("ack", a[2], subject=a[3]))
     elif a[:1] == ["button"] and len(a) == 5 and a[1] == "skip":
         print(button("skip", a[2], run_id=a[3], subject=a[4]))
+    elif a[:1] == ["button"] and a[1:2] == ["wd_ack"] and len(a) == 5 and a[3] in watchdog.CHECKS:
+        print(button("wd_ack", a[2], check=a[3], incident=int(a[4])))
+    elif a[:1] == ["button"] and a[1:2] in (["wd_snooze"], ["wd_diag"]) and len(a) == 4 and a[3] in watchdog.CHECKS:
+        print(button(a[1], a[2], check=a[3]))
     elif a[:1] == ["button"] and len(a) == 4 and a[1] == "rerun":
         raw = base64.b64decode(os.environ["LAB_RERUN"]).split(b"\0")
         argv = [x.decode() for x in raw[:-1]] if raw and raw[-1] == b"" else [x.decode() for x in raw]

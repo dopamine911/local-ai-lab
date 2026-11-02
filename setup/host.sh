@@ -51,6 +51,13 @@ if [ "$H" = zaphod ]; then
   systemctl daemon-reload
   systemctl enable --now lab-actions
   systemctl is-active lab-actions || true
+
+  step "6d. zaphod: watchdog lab-watchdog (hub/watchdog; issue #12): read-only checks every minute, alerts to the phone"
+  # Check: ~/homelab/hub/watchdog/watchdog.py once (every line ok), then systemctl is-active lab-watchdog
+  install -m 644 /home/$U/homelab/hub/watchdog/lab-watchdog.service /etc/systemd/system/lab-watchdog.service
+  systemctl daemon-reload
+  systemctl enable --now lab-watchdog
+  systemctl is-active lab-watchdog || true
 fi
 
 if [ "$H" = marvin ]; then

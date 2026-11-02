@@ -1,0 +1,22 @@
+# Lab watchdog (hub/watchdog/watchdog.py, issue #12). Installed by setup/host.sh (zaphod) into /etc/systemd/system/.
+# Runs as daniel (reads marvin over ssh with daniel's key). Read-only checks every 60 s; alerts through hub/notify.
+# Log and state: ~/.local/state/lab-watchdog/
+[Unit]
+Description=Lab watchdog (read-only checks, alerts to ntfy)
+After=network-online.target docker.service lab-actions.service
+Wants=network-online.target
+
+[Service]
+User=daniel
+Group=daniel
+ExecStart=/usr/bin/python3 /home/daniel/homelab/hub/watchdog/watchdog.py run --interval 60
+Restart=on-failure
+RestartSec=30
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+[Install]
+WantedBy=multi-user.target
