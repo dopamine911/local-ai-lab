@@ -472,3 +472,13 @@ Decisions made while Daniel was away: `decisions.md`.
    question). The fork ran 23 h (20:25 to 18:54) with no crash and no errors, but served only my one test request.
    Stopped (`fork.sh stop`, `marvin/big` back and answering), peer removed from zaphod's config, all 7 zaphod models
    ready. MARVIN_FORK_KEY stays in zaphod's `.env` so a restart needs only the config block and `fork.sh start`.
+22. **Terminal-Bench re-run of llama.cpp `big` in BIOS Performance** (2026-11-01 19:01 to 00:24, Daniel; same image,
+   llama.cpp, BIOS version and medium as 10-29; MLflow 3122dd67): **18/19 in 5.37 h** (`extract-elf` failed both
+   attempts). Real use 39.8 tok/s writing (Quiet: 33), 292 reading (254). Fair comparison at medium, same power mode:
+   | Engine | Score | Time | Output tokens |
+   | --- | --- | ---: | ---: |
+   | UnbiasedStrata fork (ROCm 10.1) | 19/19 | 3.29 h | 213 K |
+   | Upstream Strata 0.2.7 | 17/19 | 4.39 h | 355 K |
+   | llama.cpp `big` | 18/19 | 5.37 h | 388 K |
+   Most of the time difference follows how much each run wrote, not only engine speed. One run each, so the scores
+   are close to noise; `extract-elf` is the swing task (passed on the fork and on llama.cpp 10-29).

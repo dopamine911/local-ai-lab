@@ -133,3 +133,9 @@ Sources: git commits (homelab, fork `~/src/UnbiasedStrata`), marvin's `~/strata-
 | 18:59 | First launch: suite skipped all 19 (results for this profile exist); tbench logged the old result as MLflow 5881856a | wrong run, soft-deleted | decisions.md 38 |
 | 19:00 | `tbench`: RERUN=1 (passes --rerun) and no log unless a new job ran; guard tested (smoke: nothing logged) | | tuning/tbench |
 | 19:01:10 | **Terminal-Bench full on llama.cpp `big` launched** (RERUN=1), tmux `tbench-big`; GPU 108-116 W busy (not the 55 W cap) | running | `~/tbench-big-2026-11-01.log` |
+
+## 2026-11-02
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 00:24 | Terminal-Bench re-run of llama.cpp `big` finished; logged automatically (checked: new run, new tokens) | **18/19 in 5.37 h**; extract-elf failed both | MLflow 3122dd67, `~/tbench-big-2026-11-01.log` |
