@@ -44,9 +44,10 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
   Fix without a BIOS visit (likely the same setting; not yet tried on the real fault):
   `echo performance | sudo tee /sys/class/ec_su_axb35/apu/power_mode` on marvin.
 - llama.cpp#27148 (open): the RAM prompt cache (`--cache-ram`, default 8 GB, + `--cache-idle-slots`, default on; both on in
-  our build) can put text from an unrelated finished conversation into a new request under concurrent load. We share
-  models between Daniel, Paul and agents. Planned fix, measured before/after: `--cache-ram 0 --no-cache-idle-slots`
-  per model on both machines (found via strixhaloguide.com/troubleshooting, 2026-10-30).
+  our build) can put text from an unrelated finished conversation into a new request: not only under concurrent load,
+  also one user sending two unrelated long prompts in a row (upstream reports, re-checked 2026-11-02; not fixed in
+  b12020). We share models between Daniel, Paul and agents. Fix, verified upstream, planned measured (issue #10):
+  `--cache-ram 0 --no-cache-idle-slots` together on every model on both machines (either alone still leaks).
 - llama.cpp b11870 (the build inside llama-swap 267) rejects Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Re-test after a llama.cpp update.
 
 ## Results
