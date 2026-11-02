@@ -49,6 +49,8 @@ logs in to Tailscale (open the link it prints), shares port 8080 on the tailnet,
 `~/llama-swap`, sets the time zone to America/Chicago, and on marvin sets the GPU memory boot setting. Then **reboot**.
 
 Good: from zaphod, `ssh marvin` (or the other way) works without a password; `docker ps` works without sudo.
+After the reboot, `lab setup check` (read-only, no sudo) checks every host.sh step on this machine and prints the fix
+for any that is not done. Good: every line `ok` ("10 lab CLI" stays BAD while the repo is newer than the installed lab).
 
 zaphod only: `gh auth login` (GitHub CLI, installed by host.sh; used to open issues). Good: `gh auth status` says logged in.
 
@@ -166,6 +168,9 @@ tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, sno
 `setup/host.sh` step 10 builds and installs it on both machines (`~/homelab/cli/build.sh install`; pinned Go container,
 nothing installed on the host). Good result: `lab version` prints a commit id and `lab manifest` prints the same
 lines as `tuning/manifest.sh`. Without a terminal `lab` prints help (safe in scripts).
+The scripts and their `lab` versions do the same (checked side by side): `lab models` = `setup/models.sh`,
+`lab backup [list|install]` = `setup/backup-to-marvin.sh`, `lab tbench` = `tuning/tbench`, and the benchmark commands
+(tuning/README.md). Either works until the scripts go.
 
 ### Renovate (issue #7, decisions.md 40)
 After `renovate.json` is on main: https://github.com/apps/renovate → Install → **Only select repositories** →
