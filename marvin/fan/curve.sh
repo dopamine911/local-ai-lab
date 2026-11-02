@@ -16,6 +16,9 @@
 # The curve under test (Daniel 2026-11-01: lower temperature wanted, noise doesn't matter). EC temperature, C:
 UP=50,58,65,72,78      # reach level 1..5 at these (factory-like default: 60,70,83,95,97)
 DOWN=45,53,60,67,74    # drop from level 1..5 at these (5 C below each UP, so it doesn't flap)
+# Kept 2026-11-02 (GPU 82 -> 73 C median vs factory). To TRY another curve without changing this file:
+#   sudo env CURVE_UP=40,45,50,55,60 CURVE_DOWN=35,40,45,50,55 ./curve.sh apply      (until reboot or `apply`)
+UP=${CURVE_UP:-$UP}; DOWN=${CURVE_DOWN:-$DOWN}
 #
 # Good result of a test: same load, lower GPU temperature, clock the same or higher (tuning/speed + sample.sh).
 set -euo pipefail
