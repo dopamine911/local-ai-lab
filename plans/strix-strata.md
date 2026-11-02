@@ -145,6 +145,8 @@ fans: clock, temp, watts. (3) Only if clocks drop (e.g. under ~2,600 MHz at 95 C
 after. Sources: strixhalo.wiki Guides/Sixunited_AXB35/Power_Mode_and_Fan_Control, Hardware/Boards/Sixunited_AXB35/Firmware.
 
 ## Later: llama.cpp ROCm build as a third contender
+Update 2026-11-02: ready-made nightly ROCm builds exist (lemonade-sdk/llamacpp-rocm, ROCm runtime included); release
+b1360 = llama.cpp b12020, the same commit as llama-swap 269. Plan and design: issue #16 (instead of building it here).
 strixhalo.wiki/AI/llamacpp-performance (Qwen3-30B-A3B, not our model): Vulkan RADV reads 755 tok/s at depth 0 but
 17 at 128K depth; ROCm 41, lhl's rocm-wmma-tune branch 51. Agents work at long depth, so after the Strata tests:
 build llama.cpp for HIP/gfx1151 in a container (same pinned tag as Vulkan), run `tuning/speed` + a depth sweep on
