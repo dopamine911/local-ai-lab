@@ -17,6 +17,7 @@ import (
 	"github.com/dopamine911/local-ai-lab/cli/internal/config"
 	"github.com/dopamine911/local-ai-lab/cli/internal/enso"
 	"github.com/dopamine911/local-ai-lab/cli/internal/mcp"
+	"github.com/dopamine911/local-ai-lab/cli/internal/webui"
 	"github.com/dopamine911/local-ai-lab/cli/internal/manifest"
 	"github.com/dopamine911/local-ai-lab/cli/internal/menu"
 )
@@ -51,7 +52,7 @@ func main() {
 			return cmd.Execute()
 		},
 	}
-	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd())
+	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -177,6 +178,27 @@ func ensoCmd() *cobra.Command {
 		},
 	})
 	return e
+}
+
+func webuiCmd() *cobra.Command {
+	w := &cobra.Command{Use: "webui", Short: "Open WebUI: settings drift"}
+	w.AddCommand(&cobra.Command{
+		Use:   "drift",
+		Short: "Settings changed by hand in the web page vs hub/compose.yaml (read-only; port of drift.sh)",
+		Long: "Compare the running Open WebUI's settings with what hub/compose.yaml would give a fresh install\n" +
+			"(a throwaway Open WebUI, no network, about 30-60 s). Read-only. Secrets show as <set>.\n" +
+			"\"in compose\" = managed by compose; \"web page only\" = changed by hand: add it to compose.yaml or undo it.\n" +
+			"To make the running one match: hub/openwebui/drift.sh --sync (moves into lab in step 3).\n" +
+			"Good result: \"0 setting(s) differ\".",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			return webui.Drift(cfg.Repo)
+		},
+	})
+	return w
 }
 
 func isTerminal(f *os.File) bool {

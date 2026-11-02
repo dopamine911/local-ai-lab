@@ -24,7 +24,7 @@ one service at a time, and run its check.
 | LocalRecall + Postgres | hub/compose.yaml | v0.6.6 (latest) | `memory` search |
 | LocalRecall MCP / mcp-proxy | hub/memory/mcp-localrecall.Dockerfile | mcps v0.0.4, mcp-proxy 0.13.0 (latest); Python 3.12.16 | same |
 | Mnemosyne | hub/memory/mnemosyne.Dockerfile | 4.0.0 (latest); Python 3.12.16 | `recall` finds the REBUILD rule |
-| Python (relays, sync, stats) | compose files | 3.13.18-slim-trixie, 3.12.16-slim (were floating `3.13-slim-trixie` / a bare digest) | containers up |
+| Python (relays, sync, stats, webui drift) | compose files, hub/openwebui/drift.sh, cli/internal/webui | 3.13.18-slim-trixie, 3.12.16-slim (were floating `3.13-slim-trixie` / a bare digest) | containers up |
 | Enso image | agents/enso/Dockerfile | Ubuntu resolute-20261024.1, snapshot 2026-10-30, bun 1.4.4 (from 1.4.0), Enso 537559a, pi 1.1.0 | `agents/enso/enso.sh check` |
 | lab CLI: Go | cli/build.sh `IMG=` | golang:1.27.3 by digest (latest) | `cli/build.sh` (vet, tests, build) |
 | lab CLI: libraries | cli/go.mod + go.sum | cobra v1.10.2, bubbletea v2.1.1, lipgloss v2.0.6, go.yaml.in/yaml v3.0.6 (latest stable; yaml v4 is still rc) | same + `lab manifest` diff against tuning/manifest.sh |
