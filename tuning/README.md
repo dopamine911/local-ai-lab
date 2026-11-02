@@ -153,7 +153,7 @@ SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"              
 
 Not set up: a SWE-bench sample (heavy; see the full guide).
 
-**`lab` (issue #6):** `lab speed`, `quality`, `bench`, `kl`, `series` and `log` do the same as the scripts below
+**`lab` (issue #6):** `lab speed`, `quality`, `bench`, `kl`, `series`, `log` and `tbench` do the same as the scripts below
 (same arguments and settings, same MLflow fields; all six checked side by side with real runs 2026-11-02). Both
 work; the scripts stay until all of `lab` is done. `lab bench --dry-run` / `lab kl --dry-run` print the commands without stopping llama-swap.
 
