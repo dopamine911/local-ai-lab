@@ -57,6 +57,9 @@ Baseline, busy samples (>=90%) by GPU temperature:
 | 09:54-10:17 | **B, curve** (up 50,58,65,72,78): same 4 runs | see table | MLflow "fan test B curve 78C run 1-4" |
 | — | Decision: **keep** | GPU **9-10 C cooler**, clock +2%, reading +1%, same watts | — |
 | ~10:25 | Daniel: `sudo curve.sh boot on` | unit marvin-fan-curve enabled, `active`: the curve is re-applied at every boot | setup/REBUILD.md marvin step 5 |
+| ~10:20 | Daniel: test curve **C** `sudo env CURVE_UP=40,45,50,55,60 CURVE_DOWN=35,40,45,50,55 curve.sh apply` (fans 100% whenever there is load: the limit any curve can reach) | fans run at idle too (level 2, ~2,600 rpm) | — |
+| 10:21-10:44 | **C**: same 4 runs from EC 40 / GPU 38 C | GPU median **70** (B 73), max **74** (B 78); clock 2,871 (B 2,859, +0.4%); reading 319.9, 314.3, 314.5, 314.2 (B 319.7, 313.5, 313.4, 313.4: +0.3%, inside run-to-run spread); writing 44.6-44.8 (same); fans at 100%: 4,749 / 4,677 / 2,447 rpm | MLflow "fan test C curve 60C run 1-4"; `~/fan-samples/2026-11-02-curve-test-C.csv` |
+| — | Result: the limit buys **3-4 C more, no measurable speed**. Choice for Daniel: keep B (fans stop at idle) or C (fans always on: a little more wear and dust) | — | — |
 
 Result, busy samples (>=90%), 265 each:
 
