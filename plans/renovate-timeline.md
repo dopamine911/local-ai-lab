@@ -15,4 +15,6 @@ What was done and when. Times are Chicago time (CST), from `date` when written. 
 | 14:50 | Daniel merged #19 and installed the app (this repo only) | — | — |
 | 14:54 | First run | Dependency Dashboard #22; PRs #20 (python 3.12.16 digest) and #21 (python 3.13.18 digest); pending approval: llama-swap (marvin 267 pin + 269), Python 3.15.2 x2; rate-limited: squid digest, mcp-proxy 0.13.3, ntfy 2.37.1, Open Terminal 0.16.0, SearXNG (check whether the Monday-morning schedule holds it back). Issue #7 closed | #22 |
 | 14:57 | **#20** (python 3.12.16-slim digest → b18b261) merged by Daniel; rebuilt `mcp-localrecall` and `mnemosyne`, pulled the memory-sync image | before and after: `recall` finds the REBUILD rule (f539fa74), `memory` search finds the watchdog timeline (same 2 results); both on Python 3.12.16; `lab mcp status` matches the repo; watchdog quiet | — |
-| next | #21 (python 3.13.18 digest), then the queued ones, one at a time | — | — |
+| 14:59 | **#21** (python 3.13.18-slim-trixie digest → ae14d4c) merged by Daniel; recreated zaphod's `gpu-stats`, `agent-stats` (hub) and `enso-relay` | same answers before/after (GPU tiles, agent totals, relay 200); `lab enso check` ok; all on image ae14d4ce8771. ComfyUI takes it at its next build | — |
+| pending | marvin's `gpu-stats` and `agent-stats` (same image): after marvin's benchmark, with the 269 switch (`git pull` + `docker compose up -d` there) | — | — |
+| next | the queued PRs (squid digest, mcp-proxy, ntfy, Open Terminal, SearXNG), one at a time | — | — |
