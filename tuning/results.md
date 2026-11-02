@@ -165,6 +165,9 @@ Qwen3.8-27B UD-Q4_K_XL (our `coder` model) on Strix Halo 18/19. A smoke pass sho
 ## llama-swap 267 -> 269 on zaphod (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
 
 Same `coder` (card 1), same settings; only the image changed (Mesa pinned, same version). Before/after back to back.
+Note: the official `unified-vulkan-N` images are nightly builds; the "269" image's llama-swap program reports **v268**
+(2576af3; v269's own changes are UI and metrics only). The llama.cpp inside is b12020 either way (checked with
+`lab manifest` / `tuning/manifest.sh`, 2026-11-02). Same pattern on marvin: its "267" image reports v266.
 
 | | 267 (b11870) | 269 (b12020) |
 | --- | --- | --- |

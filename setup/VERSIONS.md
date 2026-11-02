@@ -33,7 +33,7 @@ one service at a time, and run its check.
 
 | What | Pinned | Latest | Why not bumped in the audit |
 | --- | --- | --- | --- |
-| llama-swap (and the llama.cpp build inside it), issue #1 | **zaphod 269** (llama.cpp b12020, 2026-11-02, measured: tuning/results.md); marvin 267 (b11870) | v269 (2026-11-01) | marvin next: same before/after on `big` |
+| llama-swap (and the llama.cpp build inside it), issue #1 | **zaphod image `unified-vulkan-269`** (nightly; its llama-swap program reports v268; llama.cpp b12020, 2026-11-02, measured: tuning/results.md); marvin 267 (b11870) | v269 (2026-11-01) | marvin next: same before/after on `big` |
 | harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | Results would no longer compare with the 19/19 and 17/19 runs; bump with a fresh baseline run |
 | pi (inside Enso) | 1.1.0 | 1.4.0 | Enso supports only pi >=1.1.0 <1.2.0 (`SUPPORTED_PI_VERSIONS`); moves when Enso does |
 | tool-eval-bench | 3.0.0 | 3.0.0 | current |
