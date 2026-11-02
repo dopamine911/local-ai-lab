@@ -93,13 +93,3 @@ peers:
       - big                    # Qwen3.8-Flash-Next UD-IQ4_XS, 128K
     timeouts:
       responseHeader: 900      # first load ~1 min, long prompts read at ~460 tok/s
-  # Live-session test of our UnbiasedStrata fork (plans/strix-strata.md). Answers only while `./fork.sh start` runs
-  # on marvin; then marvin's llama-swap is stopped and `marvin/big` is offline. MARVIN_FORK_KEY is in .env and
-  # Proton Pass (made by fork.sh, marvin:~/strata-fork/key). Switch off: remove this block, ./fork.sh stop on marvin.
-  marvin-fork:
-    proxy: http://marvin:8099
-    apiKey: ${env.MARVIN_FORK_KEY}
-    models:
-      - big-fork               # UnbiasedStrata gfx1151 (fork hip-gfx1151), Qwen3.8-Flash-Next UD-IQ4_XS, 128K, medium
-    timeouts:
-      responseHeader: 900      # same as marvin's: long prompts
