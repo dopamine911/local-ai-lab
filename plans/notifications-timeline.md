@@ -52,4 +52,15 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | 2026-11-02 ~11:00 | Desktop 403 found: Notify (v0.1.6, last release 2024) checks a new account with `GET /stats/auth`; `daniel` may only read `lab-*` -> 403 (Notify issue #18). Fix: `daniel:stats:ro` in hub/compose.yaml, ntfy recreated | 10 access checks pass: stats/auth 200, lab-done 200; other topics, sending (daniel and sender on stats), sender reading, anonymous: 403; web app 404 | this commit |
 | ~11:10 | Daniel moved to **Ntfyr** (maintained Notify fork, 0.8.0 2026-10-01, Flathub; Notify can't add more topics) | "Desktop test" sent; ntfy `subscribers=5` (phone 3 + desktop) | REBUILD.md "Phone notifications" step 6 |
 | later | Optional: a desktop-only read-only access token (Ntfyr 0.8.0 supports tokens) so the phone password stays on the phone | — | — |
-| next | Step 2: **Rerun** and **Skip** on benchmark notifications (`tuning/log`); zaphod runs only | — | — |
+
+### Phase 2, step 2: Rerun and Skip (2026-11-02)
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| ~10:55 | `actiond.py`: actions `skip` (MLflow set-tag reviewed=skipped) and `rerun` (one of speed/quality/bench/kl/tbench in tuning/, stored arguments and non-secret settings, detached with `setsid -f flock -n`, one at a time; "busy" gives the button back). The 5 benchmarks record how they were started (`LAB_RERUN`, base64 of the arguments); `tuning/log` adds Rerun (zaphod only), Skip, Open | refusals checked: marvin by MACHINE, BASE_URL, TARGET and through the peer (`marvin/big`, a gap found and closed), non-benchmark (`rm`), path trick (`../hub/notify`), wrong folder; tricky arguments (commas, semicolons, quotes) survive | this commit |
+| 11:01 | Test copy on port 2588 | rerun 200 (job ran, logged MLflow f377ab7f "button test"); a second rerun while running 409 busy, its button still usable; first again 403; skip 200 on a fan-test run, tag checked, then removed | actions.log |
+| 11:08 | Daniel tapped **Skip** 27 s before restarting the live service | old code: 500 KeyError, button used up; after restart 403 already used. Fix: an action unknown to the running service is refused (501) without using up the button (takes effect at next restart) | this commit |
+| 11:09 | Daniel: `sudo systemctl restart lab-actions` | active | — |
+| 11:10 | Phone **Rerun** (100.64.122.73) | 200, job ran under the service's environment, logged MLflow 220593f7 at 11:12:46, "Done" with new buttons arrived | jobs/WaWbIbxw3_AJz_Vz.log |
+| 11:12 | Phone **Skip** on that Done | 200; MLflow run 220593f7 tag `reviewed=skipped` checked | — |
+| next | Watchdog (#12) on the same buttons (Acknowledge, Snooze); marvin Rerun after reservations (#3) | — | — |

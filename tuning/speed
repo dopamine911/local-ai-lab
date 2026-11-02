@@ -9,6 +9,8 @@
 # Writes tuning/runs/<date>-speed-<model>.json and logs speed_* metrics to MLflow (./log). Set NOLOG=1 to skip logging.
 set -euo pipefail
 cd "$(dirname "$0")"
+# How this run was started, for the Rerun button (hub/actions/actiond.py; tuning/log adds it). Outermost script wins.
+export LAB_RERUN="${LAB_RERUN:-$(printf '%s\0' "$(basename "$0")" "$@" | base64 -w0)}" LAB_RERUN_CWD="${LAB_RERUN_CWD:-$PWD}"
 MODEL="${1:?model}"; NOTE="${2:?note}"
 [ -n "${API_KEY:-}" ] || { set -a; . ~/llama-swap/.env; set +a; API_KEY="$ZAPHOD_KEY"; }
 OUT="runs/$(date +%F-%H%M)-speed-${MODEL//\//-}.json"

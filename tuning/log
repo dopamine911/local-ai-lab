@@ -29,11 +29,20 @@ rc=${PIPESTATUS[0]}
 if [ "${NOTIFY:-1}" != 0 ]; then
   run=$(grep -oE 'Logged run [0-9a-f]+' "$OUT" | awk '{print $3}')
   summary=$(grep -E '^  (Terminal-Bench|tool-eval score|mean KLD|speed_|[a-z_]+ = )' "$OUT" | sed 's/^  //' | head -6)
+  # Buttons (hub/actions/actiond.py, issue #11): Rerun (zaphod runs started by a benchmark script that recorded
+  # LAB_RERUN; not marvin until reservations, #3), Skip (MLflow tag reviewed=skipped), Open. A button that can't be
+  # made is left out; the notification still goes.
+  A="$HERE/../hub/actions/actiond.py"; btn=()
+  if [ "$M" = zaphod ] && [ -n "${LAB_RERUN:-}" ]; then b=$("$A" button rerun Rerun "$2 ($M): $3" 2>/dev/null) && btn+=("$b"); fi
   if [ "$rc" = 0 ] && [ -n "$run" ]; then
-    "$HERE/../hub/notify" -g white_check_mark -c "https://mlflow.ai.dopamine911.com/#/runs/$run" \
+    b=$("$A" button skip Skip "$run" "$2 ($M): $3" 2>/dev/null) && btn+=("$b")
+    btn+=("view, Open, https://mlflow.ai.dopamine911.com/#/runs/$run")
+    acts=$(IFS=';'; echo "${btn[*]}")
+    "$HERE/../hub/notify" -g white_check_mark -c "https://mlflow.ai.dopamine911.com/#/runs/$run" -a "$acts" \
       "Done: $2 ($M)" "$3"$'\n'"${summary:-logged}"$'\n'"MLflow run ${run:0:8}" >/dev/null 2>&1 || true
   else
-    "$HERE/../hub/notify" -t lab-alert -p high -g warning "Logging failed: $2 ($M)" \
+    acts=$(IFS=';'; echo "${btn[*]}")
+    "$HERE/../hub/notify" -t lab-alert -p high -g warning ${acts:+-a "$acts"} "Logging failed: $2 ($M)" \
       "$3"$'\n'"$(tail -3 "$OUT")" >/dev/null 2>&1 || true
   fi
 fi

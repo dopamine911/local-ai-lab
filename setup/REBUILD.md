@@ -132,6 +132,9 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    `b=$(~/homelab/hub/actions/actiond.py button ack Ack "rebuild check"); ~/homelab/hub/notify -a "$b" "test" "tap Ack"`.
    Good result: tapping **Ack** clears it and "Acknowledged" arrives; `actiond.py log` shows the phone's
    Tailscale address with `200 ok`.
+   Benchmark notifications from `tuning/log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
+   time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
+   After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 

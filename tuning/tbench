@@ -21,6 +21,8 @@
 #   (the profile name gets "+<skill>" appended, so these runs never mix with plain ones)
 set -e
 cd "$(dirname "$0")"
+# How this run was started, for the Rerun button (hub/actions/actiond.py; tuning/log adds it). Outermost script wins.
+export LAB_RERUN="${LAB_RERUN:-$(printf '%s\0' "$(basename "$0")" "$@" | base64 -w0)}" LAB_RERUN_CWD="${LAB_RERUN_CWD:-$PWD}"
 REPO=https://github.com/kyuz0/terminal-bench-mini.git
 PIN=60739af                         # Terminal-Bench-Local commit, 2026-10-27
 DIR=terminal-bench

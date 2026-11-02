@@ -37,6 +37,9 @@ Good: it prints lines like `pp512_tps = 1115.4` and `tg128_tps = 27.8`, then `Lo
 Note: llama-bench doesn't use speculative decoding (MTP). Test MTP with a server test.
 
 **`./log`**: record any other result, e.g. a server test. It reads the model's current settings from llama-swap by itself.
+It also sends the result to the phone (`hub/notify`) with buttons: **Rerun** (zaphod runs started by `speed`,
+`quality`, `bench`, `kl` or `tbench`, which record how they were started in `LAB_RERUN`), **Skip** (MLflow tag
+`reviewed=skipped`), **Open**. `NOTIFY=0` sends nothing.
 
 ```bash
 ./log zaphod coder "MTP depth 3 vs 2" server_tg_tps=61.2

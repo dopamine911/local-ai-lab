@@ -11,6 +11,8 @@
 # starts llama-swap again, and records everything in MLflow.
 set -e
 cd "$(dirname "$0")"
+# How this run was started, for the Rerun button (hub/actions/actiond.py; tuning/log adds it). Outermost script wins.
+export LAB_RERUN="${LAB_RERUN:-$(printf '%s\0' "$(basename "$0")" "$@" | base64 -w0)}" LAB_RERUN_CWD="${LAB_RERUN_CWD:-$PWD}"
 CARD="$1"; NOTE="$2"; shift 2 || { sed -n '2,10p' "$0"; exit 1; }
 case "$CARD" in 1) DEV=renderD128 ;; 2) DEV=renderD129 ;; *) echo "card must be 1 or 2"; exit 1 ;; esac
 MODEL="${MODEL:-/models/Qwen3.8-27B-UD-Q4_K_XL.gguf}"
