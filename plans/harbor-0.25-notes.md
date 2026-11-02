@@ -22,3 +22,14 @@ Docker, Core-19 tasks with their own tests, pass@2 (a second attempt as its own 
 Still `HARBOR_VERSION = "0.20.0"` at its latest commit 60739af (2026-10-27): held through all five harbor releases
 since July. No issue or PR about a harbor upgrade (its one open issue is about podman-compose). It publishes
 versioned Core-19 suites, i.e. it freezes the runner on purpose.
+
+## Test: smoke before and after (Daniel, 2026-11-02)
+
+One task (`git-leak-recovery`, pass@2) on marvin `big` (TARGET=marvin, same model as the 2026-11-01 baseline), first
+on harbor 0.20.0, then 0.25.0 (only `HARBOR_VERSION` in tuning/terminal-bench/terminal_bench.py changes). Each run has
+its own profile (`mtp3-128k-np2-h020-smoke`, `...-h025-smoke`) so nothing merges with the full-run results. One task
+checks that the chain works on 0.25 (LiteLLM rework) and compares time and tokens; it can't show a score change.
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 17:59 | doctor on 0.20.0 (marvin big); smoke 0.20.0 started | doctor passed: Harbor 0.20.0, 131,072-token context | — |
