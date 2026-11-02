@@ -56,6 +56,7 @@ func main() {
 	}
 	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
 	root.AddCommand(benchCmds()...)
+	root.AddCommand(machineCmds()...)
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
