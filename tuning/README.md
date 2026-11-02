@@ -165,6 +165,7 @@ Not set up: a SWE-bench sample (heavy; see the full guide).
 | `instructions/` | Pinned instruction files (skills) for testing |
 | `tbench-skill-patch.py` | Adds skill support to Terminal-Bench's prompt hook |
 | `tbench` | Terminal-Bench-Local: setup, smoke, full run, log |
+| `grammar-repro.py` | 8 small requests that show llama.cpp's tools + JSON-format bug (#31342); all OK once fixed (plans/grammar-bug-timeline.md) |
 | `kld/` | Fixed code sample, its checksum, and KL results |
 | `terminal-bench/` | The benchmark itself (downloaded by `./tbench setup`; not in git) |
 | `log_run.py` | The logging script |

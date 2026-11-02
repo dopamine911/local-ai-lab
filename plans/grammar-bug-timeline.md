@@ -29,7 +29,8 @@ the model always answers with the JSON.
 | 16:47 | Server log | grammar printed as `root ::= ` (empty), then `space ::= ...`: the empty root is the parse error | — |
 | 16:47 | Read b12020 source | cause above | — |
 | 16:47 | Repro variant 8: tools + schema + `tool_choice: required` | OK: confirms the lazy-grammar cause | — |
-| 16:48 | Upstream search | issue #31342 open; fix PR #31395 closed by its author, unreviewed; master unchanged | this commit |
+| 16:48 | Upstream search | issue #31342 open; fix PR #31395 closed by its author, unreviewed; master unchanged | 22b60f2 |
+| 16:50 | Checked the 2026-11-02 reference to PR #31395: commit 5889d80 is a cherry-pick in another user's fork, not in any open upstream PR | no fix in flight upstream; next step (comment on #31342 and/or reopen the fix as a PR) is Daniel's call | this commit |
 
 Workaround for clients now: send `tool_choice: "required"` or `"none"` together with a response format, or drop
 `tools` from the request that asks for the JSON answer.
