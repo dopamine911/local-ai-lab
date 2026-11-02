@@ -17,4 +17,20 @@ the next phases are in issue #11 (actions) and #12 (watchdog).
 | 18:53 | Checked the other branches: a failed run sends lab-alert with the error lines; `hub/notify` reports "failed (HTTP 000)" when ntfy is down (was exiting silently) | pass | next commit |
 | ~18:58 | Daniel: Tailscale on the Android phone won't log in (button does nothing); generating an auth key also fails | cause: Tailscale incident "Coordination service issues" (status.tailscale.com); tailnet zenner.dev, Tailnet Lock off, zaphod ↔ marvin still fine (7 ms) | — |
 | next | Daniel: phone joins the tailnet after the incident, then the app (REBUILD.md "Phone notifications") | — | — |
-| (was) next | Daniel: phone app set up (REBUILD.md "Phone notifications") | — | — |
+
+## 2026-10-31
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| 20:22 | Daniel: Tailscale works on the phone | phone `pixel-11-pro` (100.64.122.73) on the tailnet; `tailscale ping` from zaphod 84 ms; ntfy up 26 h; anonymous HTTPS still 403 | — |
+
+## 2026-11-01 (CST from today: daylight saving ended)
+
+| Time | What | Result | Record |
+| --- | --- | --- | --- |
+| ~18:00 | Daniel: ntfy app installed, login added, 3 topics subscribed | first test (2026-10-31 20:30 CDT, re-sent today) not delivered: ntfy showed 0 subscribers | — |
+| ~18:20 | Checked the path: phone browser opens `https://notify.<DOMAIN>/v1/health` (healthy); zaphod saw no stream from the phone | network fine; cause: topics were added without a server, so they went to the public ntfy.sh | — |
+| ~18:40 | Daniel re-added the topics on our server; deleted the ntfy.sh ones | ntfy `subscribers=3`; the app's own test send is refused for `daniel` (read-only, as designed) | — |
+| 18:41 | `hub/notify` to lab-done, lab-alert (high), lab-research | **all three arrived on the phone** | this commit |
+| — | REBUILD.md "Phone notifications": set the app's default server first; check `subscribers=3`; the login fallback (`NTFY_ENABLE_LOGIN`) was not needed and is removed | — | this commit |
+| next | Phase 2: action buttons (issue #11); watchdog (issue #12) | — | — |

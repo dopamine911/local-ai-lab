@@ -109,14 +109,17 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 
 ### Phone notifications (ntfy, issue #11)
 1. On the Android phone (Tailscale on): install the ntfy app.
-2. Settings → Manage users → add server `https://notify.<DOMAIN>`, user `daniel`, password `NTFY_PHONE_PASSWORD`
+2. App ⋮ → Settings → **Default server**: `https://notify.<DOMAIN>`. Without this, new topics go to the public
+   ntfy.sh, where anyone can post to them (happened on the first setup, 2026-11-01).
+3. Settings → Manage users → add server `https://notify.<DOMAIN>`, user `daniel`, password `NTFY_PHONE_PASSWORD`
    (hub/.env, Proton Pass "ntfy phone").
-3. Subscribe to `lab-done`, `lab-alert`, `lab-research` on that server (not ntfy.sh).
-   For each: turn on **Instant delivery** (otherwise the app polls a self-hosted server), and exempt the ntfy app
-   from Android battery optimisation.
-4. On zaphod: `~/homelab/hub/notify "test" "rebuild check"`. Good result: the phone shows it within seconds.
-   If the app refuses the login: set `NTFY_ENABLE_LOGIN: "true"` for `ntfy` in hub/compose.yaml (login API only;
-   the web app stays off) and `docker compose up -d ntfy`. Messages are kept 24 h: a phone offline longer misses them.
+4. Subscribe to `lab-done`, `lab-alert`, `lab-research`. Check: the grey text under each topic says
+   `notify.<DOMAIN>`, not ntfy.sh. Turn on **Instant delivery** for each, and set Android → Apps → ntfy → Battery →
+   **Unrestricted**.
+5. On zaphod: `~/homelab/hub/notify "test" "rebuild check"`. Good result: the phone shows it within seconds, and
+   `docker compose -f ~/homelab/hub/compose.yaml logs --tail 2 ntfy` shows `subscribers=3` (one per topic).
+   "Send test notification" in the app fails with "not authorized" on purpose: `daniel` can only read.
+   Messages are kept 24 h: a phone offline longer misses them.
 
 ## 6. Web pages and outside services (by hand for now; each is a to-do for code)
 
