@@ -87,3 +87,10 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 18:28 | PR #31 opened (Daniel) | — | — |
 | 18:28 | Daniel merged PR #31 (bd41711). `cli/build.sh install` on both; `lab setup check` on each | zaphod and marvin: **all done**, lab bd41711; `lab --help` lists monitors, sort-log, compare-skill; `lab webui` lists comfyui-env | this commit |
 | next | Step 6 (reserve #3, pool #4, research #5: Daniel's decisions first) or wrappers/docs | — | —
+
+## Clean-up: wrappers and docs (branch `cli-cleanup-docs`, 2026-11-02)
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| ~18:30 | Daniel: clean-up first and new docs. Read as: wrappers + every forward-looking doc on `lab` + a generated command reference in docs/cli/ (no existing doc moved) | — | — |
+| 18:34 | 18 scripts → one-line wrappers calling `~/.local/bin/lab <cmd>` (full path: the Rerun button runs without ~/.local/bin on PATH; clear message when lab is missing; each call logged to ~/.cache/lab-wrapper-calls.log, the evidence for removing them). **Not wrapped:** setup/backup-to-marvin.sh and hub/memory/sync.sh (cron: unchanged), setup/host.sh (bootstrap), tuning/activity.sh (no lab command; nothing calls it now: goes with the wrappers), Strata scripts | `--help` of all 18 with a bare environment (HOME + /usr/bin PATH, like the Rerun service): right lab help, exit 0. Read-only runs wrapper vs lab: series, manifest, models (kokoro), image-mode status, webui drift, webui models, enso check: **identical** output and exit code. Bad arguments: exit 1. Call log emptied after the test | this commit |

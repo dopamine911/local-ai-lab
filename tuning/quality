@@ -1,52 +1,8 @@
 #!/usr/bin/env bash
-# Tool-use quality test (tool-eval-bench 3.0.0) through llama-swap, logged to MLflow.
-#
-# Usage: ./quality <model> "<note>" [--full] [extra tool-eval-bench options]
-# Examples:
-#   ./quality coder "baseline"                  # 15 core scenarios, about 2 minutes
-#   ./quality coder "MTP depth 3" --full        # all 69 standard scenarios, about 10 minutes
-#   ./quality coder "temp 0.6" --temperature 0.6
-#   SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full
-#     (SKILL adds an instruction file after the built-in system prompt; frontmatter is stripped)
-#   SERIES=ornith-temp0.6 ./quality ornith "seed 2" --full --temperature 0.6 --seed 2
-#     (SERIES groups repeats of one setup; ./series shows average, lowest, highest)
-#   BASE_URL=http://127.0.0.1:8099/v1 API_KEY=... ./quality strata "..." --full
-#     (another OpenAI-compatible server instead of llama-swap)
-#
-# Defaults: temperature 0 and seed 42, so the same model and settings give the
-# same answers every time and runs compare cleanly. The model runs with its normal
-# thinking. Results: score out of 100 plus a per-category breakdown, in MLflow.
-set -e
-cd "$(dirname "$0")"
-# How this run was started, for the Rerun button (hub/actions/actiond.py; tuning/log adds it). Outermost script wins.
-export LAB_RERUN="${LAB_RERUN:-$(printf '%s\0' "$(basename "$0")" "$@" | base64 -w0)}" LAB_RERUN_CWD="${LAB_RERUN_CWD:-$PWD}"
-MODEL="$1"; NOTE="$2"; shift 2 || { sed -n '2,13p' "$0"; exit 1; }
-SUITE="--short"
-if [ "$1" = "--full" ]; then SUITE=""; shift; fi
-set -a; . ~/llama-swap/.env; set +a
-mkdir -p tool-eval/data tool-eval/runs
-OUT="$(date +%Y-%m-%d-%H%M)-${MODEL//\//_}.json"
-PROMPT_ARGS=()
-if [ -n "$SKILL" ]; then
-  [ -f "$SKILL" ] || { echo "SKILL file not found: $SKILL"; exit 1; }
-  export SKILL_NAME=$(basename "$SKILL" .md) SKILL_SHA=$(sha256sum "$SKILL" | cut -c1-12)
-  mkdir -p tool-eval/prompts
-  PF="tool-eval/prompts/$SKILL_NAME-$SKILL_SHA.txt"
-  { cat tool-eval/default-system-prompt.txt; printf '\n\n'
-    python3 -c 'import re,sys;print(re.sub(r"\A---\n.*?\n---\n","",open(sys.argv[1]).read(),count=1,flags=re.S).strip())' "$SKILL"; } > "$PF"
-  PROMPT_ARGS=(--system-prompt-file "/app/$PF")
-  echo "== with instructions: $SKILL_NAME ($SKILL_SHA, $(wc -c < "$PF") bytes of system prompt)"
-fi
-
-export RUN_START=$(date +%s)   # ./log reads real-use speed for this window from llama-swap's request log
-echo "== tool-eval-bench on $MODEL ${SUITE:-(full)}"
-docker run --rm --network host -u "$(id -u):$(id -g)" \
-  -v "$PWD/tool-eval/data:/app/data" -v "$PWD/tool-eval/runs:/app/runs" -v "$PWD/tool-eval/prompts:/app/tool-eval/prompts:ro" \
-  tool-eval-bench:3.0.0 run $SUITE --seed 42 \
-  --base-url "${BASE_URL:-http://127.0.0.1:8080/v1}" --api-key "${API_KEY:-$ZAPHOD_KEY}" --model "$MODEL" \
-  --no-live --json-file "/app/runs/$OUT" "${PROMPT_ARGS[@]}" "$@" > "tool-eval/runs/${OUT%.json}.log" 2>&1 \
-  || { echo "tool-eval-bench failed:"; tail -5 "tool-eval/runs/${OUT%.json}.log"; exit 1; }
-
-REPORT=$(python3 -c "import json;print(json.load(open('tool-eval/runs/$OUT'))['report_path'].replace('/app/','tool-eval/'))")
-echo "== results (full report with every conversation: $REPORT)"
-./log "${MACHINE:-zaphod}" "$MODEL" "$NOTE" "tool-eval/runs/$OUT" "$REPORT"
+# Moved to `lab quality` (issue #6; same arguments, same results, checked side by side). This wrapper stays until
+# nothing calls it (see ~/.cache/lab-wrapper-calls.log), then it goes. Help: lab quality --help
+# Full path on purpose: the Rerun button (hub/actions) runs benchmarks without ~/.local/bin on its PATH.
+LAB="$HOME/.local/bin/lab"
+[ -x "$LAB" ] || { echo "quality: lab is not installed. Run: ~/homelab/cli/build.sh install" >&2; exit 1; }
+echo "$(date '+%F %T') tuning/quality $(ps -o comm= $PPID 2>/dev/null)" >> "$HOME/.cache/lab-wrapper-calls.log" 2>/dev/null || true
+exec "$LAB" quality "$@"
