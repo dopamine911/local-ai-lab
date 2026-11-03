@@ -33,3 +33,19 @@ checks that the chain works on 0.25 (LiteLLM rework) and compares time and token
 | Time | Action | Result | Commit |
 | --- | --- | --- | --- |
 | 17:59 | doctor on 0.20.0 (marvin big); smoke 0.20.0 started | doctor passed: Harbor 0.20.0, 131,072-token context | — |
+| 18:02 | smoke on 0.20.0 | **1/1**, first attempt, 3.3 min (17:59:14-18:02:32), 14,660 input / 1,794 output tokens; MLflow 893f6157 | — |
+| 18:02 | `HARBOR_VERSION` 0.20.0 → 0.25.0 (only change; test); doctor | doctor passed: Harbor 0.25.0 (uvx), 131,072-token context | — |
+| 18:02 | smoke on 0.25.0 | **failed after 9 s, before any inference** (exit 1): the suite's own prompt hook (`compat/harbor_prompt/sitecustomize.py`, upstream code) reads `Terminus2._parser_name`, which 0.25.0 no longer has: `AttributeError: 'Terminus2' object has no attribute '_parser_name'`. Nothing logged | — |
+| 18:03 | `HARBOR_VERSION` back to 0.20.0 (terminal_bench.py identical to upstream again). Compared Terminus-2's code in both versions (uv cache) | see "What the code shows" | this commit |
+
+## What the code shows (Terminus-2, harbor 0.20.0 vs 0.25.0)
+Correction to "No change listed to the Terminus-2 agent" above: the release notes don't list it, but its code changed
+(448 lines in 2 files).
+- **Same behaviour as far as the code shows:** prompt template files byte for byte the same; same defaults (temperature
+  not set = the server's, parser json, summarize on at 8,000 free tokens, 160x40 terminal, no turn limit, no interleaved
+  thinking).
+- **Reorganised:** the settings moved into one `options` object (`self._parser_name` → `self.options.parser_name`):
+  this is what breaks the suite's prompt hook. Model connection (base URL, API key) goes through new LiteLLM helpers.
+- **tmux:** more fallbacks when installing tmux/asciinema inside a task container; not how the agent uses tmux.
+- So the suite needs a code change to run on 0.25 at all; upstream can't bump harbor without changing its hook, and our
+  results on a patched hook would no longer be the published suite's.
