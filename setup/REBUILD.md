@@ -98,6 +98,9 @@ docker compose --profile agent up -d beszel-agent
 **zaphod**
 ```
 cd ~/llama-swap && docker compose build && docker compose up -d
+# LocalRecall's database runs as uid 999; if it can't write its folder it silently uses /tmp and loses the
+# search index on every restart. Also needed after a restore (the backup copies files as daniel).
+mkdir -p ~/homelab/hub/data/localrecall-db && sudo chown 999:999 ~/homelab/hub/data/localrecall-db
 cd ~/homelab/hub && docker compose --profile images build && docker compose up -d   # includes localrecall, mcp-localrecall, mnemosyne
 docker compose --profile agent up -d beszel-agent
 lab mcp setup     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
@@ -198,4 +201,6 @@ patterns" are not available on this plan: they stay disabled.) The local gitleak
    rsync -a marvin:$S/llama-swap-data/ ~/homelab/zaphod/llama-swap/data/
    ```
    The `.env` files are in `marvin:$S/env/` too (and in Proton Pass).
-4. Start: `docker compose up -d`. Good: your old chats are in Open WebUI; Beszel shows its history.
+4. `sudo chown -R 999:999 ~/homelab/hub/data/localrecall-db` (the backup stores it as daniel; the database must own it).
+5. Start: `docker compose up -d`. Good: your old chats are in Open WebUI; Beszel shows its history.
+   If the memory search finds nothing (watchdog `mcp-calls`), re-index: plans/switch-move-timeline.md 20:59.
