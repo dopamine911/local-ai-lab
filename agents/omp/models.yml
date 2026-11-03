@@ -1,0 +1,13 @@
+# oh-my-pi (omp) on any machine in the tailnet: the lab's models through zaphod's llama-swap.
+# Copy to ~/.omp/agent/models.yml on that machine. The key is NOT in this file: `apiKey` names an
+# environment variable; set ZAPHOD_KEY (from Proton Pass, or zaphod/llama-swap/.env) before starting omp.
+# If ZAPHOD_KEY is unset, omp sends the literal text "ZAPHOD_KEY" and gets 401.
+# Use: omp --model lab/marvin/big
+providers:
+  lab:
+    baseUrl: http://zaphod.tail740235.ts.net:8080/v1   # Tailscale; zaphod forwards marvin/* to marvin
+    api: openai-completions
+    apiKey: ZAPHOD_KEY
+    models:
+      - { id: marvin/big, name: "marvin/big: Qwen3.8-Flash-Next, marvin, 128K", reasoning: true, contextWindow: 131072, maxTokens: 32768 }
+      - { id: coder, name: "coder: Qwen3.8-27B, zaphod card 1, 64K", reasoning: true, contextWindow: 65536, maxTokens: 16384 }
