@@ -28,14 +28,14 @@ Edit the file, run the command, commit both in the same commit.
 
 | To change | Edit | Then run |
 | --- | --- | --- |
-| Open WebUI settings | `hub/compose.yaml` (open-webui environment) | `hub/openwebui/drift.sh --sync`. Never change them in the web page |
-| Per-model options in Open WebUI | `hub/openwebui/models.yaml` | `hub/openwebui/models.sh --apply` |
-| Agent tools | `hub/mcp/servers/*.json` | `hub/mcp/setup.sh` |
+| Open WebUI settings | `hub/compose.yaml` (open-webui environment) | `lab webui drift --sync`. Never change them in the web page |
+| Per-model options in Open WebUI | `hub/openwebui/models.yaml` | `lab webui models --apply` |
+| Agent tools | `hub/mcp/servers/*.json` | `lab mcp setup` |
 | Web services and their versions | `hub/compose.yaml` | `cd ~/homelab/hub && docker compose up -d` |
 | zaphod's models | `zaphod/llama-swap/config/config.yaml` | Nothing: llama-swap reloads by itself. Check: `cd ~/llama-swap && docker compose logs --tail 20` |
 | marvin's model | `marvin/llama-swap/config/config.yaml` | Push, then on marvin `cd ~/homelab && git pull`; it reloads by itself |
 | Machine setup (packages, boot, time zone) | `setup/host.sh` | `sudo ~/homelab/setup/host.sh` on that machine |
-| Which model files to download | `setup/models-<machine>.txt` | `~/homelab/setup/models.sh` |
+| Which model files to download | `setup/models-<machine>.txt` | `lab models` |
 | Keys and tokens | Proton Pass | Copy into the right `.env` file (mode 600). Never into git |
 
 ## 3. zaphod's two graphics cards
@@ -60,7 +60,7 @@ Source: `zaphod/llama-swap/config/config.yaml` (the `routing` matrix and the `im
 1. BIOS settings (by hand). Good: marvin's GPU at 130-140 W when busy.
 2. Install Ubuntu 26.04 (by hand). Good: `df -h /` shows the whole disk.
 3. `sudo ~/homelab/setup/host.sh`, then reboot. Good: `ssh` between the machines works; `docker ps` works without sudo.
-4. `setup/models.sh` in tmux (hours). Good: ends with `MODELS-OK`.
+4. `lab models` in tmux (hours). Good: ends with `MODELS-OK`.
 5. `.env` files from Proton Pass (by hand). Good: each one in place, mode 600.
 6. Restore data from marvin (zaphod only, if rebuilding). Good: `hub/data` filled again.
 7. Build and start the services. Good: "Health check passed"; drift check says 0 differ.

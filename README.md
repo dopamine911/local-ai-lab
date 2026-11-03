@@ -2,6 +2,9 @@
 
 What this lab does, feature by feature, with links to every detail: [FEATURES.md](FEATURES.md).
 
+Running it: one command, `lab` (both machines; `lab --help`, or `lab` on a terminal for a menu). Every command, with
+what a good result looks like: [docs/cli/](docs/cli/README.md) (generated from `lab`'s own help).
+
 ```
 ~/homelab/
   CLAUDE.md                  notes for Claude (link to ~/llama-swap/CLAUDE.md)
@@ -32,11 +35,11 @@ Caddy listens only on zaphod's Tailscale address, so none of this is reachable f
 ## Open WebUI settings
 
 **All Open WebUI settings are in `hub/compose.yaml`** (the `open-webui` environment block), not in the web page.
-A rebuilt Open WebUI starts with them. Change a setting = edit compose.yaml, then `~/homelab/hub/openwebui/drift.sh --sync`.
+A rebuilt Open WebUI starts with them. Change a setting = edit compose.yaml, then `lab webui drift --sync`.
 
-- `hub/openwebui/drift.sh`: compares the running Open WebUI with compose.yaml (builds a throwaway copy, no network,
+- `lab webui drift`: compares the running Open WebUI with compose.yaml (builds a throwaway copy, no network,
   about a minute). Good result: `0 setting(s) differ`. "web page only" lines = changed by hand: add them to compose or undo.
-- `hub/openwebui/drift.sh --sync`: copies the compose-managed settings (`hub/openwebui/managed-keys.txt`) into the
+- `lab webui drift --sync`: copies the compose-managed settings (`hub/openwebui/managed-keys.txt`) into the
   running Open WebUI; stops it for a few seconds; saves `data/open-webui/webui.db.before-sync-<date>` first.
 
 What is set (2026-10-29, checked working end to end):
@@ -51,10 +54,10 @@ What is set (2026-10-29, checked working end to end):
   queries leave zaphod, no key).
 - **Code runner:** Open Terminal (own container, own home folder `hub/data/open-terminal`, no Docker socket, no host files).
 - **Images:** ComfyUI, Z-Image Turbo, 1024x1024, 8 steps (first image ~26 s incl. loading). **Only while image mode is
-  on** (`~/homelab/hub/image-mode on`, then `off`): it borrows card 2. Workflow + node map are generated from the
-  workflow file: `hub/openwebui/make-comfyui-env.sh` or `lab webui comfyui-env` (or `... qwen` for Qwen-Image, better at text in images), then
-  `drift.sh --sync`.
-- **Models** (`hub/openwebui/models.yaml`, apply with `hub/openwebui/models.sh --apply`; without `--apply` it only checks):
+  on** (`lab image-mode on`, then `off`): it borrows card 2. Workflow + node map are generated from the
+  workflow file: `lab webui comfyui-env` or `lab webui comfyui-env` (or `... qwen` for Qwen-Image, better at text in images), then
+  `lab webui drift --sync`.
+- **Models** (`hub/openwebui/models.yaml`, apply with `lab webui models --apply`; without `--apply` it only checks):
   native function calling for all (also the default for new models), vision only for `ornith` and `chat`, helper models
   (embed, rerank, stt, tts, coder-tb) hidden from the model picker. Names come from the llama-swap configs.
 
@@ -70,7 +73,7 @@ Every agent has its own token and list of allowed tool servers; no token or a wr
 | `memory` | Search the lab's own notes (LocalRecall over ~/homelab and ~/full-homelab Markdown; synced hourly by `hub/memory/sync.sh`). Read-only. Raw tool-test transcripts and Terminal-Bench tasks are excluded (attacker text, benchmark contamination) | enso, claude-code |
 | `recall` | Short memories shared by all agents (Mnemosyne 4.0.0, one SQLite file in hub/data/mnemosyne): remember, recall, get, invalidate, validate (the other 25 tools are off, `hub/mcp/servers/recall.tools`) | enso, claude-code |
 
-Setup and rebuild: `hub/mcp/setup.sh` (servers in `hub/mcp/servers/`, agent logins in `hub/mcp/clients/`,
+Setup and rebuild: `lab mcp setup` (servers in `hub/mcp/servers/`, agent logins in `hub/mcp/clients/`,
 tokens in `hub/.env` as `MCP_TOKEN_<NAME>`). Admin: `mcpjungle list tools`, `mcpjungle list mcp-clients`.
 
 Connect an agent:
@@ -80,9 +83,9 @@ Connect an agent:
 
 ## Images: ComfyUI on card 2
 
-`hub/image-mode on` lends card 2 to ComfyUI (https://comfy.<DOMAIN>): it switches llama-swap to the `image-mode`
+`lab image-mode on` lends card 2 to ComfyUI (https://comfy.<DOMAIN>): it switches llama-swap to the `image-mode`
 profile (coder-2 requests answered by coder on card 1; ornith, chat, north, flint, tts-qwen blocked), unloads card 2's
-chat model and starts ComfyUI. `hub/image-mode off` stops ComfyUI and gives card 2 back. `hub/image-mode status` shows
+chat model and starts ComfyUI. `lab image-mode off` stops ComfyUI and gives card 2 back. `lab image-mode status` shows
 the state. Document search and speech keep working throughout. ComfyUI has no login: anyone on the tailnet can use it
 while it runs. Models live in /srv/models/comfyui; outputs in hub/data/comfyui/output.
 Image: `comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14`, built from hub/comfyui/Dockerfile (30.6 GB; PyTorch ROCm wheels).
@@ -93,7 +96,7 @@ Image: `comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14`, built from hub/comfyui/Doc
 
 ## Set up or rebuild a machine
 
-Follow `setup/REBUILD.md`: BIOS and installer choices, then `setup/host.sh` (host settings), `setup/models.sh`
+Follow `setup/REBUILD.md`: BIOS and installer choices, then `setup/host.sh` (host settings), `lab models`
 (pinned model downloads), secrets, and `docker compose`. marvin's first setup is logged step by step in `marvin/SETUP.md`.
 
 marvin is linked to zaphod as a llama-swap peer (`peers:` at the end of `zaphod/llama-swap/config/config.yaml`), so its

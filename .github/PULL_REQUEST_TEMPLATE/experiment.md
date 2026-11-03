@@ -9,7 +9,7 @@ Closes #TODO
 TODO
 
 ## Environment
-<!-- From tuning/manifest.sh: machine, BIOS power mode, GPU/VBIOS, kernel, Mesa/ROCm, image digest, llama.cpp or engine
+<!-- From lab manifest: machine, BIOS power mode, GPU/VBIOS, kernel, Mesa/ROCm, image digest, llama.cpp or engine
      commit, model file + sha256. Same for baseline and change, or say what differs. -->
 TODO
 
@@ -20,7 +20,7 @@ TODO
 | TODO | | | | | |
 
 ## Quality guard
-<!-- Tool-use score (tuning/quality subset) and/or KL (tuning/kl), baseline vs change. A speed gain only counts when
+<!-- Tool-use score (lab quality subset) and/or KL (lab kl), baseline vs change. A speed gain only counts when
      these stay within their noise (tool use about ±4 between seeds). -->
 TODO
 

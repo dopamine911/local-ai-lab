@@ -20,7 +20,7 @@ DOWN=45,53,60,67,74    # drop from level 1..5 at these (5 C below each UP, so it
 #   sudo env CURVE_UP=40,45,50,55,60 CURVE_DOWN=35,40,45,50,55 ./curve.sh apply      (until reboot or `apply`)
 UP=${CURVE_UP:-$UP}; DOWN=${CURVE_DOWN:-$DOWN}
 #
-# Good result of a test: same load, lower GPU temperature, clock the same or higher (tuning/speed + sample.sh).
+# Good result of a test: same load, lower GPU temperature, clock the same or higher (lab speed + sample.sh).
 set -euo pipefail
 E=${EC_SYSFS:-/sys/class/ec_su_axb35}   # EC_SYSFS: a fake folder, for the dry run only (no board/root check then)
 HERE=$(cd "$(dirname "$0")" && pwd)

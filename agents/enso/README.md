@@ -17,13 +17,13 @@ fall short. Plan: `plans/agent-infra.md` step 1.
 
 ## Use
 
-1. `./enso.sh build` (once per Enso commit; ~3 min, 2.9 GB).
-2. `./enso.sh setup` (keys and config; safe to rerun after editing `config/`).
-3. `./enso.sh up`. Good result: `Enso: http://localhost:5178`.
-4. `./enso.sh check`. Good result: `ok: models`, `ok: no internet`, `ok: tools (mcpjungle): connected, 36 tools` (browser 25, search 4, memory 2, recall 5).
-5. Work: `./enso.sh tui --model lab/coder` (Enso's terminal on the workspace, with MCP tools), or the web page.
+1. `lab enso build` (once per Enso commit; ~3 min, 2.9 GB).
+2. `lab enso setup` (keys and config; safe to rerun after editing `config/`).
+3. `lab enso up`. Good result: `Enso: http://localhost:5178`.
+4. `lab enso check`. Good result: `ok: models`, `ok: no internet`, `ok: tools (mcpjungle): connected, 36 tools` (browser 25, search 4, memory 2, recall 5).
+5. Work: `lab enso tui --model lab/coder` (Enso's terminal on the workspace, with MCP tools), or the web page.
    One-shot: `docker exec -w /work/enso-harness enso bun /opt/enso/scripts/enso.ts -e builtin:mcp -e builtin:tool-search --model lab/coder -p "..."`.
-6. `./enso.sh down` when done.
+6. `lab enso down` when done.
 
 The agent's changes stay in `~/agents/work/enso-harness` (its own clone, commits as "enso-agent (local model)",
 no push credentials). Review them there; nothing reaches GitHub unless Daniel pushes.

@@ -25,33 +25,33 @@ Change one setting at a time, test it the same way every time, and record the re
 
 ## The three commands
 
-**`./bench`**: one card, llama-bench, 3 repeats, logged automatically. It stops llama-swap while it runs and starts it again after.
+**`lab bench`**: one card, llama-bench, 3 repeats, logged automatically. It stops llama-swap while it runs and starts it again after.
 
 ```bash
 cd ~/homelab/tuning
-./bench 1 "baseline card 1"
-./bench 2 "ubatch sweep" -ub 512,1024,2048
-MODEL=/models/flint-UD-Q4_K_XL.gguf ./bench 1 "flint first look"
+lab bench 1 "baseline card 1"
+lab bench 2 "ubatch sweep" -ub 512,1024,2048
+MODEL=/models/flint-UD-Q4_K_XL.gguf lab bench 1 "flint first look"
 ```
 Good: it prints lines like `pp512_tps = 1115.4` and `tg128_tps = 27.8`, then `Logged run ...`.
 Note: llama-bench doesn't use speculative decoding (MTP). Test MTP with a server test.
 
-**`./log`**: record any other result, e.g. a server test. It reads the model's current settings from llama-swap by itself.
+**`lab log`**: record any other result, e.g. a server test. It reads the model's current settings from llama-swap by itself.
 It also sends the result to the phone (`hub/notify`) with buttons: **Rerun** (zaphod runs started by `speed`,
 `quality`, `bench`, `kl` or `tbench`, which record how they were started in `LAB_RERUN`), **Skip** (MLflow tag
 `reviewed=skipped`), **Open**. `NOTIFY=0` sends nothing.
 
 ```bash
-./log zaphod coder "MTP depth 3 vs 2" server_tg_tps=61.2
-./log <machine> <model> "<note>" [name=value ...] [files ...]
+lab log zaphod coder "MTP depth 3 vs 2" server_tg_tps=61.2
+lab log <machine> <model> "<note>" [name=value ...] [files ...]
 ```
 
-**`./quality`**: is the model still good at using tools? (tool-eval-bench 3.0.0, through llama-swap). Run it after any change that `./bench` says is faster, so faster never means worse.
+**`lab quality`**: is the model still good at using tools? (tool-eval-bench 3.0.0, through llama-swap). Run it after any change that `lab bench` says is faster, so faster never means worse.
 
 ```bash
-./quality coder "baseline"                    # 15 core scenarios, about 1.5 minutes
-./quality coder "MTP depth 3" --full          # all 69 scenarios, about 10 minutes
-./quality coder "temp 0.6" --temperature 0.6  # test a sampling setting
+lab quality coder "baseline"                    # 15 core scenarios, about 1.5 minutes
+lab quality coder "MTP depth 3" --full          # all 69 scenarios, about 10 minutes
+lab quality coder "temp 0.6" --temperature 0.6  # test a sampling setting
 ```
 Good: `tool-eval score = 97 (29/30 points)` or close to it, then `Logged run ...`.
 It uses temperature 0 and seed 42, so the same settings give the same score every time; a change of even 1 point is real. Each run's full report (every conversation, what passed and failed) is in `tool-eval/runs/`, and attached to the run in MLflow.
@@ -61,7 +61,7 @@ It uses temperature 0 and seed 42, so the same settings give the same score ever
 source ~/llama-swap/.env
 for i in 1 2 3; do curl -s http://localhost:8080/v1/chat/completions -H "Authorization: Bearer $ZAPHOD_KEY" -H 'Content-Type: application/json' -d '{"model":"coder","temperature":0,"seed":42,"messages":[{"role":"user","content":"Write a Python function that checks if a number is prime, with comments"}]}' | grep -oE '"predicted_per_second":[0-9.]+'; done
 ```
-Use the middle of the three numbers in `./log`.
+Use the middle of the three numbers in `lab log`.
 
 ## Reading results in MLflow
 
@@ -72,18 +72,18 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
   Show one kind: search box `tags.benchmark = "tool-use"`.
 - `env.*`: the machine that served the model: board and BIOS, CPU, RAM, GPUs (PCI address + VBIOS), `vulkan_devices`
   (llama.cpp's names and numbering), kernel, Mesa, image, `llama_cpp_commit`, `llama_swap_version`. Collected by
-  `manifest.sh` on that machine (marvin over SSH). Filter example: `tags.env.llama_cpp_commit = "74bca39"`.
+  `lab manifest` on that machine (marvin over SSH). Filter example: `tags.env.llama_cpp_commit = "74bca39"`.
 - `model.*` and `model.draft.*`: the exact model and MTP draft files, with Hugging Face repo, revision and sha256 from
   `setup/models-<machine>.txt`. `model.pinned = no` means the file is missing from that list: add it.
 - Settings: every flag of the server command, one field each (context `c`, slots `np`, `spec-draft-n-max`, `temp`, ...).
-- `series`: repeats of one setup (different seeds or temperatures). Start one with `SERIES=<name> ./quality ...`;
-  `./series` prints average, lowest, highest and spread per series; in MLflow use the runs table's **Group by > series**.
+- `series`: repeats of one setup (different seeds or temperatures). Start one with `SERIES=<name> lab quality ...`;
+  `lab series` prints average, lowest, highest and spread per series; in MLflow use the runs table's **Group by > series**.
 - `behavior_*` (tool-use): automatic checks for problems the grader misses or hides (`tool-eval/behavior.py`):
   `q4_claim_sent` (TC-62 sent the unsupported Q4 claim; the grader calls that a pass), `attacker_echo` (repeated the
   attacker's address or key), `looping` (a line repeated 10+ times), `invented_query`, `ignored_required`.
   Check a result file directly: `python3 tool-eval/behavior.py tool-eval/runs/<run>.json`.
 - `live_*` (tool-use, Terminal-Bench): real-use speed **during the run**, from llama-swap's own request log on the machine
-  that served the model (`activity.sh`): `live_writing_tps` and `live_reading_tps` (medians; reading only for prompts
+  that served the model (read by `lab log`): `live_writing_tps` and `live_reading_tps` (medians; reading only for prompts
   with 500+ new tokens), `live_draft_acceptance_pct` (MTP), `live_cached_pct` (prompt reused from cache), tokens, busy
   minutes. Any chat with the same model during the run is counted too. Not available for Strata (not llama-swap).
   One old run (coder short suite) shows `live_reading_tps` 0: it had no long prompt, not a slow one.
@@ -95,7 +95,7 @@ Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. S
 Older runs: `model.*` was added afterwards from each run's saved server command (tag `model.backfilled`); 25 runs, all
 files found in the pinned lists. Runs before 2026-10-29 afternoon have no `env.*` tags; their settings commit (`config_commit`) still applies.
 
-**Is a difference real?** Run each test 3 times as one series (`SERIES=...`), then `./series`. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
+**Is a difference real?** Run each test 3 times as one series (`SERIES=...`), then `lab series`. If the gap between two settings is smaller than the gap between your own repeats, treat them as the same. When two settings tie, keep the default: one less thing to remember.
 
 **Things that skew results:** a second model busy on the same card, a chat in progress, heat (watch Beszel), and llama.cpp updates (re-test after updating the image).
 
@@ -105,12 +105,12 @@ Which test to use depends on what kind of setting it is.
 
 | Setting | What it does | Test with | Current → try |
 | --- | --- | --- | --- |
-| `-ub` (ubatch) | Prompt tokens the GPU handles per pass | `./bench` | 512 → 1024, 2048 |
-| `-b` (batch) | Max prompt tokens per step; keep ≥ `-ub` | `./bench` | 2048 → keep |
-| `-fa` | Flash attention | `./bench` | on → keep |
+| `-ub` (ubatch) | Prompt tokens the GPU handles per pass | `lab bench` | 512 → 1024, 2048 |
+| `-b` (batch) | Max prompt tokens per step; keep ≥ `-ub` | `lab bench` | 2048 → keep |
+| `-fa` | Flash attention | `lab bench` | on → keep |
 | `-c` | How much text the model holds in view | memory in llama-swap UI / Beszel | 65536 → raise to ~90% memory |
 | `-np` / `-kvu` | Request slots / slots share one context pool | server test with 2 agents | 1 → 2 with `-kvu` |
-| `-ctk` / `-ctv q8_0` | Halves context memory, small quality cost | `./bench`, then a quality test | f16 → q8_0 |
+| `-ctk` / `-ctv q8_0` | Halves context memory, small quality cost | `lab bench`, then a quality test | f16 → q8_0 |
 | `--spec-draft-n-max` | MTP: tokens drafted ahead | server test | 2 → 3, 4 |
 | `--spec-draft-p-min` | MTP: only draft confident tokens | server test | 0 → 0.7 |
 | `temperature`, `top_p`, `top_k`, `min_p` | How the next word is picked | quality test, 3 repeats | Qwen's values → leave unless testing quality |
@@ -119,60 +119,57 @@ Which test to use depends on what kind of setting it is.
 
 ## Deeper quality tests
 
-**`./kl`: KL-divergence.** How far a smaller model file, or a context-memory setting, drifts from the full-precision original (Q8_0). Lower is closer. Runs llama.cpp b11913 (official image; llama-swap itself runs b11870), same fixed code sample every time (`kld/code-sample.txt`; the script refuses to run if it changes).
+**`lab kl`: KL-divergence.** How far a smaller model file, or a context-memory setting, drifts from the full-precision original (Q8_0). Lower is closer. Runs llama.cpp b11913 (official image; llama-swap itself runs b11870), same fixed code sample every time (`kld/code-sample.txt`; the script refuses to run if it changes).
 ```bash
-./kl base                                             # once, after downloading the 29 GB Q8_0 file
-./kl test "Q4_K_XL as served"
-./kl test "q8_0 context" -ctk q8_0 -ctv q8_0
-MODEL=/models/Qwen3.8-27B-UD-Q5_K_XL.gguf ./kl test "Q5_K_XL"
+lab kl base                                             # once, after downloading the 29 GB Q8_0 file
+lab kl test "Q4_K_XL as served"
+lab kl test "q8_0 context" -ctk q8_0 -ctv q8_0
+MODEL=/models/Qwen3.8-27B-UD-Q5_K_XL.gguf lab kl test "Q5_K_XL"
 ```
 Good: `mean KLD` under about 0.05 and `same top token` above about 90% for a Q4 file. Use it to compare files and settings with each other, not as a pass mark. Stops llama-swap while it runs.
 
-**`./tbench`: Terminal-Bench-Local (Core-19).** 19 real terminal tasks in containers, graded pass/fail, 2 attempts each. The test your earlier model scores (18/19) came from. You start it yourself; Claude Code won't run downloaded benchmark code on its own.
+**`lab tbench`: Terminal-Bench-Local (Core-19).** 19 real terminal tasks in containers, graded pass/fail, 2 attempts each. The test your earlier model scores (18/19) came from. You start it yourself; Claude Code won't run downloaded benchmark code on its own.
 ```bash
-./tbench setup                 # once
-./tbench doctor                # checks, no inference
-./tbench smoke "first try"     # 1 task, 10-30 minutes
+lab tbench setup                 # once
+lab tbench doctor                # checks, no inference
+lab tbench smoke "first try"     # 1 task, 10-30 minutes
 tmux new -s tbench             # full run: about 10 hours, so inside tmux
-./tbench full "coder MTP2"     # Ctrl-b then d to detach; tmux attach -t tbench to return
+lab tbench full "coder MTP2"     # Ctrl-b then d to detach; tmux attach -t tbench to return
 ```
-Set `PROFILE` to describe what you changed (e.g. `PROFILE=mtp3 ./tbench full "MTP depth 3"`). Results are logged to MLflow automatically when a run finishes. Use the full run only for your final 2-3 setups.
+Set `PROFILE` to describe what you changed (e.g. `PROFILE=mtp3 lab tbench full "MTP depth 3"`). Results are logged to MLflow automatically when a run finishes. Use the full run only for your final 2-3 setups.
 
 ## Testing a skill (instruction file)
 
 Does an instruction file, such as `the-craft`, change how well a model works? Both tests can add one to the model's prompt. Pinned copies live in `instructions/` (e.g. `instructions/the-craft@3c329d0.md`: the standard install, SKILL.md + the two always-on rules, from brewpirate/acme-frontier-ai at commit 3c329d0).
 
 ```bash
-SKILL=instructions/the-craft@3c329d0.md ./quality coder "with the-craft" --full    # tool use, ~30 min
-./compare-skill instructions/the-craft@3c329d0.md coder flint                    # both arms, side-by-side table
-SKILL=instructions/the-craft@3c329d0.md ./tbench smoke "the-craft"                # Terminal-Bench
+SKILL=instructions/the-craft@3c329d0.md lab quality coder "with the-craft" --full    # tool use, ~30 min
+lab compare-skill instructions/the-craft@3c329d0.md coder flint                    # both arms, side-by-side table
+SKILL=instructions/the-craft@3c329d0.md lab tbench smoke "the-craft"                # Terminal-Bench
 ```
 - tool-eval-bench: the file is added after the built-in system prompt (`tool-eval/default-system-prompt.txt`).
-- Terminal-Bench: added to the agent's prompt by a small patch to its prompt hook (`tbench-skill-patch.py`, applied by `./tbench setup`). The profile gets `+<skill>` appended, so these runs are never compared with plain ones by accident.
+- Terminal-Bench: added to the agent's prompt by a small patch to its prompt hook (`tbench-skill-patch.py`, applied by `lab tbench setup`). The profile gets `+<skill>` appended, so these runs are never compared with plain ones by accident.
 - MLflow records the skill name and a checksum on every run. Comparison tables are saved in `tool-eval/compare/`.
 
 Not set up: a SWE-bench sample (heavy; see the full guide).
 
-**`lab` (issue #6):** `lab speed`, `quality`, `bench`, `kl`, `series`, `log`, `tbench`, `compare-skill` and `sort-log` do the same as the scripts below
-(same arguments and settings, same MLflow fields; all six checked side by side with real runs 2026-11-02). Both
-work; the scripts stay until all of `lab` is done. `lab bench --dry-run` / `lab kl --dry-run` print the commands without stopping llama-swap.
+**`lab` (issue #6):** every command above is a `lab` command (`lab <command> --help`; reference: docs/cli/). The files
+`speed`, `quality`, `bench`, `kl`, `series`, `log`, `tbench`, `compare-skill`, `sort-log` and `manifest.sh` in this
+folder are one-line wrappers that call `lab`, kept until nothing calls them (`~/.cache/lab-wrapper-calls.log`).
 
 ## Files here
 
 | File | What |
 | --- | --- |
-| `bench` | Benchmark one card and log it |
-| `log` | Log any result (runs `log_run.py` inside the MLflow container; nothing to install) |
-| `quality` | Tool-use quality test and log it |
-| `kl` | KL-divergence test and log it |
-| `compare-skill` | A/B test of an instruction file (skill) on one or more models |
+| `bench`, `speed`, `quality`, `kl`, `series`, `log`, `tbench`, `compare-skill`, `sort-log`, `manifest.sh` | One-line wrappers for the `lab` commands of the same name (`manifest.sh`: `lab manifest`); go once nothing calls them |
+| `activity.sh` | Old copy of the request-log reader; `lab log` has its own. Goes with the wrappers |
 | `instructions/` | Pinned instruction files (skills) for testing |
 | `tbench-skill-patch.py` | Adds skill support to Terminal-Bench's prompt hook |
-| `tbench` | Terminal-Bench-Local: setup, smoke, full run, log |
 | `grammar-repro.py` | 8 small requests that show llama.cpp's tools + JSON-format bug (#31342); all OK once fixed (plans/grammar-bug-timeline.md) |
 | `kld/` | Fixed code sample, its checksum, and KL results |
-| `terminal-bench/` | The benchmark itself (downloaded by `./tbench setup`; not in git) |
-| `log_run.py` | The logging script |
+| `terminal-bench/` | The benchmark itself (downloaded by `lab tbench setup`; not in git) |
+| `log_run.py` | The logging script (`lab log` runs it in the MLflow image) |
+| `tool-eval/compare.py`, `tool-eval/sort_to_mlflow.py` | Side-by-side table for `lab compare-skill`; writes the hand-sorted misses for `lab sort-log` |
 | `tool-eval/runs/` | Quality reports: one `.json` (scores) and one `.md` (every conversation) per run |
 | `runs/` | Raw llama-bench output, one file per run |
 | `results.md` | Written summary and next ideas |

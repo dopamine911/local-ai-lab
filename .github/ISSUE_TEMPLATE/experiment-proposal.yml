@@ -44,7 +44,7 @@ body:
     id: plan
     attributes:
       label: Test plan
-      description: Harness and options (tuning/speed, tuning/quality subset, tuning/kl), runs per side (at least 3), estimated time, and the reservation needed.
+      description: Harness and options (lab speed, lab quality subset, lab kl), runs per side (at least 3), estimated time, and the reservation needed.
     validations: {required: true}
   - type: dropdown
     id: risk

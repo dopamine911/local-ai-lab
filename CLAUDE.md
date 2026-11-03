@@ -18,7 +18,7 @@ Overview of every feature with links: `FEATURES.md` (keep it updated when adding
 | `hub/` | Caddy, Open WebUI, Beszel, Homepage, MLflow (see README.md) |
 | `marvin/llama-swap/` | Files to copy to marvin |
 | `tuning/` | Benchmarks and results (see tuning/README.md) |
-| `setup/` | Rebuild a machine: REBUILD.md, host.sh, models.sh, models-<machine>.txt |
+| `setup/` | Rebuild a machine: REBUILD.md, host.sh, models-<machine>.txt (downloads: `lab models`) |
 
 ## llama-swap on zaphod
 - Image `llama-swap-zaphod:269-media` (since 2026-11-02, issue #1): official image `unified-vulkan-269` (a nightly build: its llama-swap program reports v268, 2576af3; llama.cpp b12020; plus whisper-server, sd-server, audiocpp_server, llama-tts) on Ubuntu 26.04's Mesa (pinned 26.0.8), built from the Dockerfile. `:267-media` (b11870) kept for rollback; speed and tool use were the same (tuning/results.md). Models in /srv/models.
@@ -28,9 +28,9 @@ Overview of every feature with links: `FEATURES.md` (keep it updated when adding
 - Commit every config change: "what · from → to · why". Benchmarks record the last commit that touched `zaphod/llama-swap/`.
 
 ## Rebuild
-`setup/REBUILD.md` + `setup/host.sh` + `setup/models.sh` rebuild either machine. Every change to a machine (package, boot setting, Tailscale, web-UI setting, model) goes into a script or REBUILD.md in the same commit.
+`setup/REBUILD.md` + `setup/host.sh` + `lab models` rebuild either machine. Every change to a machine (package, boot setting, Tailscale, web-UI setting, model) goes into a script or REBUILD.md in the same commit.
 
-Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Never tell Daniel to change Open WebUI in the web page: edit compose, then `hub/openwebui/drift.sh --sync`; `drift.sh` alone checks for hand changes. Per-model settings: `hub/openwebui/models.yaml` + `models.sh --apply`.
+Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Never tell Daniel to change Open WebUI in the web page: edit compose, then `lab webui drift --sync`; `lab webui drift` alone checks for hand changes. Per-model settings: `hub/openwebui/models.yaml` + `models.sh --apply`.
 
 ## Do not undo
 - `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` in compose.yaml. Resizable BAR is off, and without this switch llama.cpp puts part of the model in system RAM: 3-10x slower.
@@ -51,7 +51,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 - llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Cause found 2026-11-02: `common/parsers/qwen3-coder.cpp` makes the grammar lazy even with a response format, so it comes out empty; upstream issue #31342 open, fix PR #31395 closed unreviewed (plans/grammar-bug-timeline.md). Client workaround: `tool_choice` "required" or "none" with the format. Re-test with `tuning/grammar-repro.py` after a llama.cpp update.
 
 ## Results
-`tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `tuning/bench`, `quality`, `kl`, `tbench`, `compare-skill`; see tuning/README.md.
+`tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `lab speed`, `quality`, `bench`, `kl`, `tbench`, `compare-skill`, `series` (one CLI for the lab: `lab --help`, docs/cli/; the old scripts are wrappers); see tuning/README.md.
 
 ## Next steps
 1. Terminal-Bench full run of `coder-tb`, with and without the-craft (overnight, in tmux).
@@ -59,7 +59,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 2b. marvin Terminal-Bench done (19/19, 2026-10-29). Next, each needs Daniel's go-ahead: a the-craft run for comparison; add `--metrics` to llama-server on both machines (Homepage "pending" count),
     and try `big` at 256K context (plans: measured before/after; ~+3 GB).
 3. Tuning ideas in tuning/results.md. marvin `big` uses llama.cpp's default batch (-b 2048 -ub 512); try -ub 2048 on
-   the 32K test (`tuning/speed`), one change, before the Strata comparison is final.
+   the 32K test (`lab speed`), one change, before the Strata comparison is final.
 4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.
 5. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
 

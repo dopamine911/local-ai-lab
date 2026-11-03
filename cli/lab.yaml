@@ -10,13 +10,13 @@ machines:
     ssh: marvin
     llama_swap_port: 8080
     llama_swap_container: llama-swap
-mcpjungle:                      # the MCP gateway (lab mcp setup / hub/mcp/setup.sh)
+mcpjungle:                      # the MCP gateway (lab mcp setup)
   version: 0.4.7                # the CLI; same version as the mcpjungle image in hub/compose.yaml (Renovate moves both)
   bin: ~/.local/bin/mcpjungle
   registry: http://127.0.0.1:8085
 enso:
   container: enso
-  image: enso-agent:537559a     # same tag as agents/enso/compose.yaml and enso.sh (Enso commit 537559a)
+  image: enso-agent:537559a     # same tag as agents/enso/compose.yaml (Enso commit 537559a)
 images:                        # containers lab runs (benchmarks, backup); same as the scripts they replace
   mlflow: ghcr.io/mlflow/mlflow:v3.17.2        # logging (tuning/log_run.py) and series; same version as hub/compose.yaml
   python: python:3.13.18-slim-trixie@sha256:ae14d4ce8771606477a81446e7ef429edd6762305fc50c84507c1041fa8285d1  # activity (llama-swap request log), backup copy step; same as hub/compose.yaml
