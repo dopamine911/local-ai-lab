@@ -7,7 +7,7 @@ Last audit: **2026-10-30** by hand. From issue #7: **Renovate** (`renovate.json`
 update, with this table's check in the PR body; held-back items wait for approval on its Dependency Dashboard issue.
 Merge one at a time and run the check. Dry run (changes nothing): see plans/renovate-timeline.md.
 
-**Not covered by Renovate (check by hand at each audit):** harbor (pinned in tuning/terminal-bench, not in git; #2);
+**Not covered by Renovate (check by hand at each audit):** harbor (pinned by Terminal-Bench-Local, not in git; #2: at each audit check `HARBOR_VERSION` in kyuz0/terminal-bench-mini's terminal_bench.py, follow when it moves);
 Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBUNTU_SNAPSHOT`); ComfyUI's torch/ROCm
 (`TORCH`, `ROCM`; torchvision unpinned); Caddy's Cloudflare plugin (`xcaddy --with`, unpinned); other apt packages
 (take the Ubuntu archive of the build day); images we build ourselves (their inputs are covered).
@@ -42,6 +42,6 @@ Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBU
 | What | Pinned | Latest | Why not bumped in the audit |
 | --- | --- | --- | --- |
 | llama-swap (and the llama.cpp build inside it), issue #1 | **image `unified-vulkan-269` on both machines** (nightly; its llama-swap program reports v268; llama.cpp b12020; zaphod and marvin 2026-11-02, measured before/after: tuning/results.md) | v269 (2026-11-01) | — |
-| harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | Results would no longer compare with the 19/19 and 17/19 runs; bump with a fresh baseline run |
+| harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | **Wait for upstream** (Daniel, 2026-11-02): Terminal-Bench-Local pins 0.20.0, and its prompt hook doesn't run on 0.25 (tested: plans/harbor-0.25-notes.md). Bump when Terminal-Bench-Local does, with a fresh baseline |
 | pi (inside Enso) | 1.1.0 | 1.4.0 | Enso supports only pi >=1.1.0 <1.2.0 (`SUPPORTED_PI_VERSIONS`); moves when Enso does |
 | tool-eval-bench | 3.0.0 | 3.0.0 | current |

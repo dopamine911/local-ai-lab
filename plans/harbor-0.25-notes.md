@@ -49,3 +49,8 @@ Correction to "No change listed to the Terminus-2 agent" above: the release note
 - **tmux:** more fallbacks when installing tmux/asciinema inside a task container; not how the agent uses tmux.
 - So the suite needs a code change to run on 0.25 at all; upstream can't bump harbor without changing its hook, and our
   results on a patched hook would no longer be the published suite's.
+
+## Decision (Daniel, 2026-11-02): wait for upstream
+Keep harbor 0.20.0 until Terminal-Bench-Local moves to a newer harbor (it must change its prompt hook to do so).
+Then: \`lab tbench setup\` on the new pin, smoke, fresh 19-task baseline, results.md notes which harbor each row used.
+Check at each version audit: \`HARBOR_VERSION\` in kyuz0/terminal-bench-mini's terminal_bench.py (setup/VERSIONS.md).
