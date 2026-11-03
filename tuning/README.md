@@ -165,6 +165,7 @@ folder are one-line wrappers that call `lab`, kept until nothing calls them (`~/
 | `activity.sh` | Old copy of the request-log reader; `lab log` has its own. Goes with the wrappers |
 | `instructions/` | Pinned instruction files (skills) for testing |
 | `tbench-skill-patch.py` | Adds skill support to Terminal-Bench's prompt hook |
+| `cache-switch.py` | Switch test and leak check for llama.cpp's prompt cache: conversation A, B, A again with codewords (#10; plans/cache-leak-timeline.md) |
 | `grammar-repro.py` | 8 small requests that show llama.cpp's tools + JSON-format bug (#31342); all OK once fixed (plans/grammar-bug-timeline.md) |
 | `kld/` | Fixed code sample, its checksum, and KL results |
 | `terminal-bench/` | The benchmark itself (downloaded by `lab tbench setup`; not in git) |
