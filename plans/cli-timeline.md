@@ -70,5 +70,5 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 17:45 | Daniel installed docker-buildx and gh on marvin | `lab setup check` on marvin (branch binary in /tmp, removed): **all done**, 13 packages; marvin/SETUP.md row 22 (main) | main |
 | 17:47 | Daniel merged PR #29 (with Renovate #27 ntfy and #28 mcp-proxy, deployed first: plans/renovate-timeline.md) | — | — |
 | 17:49 | `cli/build.sh install` on both; `lab setup check` on each | zaphod and marvin: **all done**, lab 78df5e6 | this commit |
-| 18:13 | Daniel: leave the nightly cron on setup/backup-to-marvin.sh for now; it moves with the NAS (issue #30) | cron unchanged | this commit |
+| 18:08 | Daniel: leave the nightly cron on setup/backup-to-marvin.sh for now; it moves with the NAS (issue #30) | cron unchanged | this commit |
 | next | Step 6 (reserve #3, pool #4, research #5) | — | —
