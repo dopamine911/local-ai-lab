@@ -72,3 +72,13 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 17:49 | `cli/build.sh install` on both; `lab setup check` on each | zaphod and marvin: **all done**, lab 78df5e6 | this commit |
 | 18:08 | Daniel: leave the nightly cron on setup/backup-to-marvin.sh for now; it moves with the NAS (issue #30) | cron unchanged | this commit |
 | next | Step 6 (reserve #3, pool #4, research #5) | — | —
+
+## Remaining ports (branch `cli-remaining-ports`, 2026-11-02)
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| ~18:13 | Daniel: port the remaining scripts first (beszel-monitors.sh, make-comfyui-env.sh, compare-skill, sort-log), step 6 after | — | — |
+| ~18:16 | `lab sort-log` (same docker run of tool-eval/sort_to_mlflow.py): run with the script and with lab (safe to repeat) | output **identical** | this commit |
+| ~18:18 | `lab webui comfyui-env [zimage\|qwen]` (Go; Python's compact JSON reproduced): both workflows written by the script and by lab | file **byte for byte identical** and the same message, both workflows; committed comfyui.env restored | this commit |
+| ~18:22 | `lab monitors` (Beszel login asked like the script, password not echoed; list checked line by line against the script): the hub/.env Beszel account is refused (HTTP 400: not the web login), so only the failure path ran | monitor list **identical**; bad login: both refuse, exit 1 (the script printed a traceback, lab "Login failed."). Success path ("already there" x7) needs Daniel's login | this commit |
+| 18:14 | `lab compare-skill` written (quality in-process; each arm starts with no SKILL / SKILL_NAME / SKILL_SHA / Rerun value from the arm before, as separate processes did; result file passed directly instead of "newest file"; compare.py unchanged). Fake tool-eval image + throwaway MLflow test running | — | — |

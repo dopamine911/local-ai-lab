@@ -187,7 +187,41 @@ func benchCmds() []*cobra.Command {
 			return exitWith(bench.TBench(cfg, args))
 		},
 	}
-	return []*cobra.Command{log, series, speed, quality, benchC, kl, tb}
+	sortLog := &cobra.Command{
+		Use:   "sort-log",
+		Short: "Write the hand-sorted tool-use misses to MLflow (port of tuning/sort-log)",
+		Long: "Write the hand-sorted misses (tuning/tool-eval/classifications.json) to MLflow as sort_* metrics on their\n" +
+			"runs (lab series shows them). Safe to repeat. Good result: one line per run it updated.",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			return exitWith(bench.SortLog(cfg))
+		},
+	}
+	cmpSkill := &cobra.Command{
+		Use:                "compare-skill <path/to/SKILL.md> [model ...]",
+		Short:              "A/B test: does an instruction file change tool-use quality? (port of tuning/compare-skill)",
+		Long:               bench.CompareSkillHelp + "\nThe skill path is relative to tuning/. Good result: a table per model and \"Saved: tool-eval/compare/...\".",
+		DisableFlagParsing: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) > 0 && (args[0] == "-h" || args[0] == "--help") {
+				return cmd.Help()
+			}
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			skill := ""
+			if len(args) > 0 {
+				skill, args = args[0], args[1:]
+			}
+			return exitWith(bench.CompareSkill(cfg, skill, args))
+		},
+	}
+	return []*cobra.Command{log, series, speed, quality, benchC, kl, tb, sortLog, cmpSkill}
 }
 
 // cutDryRun takes a leading --dry-run off args (the rest pass through to the benchmark tool untouched).
