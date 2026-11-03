@@ -199,6 +199,24 @@ the other misses move between seeds (TC-03, TC-29, TC-38 only in the 88 run). Ru
 `2026-11-02-{1412,1439,1455}` (267) and `{1529,1545,1612}` (269), MLflow series `big-ls267`, `big-ls269`; speed
 f88af8a8 (269). Rollback: `image: llama-swap-marvin:267` in marvin/llama-swap/compose.yaml.
 
+## RAM prompt cache off: conversation-leak fix (llama.cpp#27148, 2026-11-02, issue #10)
+
+`--cache-ram 0 --no-cache-idle-slots` on every llama-server model (`${server}` macro), both machines. Before/after back
+to back; switch test = `tuning/cache-switch.py`: conversation A (~12K tokens), then B (~13.7K), then A again, 3 rounds.
+
+| | zaphod `coder` (1 slot) before | after | marvin `big` (2 slots, -kvu) before | after |
+| --- | ---: | ---: | ---: | ---: |
+| writing (lab speed) | 53.8 | 54.2 | 44.2 | 44.3 |
+| reading 32K | 770.9 | **821.2 (+6.5%)** | 320.0 | **298.2 (-6.8%)** |
+| first token, new 12K conversation | 15.1 s | 13.6 s | 34.9 s | 35.9 s |
+| first token, back to A after B | **2.7 s** (42 tokens read) | **13.9 s** (12,157 read) | 1.0 s | 0.8 s (A kept its slot) |
+| leaks (wrong codeword) | 0 | 0 | 0 | 0 |
+
+zaphod: the cost is reading a conversation again after it lost its slot; new long prompts got faster (likely no more
+copying each finished prompt, ~2.6 GB, into RAM). marvin: the first long prompt after a reload is normal (319), later ones
+~298; likely the idle slot's tokens stay in the shared (unified) cache. Kept on both (Daniel: privacy first). MLflow:
+d1bee8db, 3b7a0edc (coder), 2122c874, 75df3001 (big). Timeline: plans/cache-leak-timeline.md.
+
 ## Accuracy (KL-divergence vs Q8_0, 32 x 512 tokens of code, llama.cpp b11913)
 
 | Date | Model file / setting | Mean KLD | Same top token | PPL ratio | Notes |

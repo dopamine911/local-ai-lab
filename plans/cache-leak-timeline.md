@@ -27,3 +27,9 @@ cache, and every new long prompt is processed alongside it (attention over more 
 later runs slower by the same amount. zaphod's `coder` has 1 slot, so nothing stays behind there (+6.5% instead).
 Decision for Daniel: keep (privacy first, ~7% slower long prompts on marvin), test a variant (e.g. slots not unified, or
 1 slot), or roll marvin back.
+
+## Decision and records
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 19:31 | Daniel: keep the flags on marvin as they are (privacy first, ~7% slower long prompts there) | tuning/results.md section, CLAUDE.md Known issues "mitigated" (and "not only under concurrent load"), README known issues | this commit |

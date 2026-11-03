@@ -139,8 +139,10 @@ within 0.009 KL of full precision.
 - llama.cpp rejects requests to the Qwen-family models (`coder`, `big`, `ornith`) that send tools **and** a required JSON
   format ("failed to parse grammar"). Cause found (an empty grammar in llama.cpp's Qwen chat handler); workaround: send
   `tool_choice: "required"` or `"none"` with the format. Details and re-test: [plans/grammar-bug-timeline.md](plans/grammar-bug-timeline.md).
-- llama.cpp's RAM prompt cache can put text from one conversation into another (llama.cpp#27148); the fix is planned
-  with measurements ([#10](https://github.com/dopamine911/local-ai-lab/issues/10)).
+- llama.cpp's RAM prompt cache can put text from one conversation into another (llama.cpp#27148). Mitigated on both
+  machines ([#10](https://github.com/dopamine911/local-ai-lab/issues/10)): the cache is off. Cost: returning to a long
+  conversation after someone else used the model reads it again (~11 s for 12K tokens on `coder`); marvin's long prompts
+  are ~7% slower.
 - More, with what to watch for: [CLAUDE.md](CLAUDE.md) "Known issues".
 
 ## What's next
