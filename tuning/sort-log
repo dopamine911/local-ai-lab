@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Write the hand-sorted misses (tool-eval/classifications.json) to MLflow. Safe to repeat.
-set -e
-cd "$(dirname "$0")"
-docker run --rm --network host -e GIT_PYTHON_REFRESH=quiet -v "$PWD:/tuning:ro" \
-  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/tool-eval/sort_to_mlflow.py
+# Moved to `lab sort-log` (issue #6; same arguments, same results, checked side by side). This wrapper stays until
+# nothing calls it (see ~/.cache/lab-wrapper-calls.log), then it goes. Help: lab sort-log --help
+# Full path on purpose: the Rerun button (hub/actions) runs benchmarks without ~/.local/bin on its PATH.
+LAB="$HOME/.local/bin/lab"
+[ -x "$LAB" ] || { echo "sort-log: lab is not installed. Run: ~/homelab/cli/build.sh install" >&2; exit 1; }
+echo "$(date '+%F %T') tuning/sort-log $(ps -o comm= $PPID 2>/dev/null)" >> "$HOME/.cache/lab-wrapper-calls.log" 2>/dev/null || true
+exec "$LAB" sort-log "$@"

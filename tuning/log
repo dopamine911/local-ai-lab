@@ -1,50 +1,8 @@
 #!/usr/bin/env bash
-# Run log_run.py inside the MLflow image (nothing to install on zaphod).
-# Usage: ./log <machine> <model> "<note>" [name=value ...] [files ...]
-# Sends a push notification when done (hub/notify, topic lab-done; lab-alert on failure). NOTIFY=0 to skip.
-set -e
-HERE="$(cd "$(dirname "$0")" && pwd)"
-M="$1"; case "$2" in marvin/*) M=marvin ;; esac   # peer models ("marvin/big") belong to that machine
-CONFIG_COMMIT=$(cd "$HOME/homelab/$M/llama-swap" && git log -1 --format="%h %s" -- . 2>/dev/null || echo unknown)  # last change to that machine's llama-swap folder
-# Machine and software facts from the machine that served the model (tuning/manifest.sh)
-if [ "$M" = "$(hostname)" ]; then MANIFEST=$("$HERE/manifest.sh")
-else MANIFEST=$(ssh -o ConnectTimeout=10 "$M" bash -s < "$HERE/manifest.sh" 2>/dev/null || echo "host=$M (unreachable)"); fi
-# Real-use speed during the run (tuning/activity.sh), when the caller recorded RUN_START (quality, tbench)
-ACTIVITY=""
-if [ -n "${RUN_START:-}" ]; then
-  LM="${2#*/}"   # model id on the serving machine ("marvin/big" -> "big")
-  if [ "$M" = "$(hostname)" ]; then ACTIVITY=$("$HERE/activity.sh" "$LM" "$RUN_START" "$(date +%s)")
-  else ACTIVITY=$(ssh -o ConnectTimeout=10 "$M" bash -s -- "$LM" "$RUN_START" "$(date +%s)" < "$HERE/activity.sh" 2>/dev/null); fi
-fi
-OUT=$(mktemp)
-docker run --rm --network host \
-  -e GIT_PYTHON_REFRESH=quiet -e CONFIG_COMMIT="$CONFIG_COMMIT" -e SKILL_NAME -e SKILL_SHA -e SERIES -e MANIFEST="$MANIFEST" -e ACTIVITY="$ACTIVITY" -e MLFLOW_URL \
-  -v "$HERE/../setup:/setup:ro" \
-  --env-file "$HOME/homelab/hub/.env" \
-  -v "$HERE:/tuning:ro" -v "$PWD:/work:ro" -w /work \
-  ghcr.io/mlflow/mlflow:v3.17.2 python /tuning/log_run.py "$@" 2>&1 | grep -vE "View (run|experiment) " | tee "$OUT"
-rc=${PIPESTATUS[0]}
-# Push notification to Daniel's phone (hub/notify, issue #11): the result lines and the MLflow run. NOTIFY=0 turns it
-# off. A failed notification never fails the run.
-if [ "${NOTIFY:-1}" != 0 ]; then
-  run=$(grep -oE 'Logged run [0-9a-f]+' "$OUT" | awk '{print $3}')
-  summary=$(grep -E '^  (Terminal-Bench|tool-eval score|mean KLD|speed_|[a-z_]+ = )' "$OUT" | sed 's/^  //' | head -6)
-  # Buttons (hub/actions/actiond.py, issue #11): Rerun (zaphod runs started by a benchmark script that recorded
-  # LAB_RERUN; not marvin until reservations, #3), Skip (MLflow tag reviewed=skipped), Open. A button that can't be
-  # made is left out; the notification still goes.
-  A="$HERE/../hub/actions/actiond.py"; btn=()
-  if [ "$M" = zaphod ] && [ -n "${LAB_RERUN:-}" ]; then b=$("$A" button rerun Rerun "$2 ($M): $3" 2>/dev/null) && btn+=("$b"); fi
-  if [ "$rc" = 0 ] && [ -n "$run" ]; then
-    b=$("$A" button skip Skip "$run" "$2 ($M): $3" 2>/dev/null) && btn+=("$b")
-    btn+=("view, Open, https://mlflow.ai.dopamine911.com/#/runs/$run")
-    acts=$(IFS=';'; echo "${btn[*]}")
-    "$HERE/../hub/notify" -g white_check_mark -c "https://mlflow.ai.dopamine911.com/#/runs/$run" -a "$acts" \
-      "Done: $2 ($M)" "$3"$'\n'"${summary:-logged}"$'\n'"MLflow run ${run:0:8}" >/dev/null 2>&1 || true
-  else
-    acts=$(IFS=';'; echo "${btn[*]}")
-    "$HERE/../hub/notify" -t lab-alert -p high -g warning ${acts:+-a "$acts"} "Logging failed: $2 ($M)" \
-      "$3"$'\n'"$(tail -3 "$OUT")" >/dev/null 2>&1 || true
-  fi
-fi
-rm -f "$OUT"
-exit $rc
+# Moved to `lab log` (issue #6; same arguments, same results, checked side by side). This wrapper stays until
+# nothing calls it (see ~/.cache/lab-wrapper-calls.log), then it goes. Help: lab log --help
+# Full path on purpose: the Rerun button (hub/actions) runs benchmarks without ~/.local/bin on its PATH.
+LAB="$HOME/.local/bin/lab"
+[ -x "$LAB" ] || { echo "log: lab is not installed. Run: ~/homelab/cli/build.sh install" >&2; exit 1; }
+echo "$(date '+%F %T') tuning/log $(ps -o comm= $PPID 2>/dev/null)" >> "$HOME/.cache/lab-wrapper-calls.log" 2>/dev/null || true
+exec "$LAB" log "$@"

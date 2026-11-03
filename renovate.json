@@ -51,7 +51,7 @@
       "versioning": "regex:^unified-vulkan-(?<major>\\d+)$",
       "dependencyDashboardApproval": true,
       "prBodyNotes": [
-        "Held back (issue #1): before/after `tuning/speed` + tool use x3 on the machine's model; re-test the grammar bug (CLAUDE.md Known issues)."
+        "Held back (issue #1): before/after `lab speed` + tool use x3 (`lab quality`) on the machine's model; re-test the grammar bug with `tuning/grammar-repro.py` (CLAUDE.md Known issues)."
       ]
     },
     {
@@ -101,14 +101,14 @@
       ]
     },
     {
-      "description": "MCPJungle: the compose image and the CLI version in hub/mcp/setup.sh must stay the same version, so these two move together.",
+      "description": "MCPJungle: the compose image and the CLI version in cli/lab.yaml (mcpjungle.version) must stay the same version, so these two move together.",
       "matchPackageNames": [
         "ghcr.io/mcpjungle/mcpjungle",
         "mcpjungle/MCPJungle"
       ],
       "groupName": "MCPJungle server + CLI",
       "prBodyNotes": [
-        "Check: `hub/mcp/setup.sh` (every server and client line), then `lab mcp status` (\"Matches the repo\")."
+        "Check: `lab mcp setup` (every server and client line), then `lab mcp status` (\"Matches the repo\")."
       ]
     },
     {
@@ -116,7 +116,7 @@
         "ghcr.io/open-webui/open-webui"
       ],
       "prBodyNotes": [
-        "Check: `lab webui drift` and `hub/openwebui/models.sh`: 0 differ. Read the changelog first for a new major."
+        "Check: `lab webui drift` and `lab webui models`: 0 differ. Read the changelog first for a new major."
       ]
     },
     {
@@ -144,7 +144,7 @@
         "go.yaml.in/yaml/v3"
       ],
       "prBodyNotes": [
-        "Check: `cli/build.sh` (vet, tests, build) and `diff <(tuning/manifest.sh) <(cli/bin/lab manifest)`."
+        "Check: `cli/build.sh` (vet, tests incl. the manifest parser tests, build), then `cli/bin/lab manifest` (no \"unknown\") and `cli/bin/lab setup check`."
       ]
     },
     {
@@ -182,18 +182,6 @@
         "IMG=(?<depName>golang):(?<currentValue>[0-9.]+)@(?<currentDigest>sha256:[0-9a-f]{64})"
       ],
       "datasourceTemplate": "docker"
-    },
-    {
-      "description": "MCPJungle CLI version in hub/mcp/setup.sh (V=X.Y.Z).",
-      "customType": "regex",
-      "managerFilePatterns": [
-        "/^hub/mcp/setup\\.sh$/"
-      ],
-      "matchStrings": [
-        "\\nV=(?<currentValue>[0-9.]+)"
-      ],
-      "depNameTemplate": "mcpjungle/MCPJungle",
-      "datasourceTemplate": "github-releases"
     },
     {
       "description": "MCPJungle CLI version in cli/lab.yaml (mcpjungle.version), for `lab mcp setup`; grouped with the image.",

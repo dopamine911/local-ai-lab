@@ -1,4 +1,4 @@
-# How each llama-swap model appears in Open WebUI (applied by hub/openwebui/models.sh).
+# How each llama-swap model appears in Open WebUI (applied by lab webui models).
 # Names and the model list come from the llama-swap configs (zaphod + marvin as "marvin/<id>"); not repeated here.
 # Defaults for every chat model: native function calling (tools work properly), all abilities on except vision.
 vision:            # load a vision file (--mmproj) in llama-swap: can read images

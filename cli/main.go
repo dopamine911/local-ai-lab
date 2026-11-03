@@ -58,6 +58,7 @@ func main() {
 	root.AddCommand(benchCmds()...)
 	root.AddCommand(machineCmds()...)
 	root.AddCommand(monitorsCmd())
+	root.AddCommand(docsCmd(root))
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}

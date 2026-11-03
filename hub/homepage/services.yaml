@@ -277,7 +277,7 @@
     - Images (ComfyUI):
         icon: comfyui.png
         href: https://comfy.{{HOMEPAGE_VAR_DOMAIN}}
-        description: "Only in image mode: ~/homelab/hub/image-mode on"
+        description: "Only in image mode: lab image-mode on"
         siteMonitor: http://127.0.0.1:8188
     - Models panel:
         icon: mdi-tune-variant

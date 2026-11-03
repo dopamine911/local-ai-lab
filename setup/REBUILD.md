@@ -73,7 +73,7 @@ marvin only, with its screen and keyboard attached (fan-chip module, read-only; 
 
 ```
 tmux new -s models
-~/homelab/setup/models.sh
+lab models
 ```
 Downloads everything in `setup/models-<machine>.txt` (pinned versions, sha256 checked). Good: ends with `MODELS-OK`.
 It lists any file it can't download by itself ("get by hand").
@@ -100,16 +100,16 @@ docker compose --profile agent up -d beszel-agent
 cd ~/llama-swap && docker compose build && docker compose up -d
 cd ~/homelab/hub && docker compose --profile images build && docker compose up -d   # includes localrecall, mcp-localrecall, mnemosyne
 docker compose --profile agent up -d beszel-agent
-~/homelab/hub/mcp/setup.sh     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
+lab mcp setup     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
 ~/homelab/hub/memory/sync.sh && ~/homelab/hub/memory/sync.sh install   # memory (LocalRecall): index the notes, then hourly; good result: 'sync: N uploaded'
-~/homelab/hub/openwebui/drift.sh   # Open WebUI settings come from compose.yaml; good result: 0 setting(s) differ
-~/homelab/hub/openwebui/models.sh --apply   # per-model settings (needs OPENWEBUI_API_KEY); good result: then 0 model(s) differ
-~/homelab/agents/enso/enso.sh build && ~/homelab/agents/enso/enso.sh setup   # Enso in a container (agents/enso/README.md)
-~/homelab/agents/enso/enso.sh up && ~/homelab/agents/enso/enso.sh check       # good result: ok models, ok no internet, ok tools
+lab webui drift   # Open WebUI settings come from compose.yaml; good result: 0 setting(s) differ
+lab webui models --apply   # per-model settings (needs OPENWEBUI_API_KEY); good result: then 0 model(s) differ
+lab enso build && lab enso setup   # Enso in a container (agents/enso/README.md)
+lab enso up && lab enso check       # good result: ok models, ok no internet, ok tools
 ```
-Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `mcp/setup.sh` ends with
+Good: `docker compose logs --tail 40 | grep 'Health check passed'` lists the preloaded models; `lab mcp setup` ends with
 `== client ...: Servers accessible: ...` for each agent. Restoring `hub/data/mcpjungle/` from backup also brings back
-the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJungle admin") or re-run `mcp/setup.sh`.
+the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJungle admin") or re-run `lab mcp setup`.
 
 ### Phone notifications (ntfy, issue #11)
 1. On the Android phone (Tailscale on): install the ntfy app.
@@ -134,7 +134,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    `b=$(~/homelab/hub/actions/actiond.py button ack Ack "rebuild check"); ~/homelab/hub/notify -a "$b" "test" "tap Ack"`.
    Good result: tapping **Ack** clears it and "Acknowledged" arrives; `actiond.py log` shows the phone's
    Tailscale address with `200 ok`.
-   Benchmark notifications from `tuning/log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
+   Benchmark notifications from `lab log` carry **Rerun** (zaphod runs only until reservations, #3; one at a
    time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
    After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
 8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 17 read-only
@@ -154,7 +154,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    (Settings > Account > API keys) for scripts: `OPENWEBUI_API_KEY` in `hub/.env` and Proton Pass.
 3. **Beszel** (`https://monitor.<DOMAIN>`): create the account; **Add system** for each machine:
    zaphod = host `127.0.0.1`, port `45876`; marvin = host `100.101.162.9` (its Tailscale IP), port `45876`.
-   Then `~/homelab/hub/beszel-monitors.sh` or `lab monitors` (same; asks for the Beszel login) adds the network monitors.
+   Then `lab monitors` (asks for the Beszel login) adds the network monitors.
 4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
@@ -166,11 +166,12 @@ tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, sno
 
 ### lab CLI (issue #6)
 `setup/host.sh` step 10 builds and installs it on both machines (`~/homelab/cli/build.sh install`; pinned Go container,
-nothing installed on the host). Good result: `lab version` prints a commit id and `lab manifest` prints the same
-lines as `tuning/manifest.sh`. Without a terminal `lab` prints help (safe in scripts).
-The scripts and their `lab` versions do the same (checked side by side): `lab models` = `setup/models.sh`,
-`lab backup [list|install]` = `setup/backup-to-marvin.sh`, `lab tbench` = `tuning/tbench`, and the benchmark commands
-(tuning/README.md). Either works until the scripts go.
+nothing installed on the host). Good result: `lab version` prints a commit id, `lab manifest` has no "unknown", and
+`lab setup check` ends with "all done". Without a terminal `lab` prints help (safe in scripts). Every command: `lab --help`,
+reference in docs/cli/. The old scripts (tuning/speed, hub/image-mode, ...) are one-line wrappers that call `lab` until
+nothing uses them (~/.cache/lab-wrapper-calls.log). Still scripts: `setup/host.sh` (it installs Docker and builds lab),
+`setup/backup-to-marvin.sh` and `hub/memory/sync.sh` (the two cron jobs; the backup moves with the NAS, #30), the Strata
+scripts (on hold).
 
 ### Renovate (issue #7, decisions.md 40)
 After `renovate.json` is on main: https://github.com/apps/renovate → Install → **Only select repositories** →

@@ -3,6 +3,8 @@
 #   cli/build.sh            vet + test + build -> cli/bin/lab
 #   cli/build.sh install    the same, then copy to ~/.local/bin/lab
 #   cli/build.sh deps       (after changing a version below) update go.mod/go.sum, then build
+# Every build also regenerates the command reference in docs/cli/ from the commands' help (lab docs) and says so
+# when it changed: commit it with the code.
 # Good result: "tests ok", then `lab version` prints a commit id.
 # Pinned: Go 1.27.3 image by digest; libraries exactly in go.mod/go.sum (latest at 2026-11-02, setup/VERSIONS.md).
 set -euo pipefail
@@ -20,6 +22,13 @@ go vet ./...
 go test ./... && echo "tests ok"
 go build -ldflags "-s -w -X main.version=$VER" -o bin/lab .
 echo "built cli/bin/lab ($VER)"
+DOCS="$CLI/../docs/cli"
+"$CLI/bin/lab" docs "$DOCS"
+if [ -n "$(git -C "$CLI/.." status --porcelain -- docs/cli 2>/dev/null)" ]; then
+  echo "docs/cli changed (the help text changed): commit it with the code"
+else
+  echo "docs/cli up to date"
+fi
 if [ "${1:-}" = install ]; then
   install -D -m 755 "$CLI/bin/lab" "$HOME/.local/bin/lab"
   echo "installed ~/.local/bin/lab: $("$HOME/.local/bin/lab" version | head -1)"

@@ -1,4 +1,4 @@
-# Enso in a container on zaphod (plans/agent-infra.md step 1). Use agents/enso/enso.sh, not compose directly.
+# Enso in a container on zaphod (plans/agent-infra.md step 1). Use `lab enso`, not compose directly.
 #
 # enso        Enso + pi, on agents-internal only: it reaches llama-swap (models) and mcpjungle (tools) and nothing
 #             else, no internet. Its home (keys, pi config, sessions, logs) and the workspace are folders on zaphod.
