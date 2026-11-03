@@ -159,7 +159,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
 MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 (Chicago time) to marvin by `setup/backup-to-marvin.sh`
-(last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild.
+(last 14 nights; log in `~/.cache/backup-to-marvin.log`). Temporary: moves to the NAS after its rebuild (issue #30).
 On a rebuilt zaphod, run `setup/backup-to-marvin.sh install` to turn the nightly backup back on.
 Not backed up on purpose (rebuilt empty, nothing lost that matters): `~/.local/state/lab-actions/` (button tokens, 24 h;
 tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, snoozes; log).
