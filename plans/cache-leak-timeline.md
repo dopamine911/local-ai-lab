@@ -17,3 +17,4 @@ A, then B, then A again, ~12K-token prompts with a codeword each; time to first 
 
 | Time | Action | Result | Commit |
 | --- | --- | --- | --- |
+| 19:08-19:18 | **Before** (current config): `lab speed marvin/big`; switch test 3 rounds | speed **44.2** writing, **320.0** reading 32K (MLflow 2122c874). Switch: first A 34.9 s (12,120 tokens read), B 39.6 s, **A again 1.02 s** (43 read: kept in its own slot of 2 or restored from RAM); 0 leaks | — |
