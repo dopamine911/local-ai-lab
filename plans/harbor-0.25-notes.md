@@ -52,5 +52,5 @@ Correction to "No change listed to the Terminus-2 agent" above: the release note
 
 ## Decision (Daniel, 2026-11-02): wait for upstream
 Keep harbor 0.20.0 until Terminal-Bench-Local moves to a newer harbor (it must change its prompt hook to do so).
-Then: \`lab tbench setup\` on the new pin, smoke, fresh 19-task baseline, results.md notes which harbor each row used.
-Check at each version audit: \`HARBOR_VERSION\` in kyuz0/terminal-bench-mini's terminal_bench.py (setup/VERSIONS.md).
+Then: `lab tbench setup` on the new pin, smoke, fresh 19-task baseline, results.md notes which harbor each row used.
+Check at each version audit: `HARBOR_VERSION` in kyuz0/terminal-bench-mini's terminal_bench.py (setup/VERSIONS.md).
