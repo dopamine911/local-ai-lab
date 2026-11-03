@@ -50,7 +50,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
   +6.5%, but returning to a 12K-token conversation after another took the slot 2.7 → 13.9 s (read again in full);
   marvin `big` (2 slots, unified KV) writing same, 32K reading -6.8% after the first long prompt (likely the idle
   slot's tokens now stay in the shared cache), kept anyway (Daniel: privacy first). Remove, measured, once upstream
-  fixes it (plans/cache-leak-timeline.md, `tuning/cache-switch.py`).
+  fixes it (issue #34; plans/cache-leak-timeline.md, `tuning/cache-switch.py`).
 - llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Cause found 2026-11-02: `common/parsers/qwen3-coder.cpp` makes the grammar lazy even with a response format, so it comes out empty; upstream issue #31342 open, fix PR #31395 closed unreviewed (plans/grammar-bug-timeline.md). Client workaround: `tool_choice` "required" or "none" with the format. Re-test with `tuning/grammar-repro.py` after a llama.cpp update.
 
 ## Results

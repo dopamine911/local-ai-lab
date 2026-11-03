@@ -123,5 +123,5 @@ Main results so far (details in [tuning/results.md](tuning/results.md)):
 | [plans/strata.md](plans/strata.md) | Strata tests on zaphod | done |
 | [plans/more-models.md](plans/more-models.md) | Vision, chat, document search, speech, images | done |
 | [plans/morning-guide-2026-10-29.md](plans/morning-guide-2026-10-29.md) | Overnight work summary and steps for Daniel | done |
-| [GitHub issues](https://github.com/dopamine911/local-ai-lab/issues) | Reservations (#3), card pool (#4), autoresearch (#5), conversation-leak fix (#10), backups to the NAS with a tested restore (#13, #30), ROCm llama.cpp (#16); README.md "What's next" | open |
+| [GitHub issues](https://github.com/dopamine911/local-ai-lab/issues) | Reservations (#3), card pool (#4), autoresearch (#5), prompt cache back on once llama.cpp fixes the leak (#34; the workaround from #10 is in place), backups to the NAS with a tested restore (#13, #30), ROCm llama.cpp (#16); README.md "What's next" | open |
 | [CLAUDE.md](CLAUDE.md) "Next steps" | marvin 256K context, MTP tuning, Terminal-Bench full runs, llama.cpp update policy | ongoing |

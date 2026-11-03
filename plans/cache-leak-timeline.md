@@ -33,3 +33,4 @@ Decision for Daniel: keep (privacy first, ~7% slower long prompts on marvin), te
 | Time | Action | Result | Commit |
 | --- | --- | --- | --- |
 | 19:31 | Daniel: keep the flags on marvin as they are (privacy first, ~7% slower long prompts there) | tuning/results.md section, CLAUDE.md Known issues "mitigated" (and "not only under concurrent load"), README known issues | this commit |
+| 19:32 | Daniel: a new issue as the reminder: **#34** (remove the flags, measured, once llama.cpp fixes #27148). #10 left open for Daniel to close | README "What's next", FEATURES plans row and CLAUDE.md point to #34 | this commit |

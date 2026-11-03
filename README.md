@@ -152,7 +152,7 @@ within 0.009 KL of full precision.
 | [#3](https://github.com/dopamine911/local-ai-lab/issues/3) | Reservations: book a GPU for a person, benchmark or agent; scripts respect them (`lab reserve`) |
 | [#4](https://github.com/dopamine911/local-ai-lab/issues/4) | Use zaphod's two cards as one pool for the coding model (`lab pool`) |
 | [#5](https://github.com/dopamine911/local-ai-lab/issues/5) | Autoresearch: agents test performance ideas in idle time and report them for review (`lab research`) |
-| [#10](https://github.com/dopamine911/local-ai-lab/issues/10) | Fix the llama.cpp conversation leak, measured |
+| [#34](https://github.com/dopamine911/local-ai-lab/issues/34) | Turn llama.cpp's prompt cache back on once it fixes the conversation leak (the workaround, #10, is in place), measured |
 | [#13](https://github.com/dopamine911/local-ai-lab/issues/13), [#30](https://github.com/dopamine911/local-ai-lab/issues/30) | Database dumps, a tested restore, and backups on the NAS |
 | [#16](https://github.com/dopamine911/local-ai-lab/issues/16) | A ROCm build of llama.cpp next to Vulkan, same llama.cpp commit |
 | [#2](https://github.com/dopamine911/local-ai-lab/issues/2) | Terminal-Bench's runner (harbor): follow when the benchmark moves to a newer version |
