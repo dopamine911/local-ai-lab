@@ -8,6 +8,8 @@ providers:
     baseUrl: http://zaphod.tail740235.ts.net:8080/v1   # Tailscale; zaphod forwards marvin/* to marvin
     api: openai-completions
     apiKey: ZAPHOD_KEY
+    compat:
+      streamFirstEventTimeoutMs: 900000   # wait up to 15 min for the first token (zaphod waits 900 s); long prompts on marvin read at ~230-300 tok/s
     models:
       - { id: marvin/big, name: "marvin/big: Qwen3.8-Flash-Next, marvin, 128K", reasoning: true, contextWindow: 131072, maxTokens: 32768 }
       - { id: coder, name: "coder: Qwen3.8-27B, zaphod card 1, 64K", reasoning: true, contextWindow: 65536, maxTokens: 16384 }

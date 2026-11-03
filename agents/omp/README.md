@@ -18,4 +18,10 @@ from anywhere zaphod is reachable. Tested 2026-11-03 with omp 18.15.0.
 
 - `marvin/big`: 128K context, ~40 tok/s writing. Two people/agents can use it at once (2 slots).
 - `coder` and `coder-tb` share card 1, so asking for one unloads the other.
+- `big` has **128K shared by its 2 slots** (`-np 2 -kvu`): one long conversation plus a second request (another
+  person, or omp running a sub-task) can overflow it ("Context size has been exceeded", 2026-11-03 15:44). Keep
+  conversations well under ~90K, or start a new one.
+- `compat.streamFirstEventTimeoutMs: 900000`: omp waits up to 15 min for the first token (zaphod's limit too). Its
+  default gave up after ~5 min while marvin read an ~83K prompt from scratch (~230 tok/s ≈ 6 min). Setting accepted
+  by omp 18.15.0 (a misspelled key warns); the 15-min behaviour itself not yet seen.
 - Benchmarks running on zaphod (`lab tbench`) are slowed down by other use of the same model.
