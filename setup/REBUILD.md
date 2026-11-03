@@ -154,7 +154,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    (Settings > Account > API keys) for scripts: `OPENWEBUI_API_KEY` in `hub/.env` and Proton Pass.
 3. **Beszel** (`https://monitor.<DOMAIN>`): create the account; **Add system** for each machine:
    zaphod = host `127.0.0.1`, port `45876`; marvin = host `100.101.162.9` (its Tailscale IP), port `45876`.
-   Then `~/homelab/hub/beszel-monitors.sh` (asks for the Beszel login) adds the network monitors.
+   Then `~/homelab/hub/beszel-monitors.sh` or `lab monitors` (same; asks for the Beszel login) adds the network monitors.
 4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),

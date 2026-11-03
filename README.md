@@ -52,7 +52,7 @@ What is set (2026-10-29, checked working end to end):
 - **Code runner:** Open Terminal (own container, own home folder `hub/data/open-terminal`, no Docker socket, no host files).
 - **Images:** ComfyUI, Z-Image Turbo, 1024x1024, 8 steps (first image ~26 s incl. loading). **Only while image mode is
   on** (`~/homelab/hub/image-mode on`, then `off`): it borrows card 2. Workflow + node map are generated from the
-  workflow file: `hub/openwebui/make-comfyui-env.sh` (or `... qwen` for Qwen-Image, better at text in images), then
+  workflow file: `hub/openwebui/make-comfyui-env.sh` or `lab webui comfyui-env` (or `... qwen` for Qwen-Image, better at text in images), then
   `drift.sh --sync`.
 - **Models** (`hub/openwebui/models.yaml`, apply with `hub/openwebui/models.sh --apply`; without `--apply` it only checks):
   native function calling for all (also the default for new models), vision only for `ornith` and `chat`, helper models
