@@ -72,3 +72,17 @@ Branch `cli-lab-skeleton` in its own worktree (`~/homelab-cli`), so benchmark ru
 | 17:49 | `cli/build.sh install` on both; `lab setup check` on each | zaphod and marvin: **all done**, lab 78df5e6 | this commit |
 | 18:08 | Daniel: leave the nightly cron on setup/backup-to-marvin.sh for now; it moves with the NAS (issue #30) | cron unchanged | this commit |
 | next | Step 6 (reserve #3, pool #4, research #5) | — | —
+
+## Remaining ports (branch `cli-remaining-ports`, 2026-11-02)
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| ~18:09 | Daniel: port the remaining scripts first (beszel-monitors.sh, make-comfyui-env.sh, compare-skill, sort-log), step 6 after | — | — |
+| 18:09-18:13 | `lab sort-log` (same docker run of tool-eval/sort_to_mlflow.py): run with the script and with lab (safe to repeat) | output **identical** | this commit |
+| 18:09-18:13 | `lab webui comfyui-env [zimage\|qwen]` (Go; Python's compact JSON reproduced): both workflows written by the script and by lab | file **byte for byte identical** and the same message, both workflows; committed comfyui.env restored | this commit |
+| 18:09-18:13 | `lab monitors` (Beszel login asked like the script, password not echoed; list checked line by line against the script): the hub/.env Beszel account is refused (HTTP 400: not the web login), so only the failure path ran | monitor list **identical**; bad login: both refuse, exit 1 (the script printed a traceback, lab "Login failed."). Success path ("already there" x7) needs Daniel's login | this commit |
+| 18:14 | `lab compare-skill` written (quality in-process; each arm starts with no SKILL / SKILL_NAME / SKILL_SHA / Rerun value from the arm before, as separate processes did; result file passed directly instead of "newest file"; compare.py unchanged). Fake tool-eval image + throwaway MLflow test running | — | — |
+| 18:14-18:23 | `lab compare-skill` vs the script, same skill (j5-craft) and models (coder, marvin/big): copies of the scripts and a temporary lab.yaml point at a fake tool-eval image (replays two real runs: one plain, one when a skill prompt is passed; 61 s each, since result files are named by the minute); throwaway MLflow | runner calls **identical** (8, only dates differ); saved report **identical**; MLflow fields identical for all 4 runs (71-75 each, only the dated file names differ); the skill tag only on the 2 "with" runs: marvin's "without" run after coder's "with" run is clean. Fake image and throwaway MLflow removed | this commit |
+| 18:26 | Daniel ran `cli/bin/lab monitors` (branch build) with his Beszel login | login ok; **7 of 7 "already there"**, nothing added: the success path works | this commit |
+| 18:28 | PR #31 opened (Daniel) | — | — |
+| next | After merge: `cli/build.sh install` on both, `lab setup check`. Then step 6 (Daniel's decisions) or wrappers/docs | — | — |

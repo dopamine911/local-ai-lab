@@ -23,8 +23,14 @@ var frontmatter = regexp.MustCompile(`(?s)\A---\n.*?\n---\n`)
 // environment like the script: SKILL (instruction file added to the system prompt), SERIES, BASE_URL, API_KEY,
 // MACHINE. extra goes to tool-eval-bench as given.
 func Quality(cfg *config.Config, model, note string, extra []string) error {
+	_, err := qualityRun(cfg, model, note, extra)
+	return err
+}
+
+// qualityRun is Quality; it also returns the result file (tuning/tool-eval/runs/<date>-<model>.json).
+func qualityRun(cfg *config.Config, model, note string, extra []string) (string, error) {
 	if err := enterTuning(cfg, "quality", append([]string{model, note}, extra...)...); err != nil {
-		return err
+		return "", err
 	}
 	suite := []string{"--short"}
 	if len(extra) > 0 && extra[0] == "--full" {
@@ -34,13 +40,13 @@ func Quality(cfg *config.Config, model, note string, extra []string) error {
 	if key == "" {
 		k, err := zaphodKey(cfg)
 		if err != nil {
-			return err
+			return "", err
 		}
 		key = k
 	}
 	for _, d := range []string{"tool-eval/data", "tool-eval/runs"} {
 		if err := os.MkdirAll(d, 0o755); err != nil {
-			return err
+			return "", err
 		}
 	}
 	out := time.Now().Format("2006-01-02-1504") + "-" + strings.ReplaceAll(model, "/", "_") + ".json"
@@ -48,7 +54,7 @@ func Quality(cfg *config.Config, model, note string, extra []string) error {
 	if skill := os.Getenv("SKILL"); skill != "" {
 		pf, err := skillPrompt(skill)
 		if err != nil {
-			return err
+			return "", err
 		}
 		promptArgs = []string{"--system-prompt-file", "/app/" + pf}
 	}
@@ -75,7 +81,7 @@ func Quality(cfg *config.Config, model, note string, extra []string) error {
 	logPath := "tool-eval/runs/" + strings.TrimSuffix(out, ".json") + ".log"
 	lf, err := os.Create(logPath)
 	if err != nil {
-		return err
+		return "", err
 	}
 	c := exec.Command("docker", args...)
 	c.Stdout, c.Stderr = lf, lf
@@ -85,7 +91,7 @@ func Quality(cfg *config.Config, model, note string, extra []string) error {
 		fmt.Println("tool-eval-bench failed:")
 		b, _ := os.ReadFile(logPath)
 		fmt.Println(lastLines(string(b), 5))
-		return exitErr(1)
+		return "", exitErr(1)
 	}
 
 	var res struct {
@@ -93,21 +99,21 @@ func Quality(cfg *config.Config, model, note string, extra []string) error {
 	}
 	b, err := os.ReadFile("tool-eval/runs/" + out)
 	if err != nil {
-		return err
+		return "", err
 	}
 	if err := json.Unmarshal(b, &res); err != nil {
-		return err
+		return "", err
 	}
 	report := strings.ReplaceAll(res.ReportPath, "/app/", "tool-eval/")
 	fmt.Printf("== results (full report with every conversation: %s)\n", report)
 	rc, err := Log(cfg, machineEnv(), model, note, []string{"tool-eval/runs/" + out, report})
 	if err != nil {
-		return err
+		return "", err
 	}
 	if rc != 0 {
-		return exitErr(rc)
+		return "", exitErr(rc)
 	}
-	return nil
+	return "tool-eval/runs/" + out, nil
 }
 
 // skillPrompt builds the system prompt file for SKILL like the script: the built-in prompt, a blank line, then the

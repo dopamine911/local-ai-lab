@@ -57,6 +57,7 @@ func main() {
 	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
 	root.AddCommand(benchCmds()...)
 	root.AddCommand(machineCmds()...)
+	root.AddCommand(monitorsCmd())
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
@@ -302,6 +303,33 @@ func webuiCmd() *cobra.Command {
 	dc.Flags().BoolVar(&syncDrift, "sync", false, "make the running Open WebUI match (managed settings only)")
 	dc.Flags().BoolVar(&dryDrift, "dry-run", false, "show, change nothing")
 	w.AddCommand(dc)
+	w.AddCommand(&cobra.Command{
+		Use:   "comfyui-env [zimage|qwen]",
+		Short: "Write hub/openwebui/comfyui.env from a ComfyUI workflow (port of make-comfyui-env.sh)",
+		Long: "Write hub/openwebui/comfyui.env (loaded by compose for open-webui) from a ComfyUI workflow file, so the\n" +
+			"workflow file stays the only copy. Run after changing the workflow or switching models; then lab webui drift --sync.\n" +
+			"  lab webui comfyui-env           Z-Image Turbo (default: 5 s per 1024px image, steps adjustable)\n" +
+			"  lab webui comfyui-env qwen      Qwen-Image 2.1 Turbo (6 s; best at text inside images; steps fixed)\n" +
+			"Good result: \"openwebui/comfyui.env written from ... (N bytes)\".",
+		Args:      cobra.MaximumNArgs(1),
+		ValidArgs: []string{"zimage", "qwen"},
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			which := "zimage"
+			if len(args) == 1 {
+				which = args[0]
+			}
+			msg, err := webui.ComfyEnv(filepath.Join(cfg.Repo, "hub"), which)
+			if err != nil {
+				return err
+			}
+			fmt.Println(msg)
+			return nil
+		},
+	})
 	return w
 }
 
@@ -381,4 +409,27 @@ func imageModeCmd() *cobra.Command {
 func isTerminal(f *os.File) bool {
 	st, err := f.Stat()
 	return err == nil && st.Mode()&os.ModeCharDevice != 0
+}
+
+func monitorsCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "monitors",
+		Short: "Add zaphod's network monitors to Beszel (port of hub/beszel-monitors.sh)",
+		Long: "Add zaphod's network monitors (llama-swap, Open WebUI, MLflow, SearXNG, ..., chat over HTTPS, 1.1.1.1) to\n" +
+			"Beszel. Asks for your Beszel login; the password is only sent to the local hub. Safe to run again:\n" +
+			"existing targets are skipped. Good result: one line per monitor, \"added\" or \"already there\".",
+		Args: cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			email, pass, err := hub.AskLogin()
+			if err != nil {
+				return err
+			}
+			if err := hub.AddMonitors(email, pass); err == hub.ErrLoginFailed {
+				os.Exit(1)
+			} else if err != nil {
+				return err
+			}
+			return nil
+		},
+	}
 }
