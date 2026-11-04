@@ -239,6 +239,22 @@ Fix: `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1` in `~/llama-swap/compose.yaml`.
 
 Did NOT matter: PCIe ASPM policy, GPU power level, runtime power saving, Mesa 25.2 vs 26.0 for writing speed (26.0 gave +15% reading), the PSU.
 
+## Gemma 4 31B, many short parallel requests (`chat-teacher`, 2026-11-04)
+
+A project's trace teacher (~810-token prompt, ~740 shared, ~22 tokens out). Builder's run on `chat-teacher` as first
+configured (8 slots, f16, no `--swa-full`): 22.7 / 26.9 / 27.7 decisions/min at 1 / 4 / 8 workers, vs `chat` (1 slot)
+32.5. Cause found with a test server (tuning/runs/2026-11-04-1256-bench-gemma-small-batch.md):
+- The engine batches fine (llama-bench pp1 28.6, pp4 71, pp8 87, pp16 188 tok/s) and reads 110 tokens at ~600 tok/s
+  even after 1,024 earlier ones.
+- In llama-server, Gemma's sliding-window layers (default small SWA cache) made a reused prompt start save nothing:
+  ~120 new tokens took 2.1 s, as long as reading all 1,133 from scratch. Not the cause: slots, `-kvu`, context size,
+  the #10 cache switches, `--reasoning off`, the memory spill.
+- `--swa-full` fixes it: reused-start read 2,090 → 135 ms; one worker 26 → 68 calls/min. With 32K it does not fit
+  (15 GB spilled); `-c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0`: **145 calls/min at 4 workers** (4.4x `chat`),
+  24.6 GB alone on card 2.
+- Caveat: synthetic prompt (1,130 tokens, fixed 22 out), not the builder's script; `chat` (128K) cannot take
+  `--swa-full` (would need far more memory than the card has).
+
 ## Full history
 
 Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` (pp512 = reading, tg128 = writing, tokens/s)
