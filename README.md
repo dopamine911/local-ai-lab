@@ -26,7 +26,7 @@ peer of zaphod, so its models also answer on zaphod as `marvin/<name>`.
 | `coder-tb` | zaphod card 1 | the same, 256K context (benchmarks) | |
 | `ornith` | zaphod card 2 | Ornith-1.5 35B-A3B, vision; best tool-use score so far | ~90 tok/s writing |
 | `chat` | zaphod card 2 | Gemma 4 31B (QAT Q4_0), vision, 128K | |
-| `chat-teacher` | zaphod card 2 | Same Gemma file: 8 slots of 4K, thinking off, no vision; many short parallel requests (unloads after 15 idle min) | |
+| `chat-teacher` | zaphod card 2 | Same Gemma file: 4 slots of 4K, full sliding-window cache, thinking off, no vision; many short parallel requests (unloads after 15 idle min) | |
 | `embed`, `rerank` | zaphod card 1 | Qwen3-Embedding-4B, Qwen3-Reranker (document search) | always loaded |
 | `stt`, `stt-whisper`, `tts`, `tts-qwen` | zaphod card 2 | Qwen3-ASR, Whisper, Kokoro, Qwen TTS | always loaded (`tts-qwen` on demand) |
 | `big` (`marvin/big`) | marvin | Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3, 128K | ~44 tok/s writing, ~318 tok/s reading a 32K prompt |

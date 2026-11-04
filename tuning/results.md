@@ -254,6 +254,8 @@ configured (8 slots, f16, no `--swa-full`): 22.7 / 26.9 / 27.7 decisions/min at 
   24.6 GB alone on card 2.
 - Caveat: synthetic prompt (1,130 tokens, fixed 22 out), not the builder's script; `chat` (128K) cannot take
   `--swa-full` (would need far more memory than the card has).
+- Applied 13:19 (`-c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0`). Through llama-swap with the helpers loaded:
+  66.3 / 147.3 calls/min at 1 / 4 workers; card 2 28.4 GB, nothing spilled (GTT 2,745 MB, unchanged).
 
 ## Full history
 
