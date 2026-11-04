@@ -39,7 +39,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 ## Known issues
 - marvin's GPU power limit can drop back to ~55 W (BIOS Quiet-like) after a BIOS visit (2026-10-30: happened after a
   fan change; cause not certain). Symptom: GPU 100% busy but 54-55 W, clock ~2,050 MHz, long prompts ~20% slower.
-  Watch: the watchdog alerts on it (`hub/watchdog`: power mode not performance, or busy under 100 W for 2 min; tested
+  Watch: the watchdog alerts on it (`hub/watchdog`: power mode not performance, or busy under 75 W for 2 min (was 100 W until 2026-11-04: false alarms on long-context writing at 89-125 W); tested
   2026-11-02 by setting quiet through the fan module: 54 W, 2,085 MHz, -20% reading). Under load it should be ~130-140 W.
   Fix without a BIOS visit (likely the same setting; not yet tried on the real fault):
   `echo performance | sudo tee /sys/class/ec_su_axb35/apu/power_mode` on marvin.

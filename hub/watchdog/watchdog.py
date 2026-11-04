@@ -207,7 +207,9 @@ def v_low_power(r):
     busy, w = num(r, "marvin_busy"), num(r, "marvin_watts")
     if not marvin_known(r) or busy is None or w is None:
         return "unknown", "-"
-    return ("bad" if busy > 80 and w < 100 else "ok"), f"busy {busy:.0f}%, {w:.0f} W"
+    # Under 75 W, not 100: writing in a long conversation runs at ~80% busy and 89-125 W (2026-11-04), which
+    # tripped 100 W 8 times in one night. The fault this is for sits at 54-55 W.
+    return ("bad" if busy > 80 and w < 75 else "ok"), f"busy {busy:.0f}%, {w:.0f} W"
 
 
 def v_temp(key, limit, label):
@@ -293,7 +295,7 @@ CHECKS = {
     "marvin-power-mode": dict(title="marvin power mode not performance", verdict=v_power_mode, for_s=120, ok_after_s=120,
                               good="performance (BIOS Quiet/Balanced hold the GPU at ~55 W)",
                               first=MARVIN_SSH + ["~/homelab/marvin/fan/ec-module.sh check"]),
-    "marvin-low-power": dict(title="marvin GPU busy but under 100 W", verdict=v_low_power, for_s=120, ok_after_s=120,
+    "marvin-low-power": dict(title="marvin GPU busy but under 75 W", verdict=v_low_power, for_s=120, ok_after_s=120,
                              good="busy GPU at ~120-140 W (CLAUDE.md Known issues: the 55 W problem)",
                              first=MARVIN_SSH + ["~/homelab/marvin/fan/ec-module.sh check; D=$(dirname \"$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)\"); for i in 1 2 3; do "
                                                  "echo busy $(cat $D/gpu_busy_percent)% "
@@ -557,6 +559,8 @@ def test():
     tick(quiet, 1); tick(good, 1); expect("flaps back: still no resolved, no new alert", [])
     tick(good, 3); expect("good 3 min: one resolved per check",
                           [("resolved", "marvin-power-mode"), ("resolved", "marvin-low-power")])
+    tick(dict(good, marvin_busy="85", marvin_watts="90"), 5)  # long-context writing (2026-11-04)
+    expect("busy 85% at 90 W for 5 min: normal, nothing sent", [])
     unreachable = dict(good, marvin_reach=False)  # every marvin_* reading unknown
     for k in list(unreachable):
         if k.startswith("marvin_") and k != "marvin_reach":

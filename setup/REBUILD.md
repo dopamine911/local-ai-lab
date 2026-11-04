@@ -141,7 +141,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    time; output in `~/.local/state/lab-actions/jobs/`), **Skip** (MLflow tag `reviewed=skipped`) and **Open**.
    After changing `actiond.py`: `sudo systemctl restart lab-actions` (this also stops a running rerun).
 8. Watchdog (`hub/watchdog/watchdog.py`, service `lab-watchdog`, `setup/host.sh` step 6d; issue #12): 17 read-only
-   checks every minute: marvin reachable, power mode, busy under 100 W, GPU temperature; zaphod card junctions;
+   checks every minute: marvin reachable, power mode, busy under 75 W, GPU temperature; zaphod card junctions;
    llama-swap on both; disk under 10% free and containers restarting/unhealthy on both; MCPJungle servers without
    tools; a real `memory` search and `recall` through MCPJungle (agent login `watchdog`, memory+recall only, token
    `MCP_TOKEN_WATCHDOG`); nightly backup older than 26 h; memory sync failed or late; HTTPS certificate within 14 days. One alert to `lab-alert` when a problem starts (with Ack / Snooze 1 h / Run check), one "Resolved" when it
