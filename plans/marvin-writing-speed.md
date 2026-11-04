@@ -38,9 +38,17 @@ indexer (4 heads, 128). Memory per token of conversation: about 24-27 KB in f16 
    (`lab speed` at long prompts, plus `lab quality`/tool-use). Also frees ~1.7 GB per 128K.
 5. **Not the cause (ruled out by evidence):** MTP acceptance falling (it stayed ~0.6); the 55 W power fault (89-125 W,
    power mode performance); swapping (0 used); the privacy switches from #10 (they affect reading, not writing).
-6. **Open, unrelated to speed:** marvin's used memory rose ~11 GB after the 256K switch and then stayed flat
-   (Beszel). Conversation memory explains only ~3.5 GB of that; the rest is unexplained.
-
+6. **Open, unrelated to speed: marvin uses ~11 GB more since the 256K switch** (Beszel, 2026-11-04 08:30 check):
+   - **GPU memory +5.4 GB** (72.8 → 77.6 GB at the switch, 78.2 after, flat since): conversation memory ~3.5 GB
+     (GGUF math) plus, likely, larger working buffers for the longer context (~1.9 GB, not proven). Expected.
+   - **The other ~5-7 GB is not GPU memory.** System use then 110.5-113.4 GB, moving ±1.5 GB (at 128K: flat
+     101.5). llama-server's own memory was steady at 35.7 GB over 50 s with both slots busy, so it is not per-request
+     allocation. No number from before the switch exists, so it is unknown whether that 35.7 GB grew.
+   - Theories: (a) per-slot snapshots of the non-rewindable layers (up to 32 per slot, one every 8,192 tokens; ~118 MB
+     each by GGUF math, so ~2.8 GB for 105K + 117K), but the log shows no snapshot lines (~35%); (b) the memory
+     allocator keeping memory from the largest prompts (~30%); (c) kernel bookkeeping for GPU memory (~20%).
+   - Test without a config change: at the next `big` restart, record llama-server's RssAnon and Beszel GPU memory right
+     after load and after the first long conversation. Not urgent: flat for 10 h, ~9 GB free.
 ## Suggested order
 
 Theory 1 test first (it also gives the 256K "after" baseline), then 2, then 4. One change at a time, `lab speed`
