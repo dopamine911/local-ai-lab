@@ -59,6 +59,13 @@ indexer (4 heads, 128). Memory per token of conversation: about 24-27 KB in f16 
    checkpoint, so with none every change before the end means reading from token 0. 8 client cancels in the hour.
    Test (no change): find why no checkpoints are made (b12020 code, `-lm dio`, `--cache-ram 0`/`--no-cache-idle-slots`
    from #10). Ideas, each measured alone: fewer parallel omp tasks; `-np 3`; checkpoints working.
+   - 17:42 receipts: marvin's whole log since container start (50,727 lines, includes `big`'s load) has **no
+     "context checkpoints enabled" line and no "created context checkpoint"**, although the b12020 binary contains both
+     messages (log verbosity 3). So checkpoints are likely off for `big` (~60%; the message could be below verbosity 3).
+   - **Requests given up at 300 s:** activity.sqlite, last 6 h: 15 of 399 requests ended at 299-301 s with 0 tokens
+     written (plus 3 at 483-596 s). A 36-42K prompt read while the other slot is busy takes ~300 s or more, so a client
+     gives up, retries, and the whole prompt is read again. Not zaphod (peer responseHeader 900) and not omp's
+     streamFirstEventTimeoutMs (900 s). Source of the 300 s still unknown.
 
 ## Suggested order
 
