@@ -50,6 +50,16 @@ indexer (4 heads, 128). Memory per token of conversation: about 24-27 KB in f16 
    - Test without a config change: at the next `big` restart, record llama-server's RssAnon and Beszel GPU memory right
      after load and after the first long conversation. Not urgent: flat for 10 h, ~9 GB free.
 
+7. **Re-reading whole conversations (found 2026-11-04 17:22; likely the biggest cost in agent use, ~70% sure).**
+   Last hour of marvin's log: 55 requests read **450K prompt tokens (33 of 60 min)** but wrote only 29K. 16 requests
+   re-read a whole 19-32K (once 75K) conversation although the slot held most of it (e.g. f_keep 0.88, then 19,150 of
+   19,541 tokens read again). At least 3-4 conversations (omp main + side tasks) share the 2 slots, so slots swap
+   conversations. While one slot reads, writing in the other drops to **0.4-5 tok/s** (normal ~25). The log shows **no
+   "checkpoint" lines** although `--ctx-checkpoints` defaults to 32 per slot: this hybrid model can only rewind to a
+   checkpoint, so with none every change before the end means reading from token 0. 8 client cancels in the hour.
+   Test (no change): find why no checkpoints are made (b12020 code, `-lm dio`, `--cache-ram 0`/`--no-cache-idle-slots`
+   from #10). Ideas, each measured alone: fewer parallel omp tasks; `-np 3`; checkpoints working.
+
 ## Suggested order
 
 Theory 1 test first (it also gives the 256K "after" baseline), then 2, then 4. One change at a time, `lab speed`
