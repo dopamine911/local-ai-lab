@@ -12,3 +12,4 @@ hidden:            # not chat models (or benchmark-only): kept out of the model 
   - tts
   - tts-qwen
   - coder-tb
+  - chat-teacher   # trace teacher for a project's scripts (8 short slots), not for chat

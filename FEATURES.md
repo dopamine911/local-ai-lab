@@ -25,7 +25,7 @@ not here.
 | --- | --- | --- |
 | llama-swap on zaphod: one OpenAI-compatible API for all models, loads and swaps them on demand, per-card routing | working | [zaphod/llama-swap/config/config.yaml](zaphod/llama-swap/config/config.yaml), [README.md](README.md) |
 | Coding models `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B with MTP speculative decoding (~54 tok/s writing, ~765 tok/s reading a 32K prompt; `lab speed`) | working | [tuning/results.md](tuning/results.md) |
-| `ornith` (best tool use so far, vision), `chat` (Gemma 4 31B, vision), `north`, `flint` (on hold), `coder-tb` (256K, benchmarks), `coder-long` (both cards) | working | [CLAUDE.md](CLAUDE.md) |
+| `ornith` (best tool use so far, vision), `chat` (Gemma 4 31B, vision), `chat-teacher` (same Gemma, 8 short parallel slots, thinking off), `north`, `flint` (on hold), `coder-tb` (256K, benchmarks), `coder-long` (both cards) | working | [CLAUDE.md](CLAUDE.md) |
 | Vision: send screenshots to `ornith` or `chat` | working | [plans/more-models.md](plans/more-models.md) |
 | Document search models: `embed` (Qwen3-Embedding-4B) + `rerank` (Qwen3-Reranker), always loaded on card 1 | working | [plans/more-models.md](plans/more-models.md) |
 | Speech-to-text `stt` (Qwen3-ASR), `stt-whisper` (99 languages); text-to-speech `tts` (Kokoro), `tts-qwen` | working | [zaphod/llama-swap/config/](zaphod/llama-swap/config/) |
