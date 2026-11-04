@@ -49,6 +49,7 @@ indexer (4 heads, 128). Memory per token of conversation: about 24-27 KB in f16 
      allocator keeping memory from the largest prompts (~30%); (c) kernel bookkeeping for GPU memory (~20%).
    - Test without a config change: at the next `big` restart, record llama-server's RssAnon and Beszel GPU memory right
      after load and after the first long conversation. Not urgent: flat for 10 h, ~9 GB free.
+
 ## Suggested order
 
 Theory 1 test first (it also gives the 256K "after" baseline), then 2, then 4. One change at a time, `lab speed`
