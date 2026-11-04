@@ -11,7 +11,8 @@
 set -u
 MIN=${1:-60}; OUT=${2:-$HOME/fan-samples/$(date +%Y%m%d-%H%M).csv}
 mkdir -p "$(dirname "$OUT")"
-D=/sys/class/drm/card1/device; H=$(echo $D/hwmon/hwmon*); E=/sys/class/ec_su_axb35
+# The GPU is found by its busy file: its card number can change at boot (card1 until 2026-11-02, card0 since).
+D=$(dirname "$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)"); H=$(echo $D/hwmon/hwmon*); E=/sys/class/ec_su_axb35
 r() { cat "$1" 2>/dev/null || echo ""; }
 echo "time,busy_pct,gpu_w,sclk_mhz,gpu_temp_c,ec_temp_c,fan1_rpm,fan2_rpm,fan3_rpm,fan1_mode,fan2_mode,fan3_mode,power_mode" > "$OUT"
 end=$(( $(date +%s) + MIN * 60 ))

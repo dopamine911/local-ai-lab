@@ -31,10 +31,12 @@ MARVIN_SSH = ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=10", "marvin"]
 
 # One read of marvin: key=value lines. Read-only (sysfs, curl to its own llama-swap).
 MARVIN_READ = r'''
-D=/sys/class/drm/card1/device; E=/sys/class/ec_su_axb35
+# The GPU's card number can change at boot (card1 until 2026-11-02, card0 since): find it by its busy file.
+# Unreadable values stay empty (= unknown), never 0: a 0 looked like "GPU 0 C, ok" and hid that bug.
+D=$(dirname "$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)"); E=/sys/class/ec_su_axb35
 echo busy=$(cat $D/gpu_busy_percent 2>/dev/null)
-echo watts=$(( $(cat $D/hwmon/hwmon*/power1_average 2>/dev/null || echo 0) / 1000000 ))
-echo edge=$(( $(cat $D/hwmon/hwmon*/temp1_input 2>/dev/null || echo 0) / 1000 ))
+W=$(cat $D/hwmon/hwmon*/power1_average 2>/dev/null); echo watts=${W:+$((W / 1000000))}
+T=$(cat $D/hwmon/hwmon*/temp1_input 2>/dev/null); echo edge=${T:+$((T / 1000))}
 echo power_mode=$(cat $E/apu/power_mode 2>/dev/null)
 echo health=$(curl -s -o /dev/null -m 5 -w '%{http_code}' http://127.0.0.1:8080/health)
 echo disk_free=$(df -P / | awk 'NR==2{print 100-$5}')
@@ -293,9 +295,9 @@ CHECKS = {
                               first=MARVIN_SSH + ["~/homelab/marvin/fan/ec-module.sh check"]),
     "marvin-low-power": dict(title="marvin GPU busy but under 100 W", verdict=v_low_power, for_s=120, ok_after_s=120,
                              good="busy GPU at ~120-140 W (CLAUDE.md Known issues: the 55 W problem)",
-                             first=MARVIN_SSH + ["~/homelab/marvin/fan/ec-module.sh check; for i in 1 2 3; do "
-                                                 "echo busy $(cat /sys/class/drm/card1/device/gpu_busy_percent)% "
-                                                 "$(( $(cat /sys/class/drm/card1/device/hwmon/hwmon*/power1_average)/1000000 )) W; sleep 2; done"]),
+                             first=MARVIN_SSH + ["~/homelab/marvin/fan/ec-module.sh check; D=$(dirname \"$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)\"); for i in 1 2 3; do "
+                                                 "echo busy $(cat $D/gpu_busy_percent)% "
+                                                 "$(( $(cat $D/hwmon/hwmon*/power1_average)/1000000 )) W; sleep 2; done"]),
     "marvin-temp": dict(title="marvin GPU over 90 C", verdict=v_temp("marvin_edge", 90, "GPU"), for_s=300, ok_after_s=120,
                         good="under 90 C (with the fan curve ~73 C median under load)",
                         first=MARVIN_SSH + ["~/homelab/marvin/fan/curve.sh check"]),

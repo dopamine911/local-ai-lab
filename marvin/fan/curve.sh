@@ -33,7 +33,8 @@ board_check() {
   [ -d $E ] || { echo "STOP: module ec_su_axb35 not loaded (marvin/fan/ec-module.sh)"; exit 1; }
 }
 root() { [ -n "${EC_SYSFS:-}" ] || [ "$(id -u)" = 0 ] || { echo "run with sudo"; exit 1; }; }
-gpu_temp() { echo $(( $(cat /sys/class/drm/card1/device/hwmon/hwmon*/temp1_input) / 1000 )); }
+# The GPU is found by its busy file: its card number can change at boot (card1 until 2026-11-02, card0 since).
+gpu_temp() { local d; d=$(dirname "$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)"); echo $(( $(cat $d/hwmon/hwmon*/temp1_input) / 1000 )); }
 
 check() {
   board_check

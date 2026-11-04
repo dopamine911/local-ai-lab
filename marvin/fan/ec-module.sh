@@ -48,7 +48,7 @@ check() {
   say "module" "loaded, signer: $(modinfo -F signer $NAME 2>/dev/null || echo unknown)"
   local pm; pm=$(cat $SYS/apu/power_mode)
   say "BIOS power mode" "$pm$([ "$pm" = performance ] || echo '   <-- NOT performance: GPU will be held at ~55 W')"
-  say "EC temperature" "$(cat $SYS/temp1/temp 2>/dev/null || cat $SYS/temp1/temp_cur 2>/dev/null) C (GPU hwmon: $(( $(cat /sys/class/drm/card1/device/hwmon/hwmon*/temp1_input) / 1000 )) C)"
+  say "EC temperature" "$(cat $SYS/temp1/temp 2>/dev/null || cat $SYS/temp1/temp_cur 2>/dev/null) C (GPU hwmon: $(( $(cat $(dirname "$(ls /sys/class/drm/card[0-9]*/device/gpu_busy_percent 2>/dev/null | head -1)")/hwmon/hwmon*/temp1_input) / 1000 )) C)"
   for f in $SYS/fan*; do
     say "$(basename $f)" "$(cat $f/rpm 2>/dev/null) rpm, mode $(cat $f/mode), level $(cat $f/level 2>/dev/null)"
   done
