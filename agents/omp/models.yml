@@ -3,6 +3,7 @@
 # environment variable; set ZAPHOD_KEY (from Proton Pass, or zaphod/llama-swap/.env) before starting omp.
 # If ZAPHOD_KEY is unset, omp sends the literal text "ZAPHOD_KEY" and gets 401.
 # Use: omp --model lab/marvin/big   (or lab/coder, lab/ornith, lab/chat)
+# Then run ./subagents.sh once: subagents go to coder, one at a time (omp defaults to 32 at once on the main model).
 providers:
   lab:
     baseUrl: http://zaphod.tail740235.ts.net:8080/v1   # Tailscale; zaphod forwards marvin/* to marvin

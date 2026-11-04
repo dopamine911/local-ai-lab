@@ -13,6 +13,11 @@ from anywhere zaphod is reachable. Tested 2026-11-03 with omp 18.15.0.
 5. Test: `omp -p --no-session --model lab/marvin/big "Reply with exactly one word: ready"`.
    Good result: `ready`. `401 unauthorized` means ZAPHOD_KEY is not set in that shell.
 6. Use: `omp --model lab/marvin/big` (or `lab/coder`).
+7. Subagents: run [subagents.sh](subagents.sh) once. omp's defaults allow 32 subagents at once on the main model;
+   on 2026-11-04 that put 3-4 conversations on marvin's 2 slots (450K tokens read vs 29K written in an hour, writing
+   0.4-5 tok/s). After the script: main conversation and reviewer on `marvin/big`; task/scout/sonic subagents on
+   `coder` (zaphod card 1), one at a time, no subagents of subagents. Good result: `omp config list --scope global`
+   shows `task.maxConcurrency = 1` and the `modelRoles` line.
 
 ## Notes
 
