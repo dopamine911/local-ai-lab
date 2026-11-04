@@ -93,6 +93,6 @@ peers:
     proxy: http://marvin:8080
     apiKey: ${env.MARVIN_KEY}
     models:
-      - big                    # Qwen3.8-Flash-Next UD-IQ4_XS, 128K
+      - big                    # Qwen3.8-Flash-Next UD-IQ4_XS, 256K shared by 2 slots
     timeouts:
       responseHeader: 900      # first load ~1 min, long prompts read at ~460 tok/s
