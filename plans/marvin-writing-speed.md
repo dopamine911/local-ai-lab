@@ -47,6 +47,9 @@ indexer (4 heads, 128). Memory per token of conversation: about 24-27 KB in f16 
    - Theories: (a) per-slot snapshots of the non-rewindable layers (up to 32 per slot, one every 8,192 tokens; ~118 MB
      each by GGUF math, so ~2.8 GB for 105K + 117K), but the log shows no snapshot lines (~35%); (b) the memory
      allocator keeping memory from the largest prompts (~30%); (c) kernel bookkeeping for GPU memory (~20%).
+   - 2026-11-05 13:36-13:37 data point (training-mode test): `big` unloaded → **120.5 GB available**; fresh `big`,
+     empty slots → 17.7-17.9 GB; 2026-11-04 17:22 with both slots ~100K → ~15 GB (`free`). So the extra memory
+     leaves with the process. RssAnon not read this time.
    - Test without a config change: at the next `big` restart, record llama-server's RssAnon and Beszel GPU memory right
      after load and after the first long conversation. Not urgent: flat for 10 h, ~9 GB free.
 
