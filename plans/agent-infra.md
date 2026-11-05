@@ -187,6 +187,25 @@ that LocalRecall indexes.
   about each person ("peer psychology"), defaults to OpenAI (gpt-5.4-mini, text-embedding-3-small), Postgres +
   Redis, hosted MCP by default. Same objection as mem0, stronger.
 
+**Checked 2026-11-05: Hindsight (vectorize-io/hindsight, hindsight.vectorize.io), at Daniel's request.** MIT, ~59k
+stars, 7.3k forks, v1.2.0 (2026-11-03; 1.0.0 on 2026-10-13), one main author (2,259 commits; next 385). Read in the
+repo's `.env.example` and README:
+- **Saving calls a model.** `retain` sends the text to an LLM that extracts facts, entities and timestamps; a
+  background worker then calls the LLM again to merge facts into "observations" and "mental models"; `reflect`
+  answers with the LLM. Same objection as mem0: unreviewed facts written by a local model, and GPU time on every save.
+  No setting found that saves without the model.
+- Self-hosted: Docker/Helm/pip; embedded Postgres (pgvector) by default, or our own; local embeddings (bge-small,
+  CPU) by default. LLM: OpenAI-compatible base URL works (llama-swap), with switches for weak local models (strict JSON
+  schema, `REASONING_EFFORT none`). MCP server included.
+- Telemetry: no PostHog/Sentry in the source (GitHub code search); OpenTelemetry is only for its own metrics
+  (Prometheus/OTLP exporters we would configure). ~70% sure; not checked in a running container.
+- Benchmarks on the site are its own (LongMemEval-S 94.6%, LoCoMo 92.0%; paper arXiv 2512.12818), with hosted models.
+- **omp 18.15.0 has it built in:** `memory.backend` (off|local|hindsight|mnemopi|sharpshooter; ours is off),
+  `hindsight.apiUrl` (default http://localhost:8888), `autoRetain` true, `retainMode` full-session, every 3 turns.
+  Turned on as-is, every 3 turns omp would send the session to Hindsight, which then calls a model on it.
+- Verdict for now: does not meet "saving needs no model call"; keep Mnemosyne. Worth a trial only if Daniel wants
+  automatic memory from omp sessions, with its LLM on a card that is not marvin (marvin is already overloaded).
+
 **Rule for any of them:** agents write only to a memory folder; Daniel reviews it with `git diff` before it is
 committed; the folder is private (memories may name machines and decisions), so not in this public repo; LocalRecall
 does not index unreviewed memory files.
