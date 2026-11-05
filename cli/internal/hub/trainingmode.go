@@ -185,7 +185,7 @@ func (t *TrainingMode) Off() error {
 	if len(failed) > 0 {
 		return fmt.Errorf("profile still on at %s", strings.Join(failed, ", "))
 	}
-	fmt.Println("Models load again on their next request (marvin's big takes ~1-2 min).")
+	fmt.Println("Models load again on their next request (2026-11-05: coder 11 s, marvin's big 29 s; longer after a reboot).")
 	return nil
 }
 

@@ -421,7 +421,8 @@ func trainingModeCmd() *cobra.Command {
 			"status (default): profile, loaded models and memory per host.\n" +
 			"Don't mix with image-mode (one profile at a time). A llama-swap config reload switches the profile off and\n" +
 			"reloads the preloaded models: run `lab training-mode on` again then.\n" +
-			"Good result: on -> \"training mode on: memory free\"; off -> \"profile off\" twice.",
+			"Good result: on -> \"training mode on: memory free\" (2026-11-05: 1 s; card 1 7.5 GB, card 2 3.7 GB, marvin\n" +
+			"120.5 GB available); off -> \"profile off\" twice.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			cfg, err := config.Load()
 			if err != nil {

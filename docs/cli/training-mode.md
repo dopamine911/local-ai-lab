@@ -11,7 +11,8 @@ off: profile off on both; models load again on their next request.
 status (default): profile, loaded models and memory per host.
 Don't mix with image-mode (one profile at a time). A llama-swap config reload switches the profile off and
 reloads the preloaded models: run `lab training-mode on` again then.
-Good result: on -> "training mode on: memory free"; off -> "profile off" twice.
+Good result: on -> "training mode on: memory free" (2026-11-05: 1 s; card 1 7.5 GB, card 2 3.7 GB, marvin
+120.5 GB available); off -> "profile off" twice.
 ```
 
 Usage:

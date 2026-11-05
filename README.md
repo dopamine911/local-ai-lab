@@ -76,6 +76,7 @@ help: **[docs/cli/](docs/cli/README.md)**.
 | Download and verify the models | `lab models` |
 | Open WebUI settings and models | `lab webui drift [--sync]`, `lab webui models [--apply]` |
 | Lend card 2 to ComfyUI and back | `lab image-mode on\|off\|status` |
+| Lend both zaphod cards and marvin to model training and back | `lab training-mode on\|off\|status` |
 | Agent tool gateway | `lab mcp status`, `lab mcp setup` |
 | Coding agent in a container | `lab enso build\|setup\|up\|check\|tui\|down` |
 | Benchmarks (logged to MLflow, result on the phone) | `lab speed`, `lab quality`, `lab tbench`, `lab bench`, `lab kl`, `lab compare-skill` |

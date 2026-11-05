@@ -47,6 +47,7 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | Open WebUI settings kept as code (`compose.yaml`), drift check + sync | working | [lab webui drift](docs/cli/webui.md), [hub/openwebui/managed-keys.txt](hub/openwebui/managed-keys.txt) |
 | Per-model settings as code: native function calling, vision only where it works, helper models hidden | working | [hub/openwebui/models.yaml](hub/openwebui/models.yaml), [lab webui models](docs/cli/webui.md) |
 | Open WebUI documents (embeddings + hybrid search + re-ranking), speech in and out, web search | working | [README.md](README.md) |
+| Training mode: llama-swap profile `training` on zaphod (every chat/coder model off; search and speech helpers stay) and marvin (`big` off), for a training harness that checks `active == "training"` | tested 2026-11-05 (on in 1 s: card 1 7.5 GB, card 2 3.7 GB, marvin 120.5 GB available; blocked models answer 404; off: coder back in 11 s, `big` 29 s) | [lab training-mode](docs/cli/training-mode.md) |
 | Image generation: ComfyUI on card 2 (Z-Image Turbo 5 s, Qwen-Image 2.1 6 s), switched by "image mode" | ready | [lab image-mode](docs/cli/image-mode.md), [hub/comfyui/](hub/comfyui/), [lab webui comfyui-env](docs/cli/webui.md) |
 | SearXNG: private web search (Bing, Yahoo, Brave, Google CSE + developer sources) | working | [hub/searxng/settings.yml](hub/searxng/settings.yml) |
 | Open Terminal: sandboxed code runner for Open WebUI | working | [README.md](README.md) |
