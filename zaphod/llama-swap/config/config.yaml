@@ -82,6 +82,20 @@ profiles:
       flint: ~
       chat-teacher: ~
       tts-qwen: ~
+  training:
+    # lab training-mode on|off|status. A training harness checks GET /api/profiles for active == "training".
+    description: "Both cards lent to model training (lab training-mode on); search and speech helpers stay"
+    pins:
+      coder: ~
+      coder-2: ~
+      coder-tb: ~
+      coder-long: ~
+      chat: ~
+      chat-teacher: ~
+      ornith: ~
+      north: ~
+      flint: ~
+      tts-qwen: ~          # only loads next to coder-2 (voice set)
 routing:
   router:
     use: matrix

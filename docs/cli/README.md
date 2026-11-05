@@ -26,5 +26,6 @@ text as these pages. Config: `cli/lab.yaml`; secrets stay in the `.env` files an
 | [`lab sort-log`](sort-log.md) | Write the hand-sorted tool-use misses to MLflow (port of tuning/sort-log) |
 | [`lab speed`](speed.md) | Writing and 32K reading speed, medians of 3, logged (port of tuning/speed) |
 | [`lab tbench`](tbench.md) | Terminal-Bench-Local (19 terminal tasks, pass@2), logged (port of tuning/tbench) |
+| [`lab training-mode`](training-mode.md) | Lend zaphod's two cards and marvin's GPU to model training, or give them back |
 | [`lab version`](version.md) | Show the lab build (git commit) and where its config is |
 | [`lab webui`](webui.md) | Open WebUI: settings drift (and --sync), per-model settings |

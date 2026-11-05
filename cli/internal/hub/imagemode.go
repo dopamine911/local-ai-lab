@@ -20,8 +20,8 @@ import (
 
 const lsURL = "http://127.0.0.1:8080"
 
-// Card2Models are unloaded when image mode goes on (same list as the script).
-var Card2Models = []string{"coder-2", "ornith", "chat", "north", "flint", "tts-qwen"}
+// The models unloaded when image mode goes on are the ones the image-mode profile pins, read from the running config
+// (a fixed list here once missed chat-teacher).
 
 type ImageMode struct {
 	Repo, Key, Card2PCI string
@@ -63,15 +63,19 @@ func (m *ImageMode) card2MB() string {
 
 func (m *ImageMode) On() error {
 	hub := HubDir(m.Repo)
+	pinned, err := LS{"zaphod", lsURL, m.Key}.PinnedModels("image-mode")
+	if err != nil {
+		return err
+	}
 	if m.DryRun {
-		fmt.Println("would: set llama-swap profile image-mode; unload " + strings.Join(Card2Models, " ") +
+		fmt.Println("would: set llama-swap profile image-mode; unload " + strings.Join(pinned, " ") +
 			"; docker compose --profile images up -d comfyui (in " + hub + "); wait up to 4 min for ComfyUI on 127.0.0.1:8188")
 		return nil
 	}
 	if _, err := m.api("PUT", "/api/profiles/active", `{"name":"image-mode"}`); err != nil {
 		return err
 	}
-	for _, mod := range Card2Models {
+	for _, mod := range pinned {
 		m.api("POST", "/api/models/unload/"+mod, "") // not loaded: fine (script: || true)
 	}
 	fmt.Printf("llama-swap: profile image-mode on, card 2 chat models unloaded (card 2 now %s MB used)\n", m.card2MB())

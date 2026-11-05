@@ -16,6 +16,7 @@ type Machine struct {
 	LlamaSwapContainer string `yaml:"llama_swap_container"`
 	LlamaSwapEnv       string `yaml:"llama_swap_env"`
 	ImageCardPCI       string `yaml:"image_card_pci"`
+	Card1PCI           string `yaml:"card1_pci"`
 }
 
 type Config struct {

@@ -54,7 +54,7 @@ func main() {
 			return cmd.Execute()
 		},
 	}
-	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd())
+	root.AddCommand(versionCmd(), manifestCmd(), mcpCmd(), ensoCmd(), webuiCmd(), memoryCmd(), imageModeCmd(), trainingModeCmd())
 	root.AddCommand(benchCmds()...)
 	root.AddCommand(machineCmds()...)
 	root.AddCommand(monitorsCmd())
@@ -401,6 +401,66 @@ func imageModeCmd() *cobra.Command {
 				return m.Off()
 			}
 			return m.Status()
+		},
+	}
+	c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing (on/off)")
+	return c
+}
+
+func trainingModeCmd() *cobra.Command {
+	var dry bool
+	c := &cobra.Command{
+		Use:       "training-mode on|off|status",
+		Short:     "Lend zaphod's two cards and marvin's GPU to model training, or give them back",
+		ValidArgs: []string{"on", "off", "status"},
+		Args:      cobra.MatchAll(cobra.MaximumNArgs(1), cobra.OnlyValidArgs),
+		Long: "on: llama-swap profile \"training\" on zaphod and marvin, every model it pins unloaded (running requests\n" +
+			"to them are cut), then waits until zaphod's cards are <= 8 GB used each and marvin has >= 100 GB available.\n" +
+			"The search and speech helpers stay. A training harness checks GET /api/profiles for active == \"training\".\n" +
+			"off: profile off on both; models load again on their next request.\n" +
+			"status (default): profile, loaded models and memory per host.\n" +
+			"Don't mix with image-mode (one profile at a time). A llama-swap config reload switches the profile off and\n" +
+			"reloads the preloaded models: run `lab training-mode on` again then.\n" +
+			"Good result: on -> \"training mode on: memory free\"; off -> \"profile off\" twice.",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cfg, err := config.Load()
+			if err != nil {
+				return err
+			}
+			z, mv := cfg.Machines["zaphod"], cfg.Machines["marvin"]
+			env := z.LlamaSwapEnv
+			if env == "" {
+				env = "~/llama-swap/.env"
+			}
+			cards := []string{z.Card1PCI, z.ImageCardPCI}
+			if cards[0] == "" {
+				cards[0] = "0000:06:00.0"
+			}
+			if cards[1] == "" {
+				cards[1] = "0000:0b:00.0"
+			}
+			sshHost, port := mv.SSH, mv.LlamaSwapPort
+			if sshHost == "" {
+				sshHost = "marvin"
+			}
+			if port == 0 {
+				port = 8080
+			}
+			t, err := hub.NewTrainingMode(config.Expand(env), fmt.Sprintf("http://%s:%d", sshHost, port), sshHost, cards, dry)
+			if err != nil {
+				return err
+			}
+			what := "status"
+			if len(args) == 1 {
+				what = args[0]
+			}
+			switch what {
+			case "on":
+				return t.On()
+			case "off":
+				return t.Off()
+			}
+			return t.Status()
 		},
 	}
 	c.Flags().BoolVar(&dry, "dry-run", false, "show, change nothing (on/off)")

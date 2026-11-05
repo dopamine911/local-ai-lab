@@ -29,6 +29,12 @@ models:
       ${qwen-sampling}
       ${mtp}
 
+profiles:
+  training:
+    # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
+    description: "8060S lent to model training (lab training-mode on)"
+    pins:
+      big: ~
 hooks:
   on_startup:
     preload: [big]
