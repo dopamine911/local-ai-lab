@@ -156,6 +156,30 @@ Recipe (strixhalo.wiki/AI/llamacpp-with-ROCm, dated Aug 2025, ROCm 7.0.x era): `
 runtime `ROCBLAS_USE_HIPBLASLT=1` (measure); use ROCm 7.14.1 like Strata. Known: GPU hangs (ROCm#5151), workaround
 `amdgpu.cwsr_enable=0` (strixhaloguide). kyuz0's toolboxes and lhl's rocm-wmma-tune branch: reference only.
 
+## Later: halogen-flash-server as a fourth contender (read 2026-11-06, not tested)
+
+github.com/peonist-ai/halogen-flash-server (Peonist, LLC; 0.19.1 on 2026-11-06; 1,243 stars; 243 issues, 21 open).
+An engine written only for gfx1151 (marvin's GPU) and Qwen3.8-Flash-Next. Read from its README, docs and LICENSE.md;
+every number below is **theirs, one machine** (upstream Strata claimed ~1,250 reading and gave 817 on marvin).
+
+| | llama.cpp (marvin, ours) | Strata / our fork (marvin, ours) | halogen + our UD-IQ4_XS GGUF (theirs) | halogen own checkpoint (theirs) |
+| --- | --- | --- | --- | --- |
+| 32K reading tok/s | 315 | 817 / 822 | 1,465 (0.14.1) | 1,740 (0.18.0) |
+| writing tok/s | ~40-44 | 50-55 / 49.5 | 42-45 agent turns | 55-57 agent turns, 73 code |
+| agent follow-up turn | re-reads (theory 7) | | | ~2 s at 100K (cache mode 2) |
+
+For: reads our GGUF directly (lossless repack, 20 s at start; needs their 1.4 GiB draft-head file); prompt cache saves
+its place at the end of every request, aimed at exactly our agent re-read problem (plans/marvin-writing-speed.md theory 7);
+no outbound connections unless `HALOGEN_DOWNLOAD` is set, no telemetry (LICENSE.md section 5); OpenAI, Anthropic and
+Responses APIs; tools; up to 4 conversations, full 262K each, pool default 2 full conversations.
+Against: **closed source** (free EULA, compiled binary; modified copies may not be shared), company has no public
+names (their issue #242, unanswered); wants marvin to itself (~12 GB left; stalls under memory pressure, issue #85);
+default cache mode 2 does not promise identical answers on a cache hit; thinking off by default; cross-conversation
+cache privacy (llama.cpp#27148 here) not yet checked; issue #89: own checkpoint ends replies early past ~96K.
+To test (Daniel decides, marvin free): sealed like Phase 1 (`marvin/strata-test/strata-test.sh` pattern), our GGUF first
+(same weights as llama.cpp), draft head copied in by hand; then `lab speed` 32K, `tuning/cache-switch.py` (privacy),
+tool use x3, Terminal-Bench.
+
 ## Risks
 
 - Strix Halo support upstream is "experimental"; the speed claims may not hold on marvin.
