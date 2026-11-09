@@ -37,7 +37,7 @@ models:
     cmd: |
       ${server}
       -m /models/gpt-oss-120b-MXFP4.gguf
-      -c 131072 -np 1
+      -c 131072 -np 1 -ub 2048
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 
 profiles:

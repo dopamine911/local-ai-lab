@@ -29,6 +29,8 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 14:33 | MLflow check: are the two Mesa runs told apart? | `env.image` yes (269 vs 269-mesa262), but **`env.mesa` said 26.0.8 on both**: `lab manifest` reads the host's Mesa (`cli/internal/manifest/manifest.go:29`), not the container's. Tag on e9101b70 corrected by hand (`env.mesa` 26.2.6~kisak1~r + `env.mesa_note`). Manifest fix not made (Daniel) | MLflow API |
 | 14:35 | `big` brought back (one small request; gpt-oss unloaded) | `big` ready 14:35 | `/running` |
 | 14:40 | **Mesa rolled back** (Daniel: "rollback"): Dockerfile back to 26.0.8 (PPA lines and key removed), compose `:269`; marvin restarted on `:269` | container Mesa 26.0.8-1ubuntu0.3; `big` ready 14:40:29 | `docker inspect`, `dpkg-query` |
+| 14:43 | Fresh gpt-oss baseline on Mesa 26.0.8 (before `-ub`) | writing 53.5, 32K reading 557.6 (555-558). vs Mesa 26.2.6 at 14:29: writing same (53.6), reading -1.4% (565.6): so 26.2.6's small reading gain looks real, its writing gain was not. Daniel already chose rollback | MLflow 535f2a38 |
+| 14:45 | gpt-oss `-ub` 512 (default) → **2048** (`-b` stays 2048) | reload pending | this commit |
 
 Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
