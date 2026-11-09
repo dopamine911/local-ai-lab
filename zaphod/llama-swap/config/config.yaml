@@ -85,7 +85,7 @@ models:
       ${server-fit}
       --device Vulkan0,Vulkan1
       -m /models/gpt-oss-120b-MXFP4.gguf
-      -c 131072 -np 1 -b 4096 -ub 4096 -lm none
+      -c 32768 -np 1 -b 2048 -ub 2048 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 profiles:
   image-mode:
