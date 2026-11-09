@@ -14,3 +14,12 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 13:26 | Download started on marvin (`lab models marvin gpt-oss`, tmux `gptoss`, log `~/gpt-oss-download.log`) | ~46 MB/s (12.6 GB by 13:30) | |
 | 13:30 | Flags checked in marvin's image (b12020) | `--reasoning-effort`, `--chat-template-kwargs`, `--jinja` (on by default), `--spec-type draft-eagle3` all present | `llama-server --help` |
 | 13:31 | Config entry `gpt-oss` written: `-c 131072 -np 1`, temp 1.0, top-p 1.0, reasoning effort medium, through `${server}` (keeps the cache-leak fix); added to the training profile pins | not deployed yet | this commit |
+| 13:50 | Download finished, sha256 checked | `MODELS-OK` (13:51:04) | `~/gpt-oss-download.log` |
+| 13:51 | Config copied to marvin's checkout (scp; `git checkout --` before the next pull), reload | reload OK, `big` preloaded again; marvin idle (0 requests in 10 min) | llama-swap log |
+| 13:52 | gpt-oss loaded by one small request | ready in ~25 s; 1 slot, n_ctx_slot 131072; `big` unloaded; 56 GB RAM available | log, `/running` |
+| 13:52 | `lab speed gpt-oss` (3 short + 3 x 30.4K-token prompts) | **writing 53.2 tok/s** (53.2-53.3), **32K reading 558.2 tok/s** (557-559), first token 54.6 s. `big` for comparison (11-02, 128K): 44.3 / 298-318 | MLflow fe70683c, `tuning/runs/2026-11-09-1352-speed-gpt-oss.json` |
+| 13:56 | `lab quality gpt-oss` core 15 (temp 0, seed 42) | **97 (29/30)**; only miss TC-14 partial (recovered after a tool error, didn't say so); behavior flags all 0. **Not comparable with `big`**: every `big` run is the full 69 (88-95) | MLflow a6cd16b2, `tuning/tool-eval/runs/2026-11-09-1356-gpt-oss.json` |
+
+Next after the gpt-oss tests (Daniel, 2026-11-09): Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
+`marvin/llama-swap/Dockerfile`, one change, `lab speed` on `big` and `gpt-oss` before and after. Save the .debs at
+build time (PPAs drop old versions). Expected gain small: reading 0-6%, writing ~0% (plans/strix-performance-review.md #3).
