@@ -83,4 +83,7 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | 17:38 | Daniel: test "all on the cards at 32K". gpt-oss `-c 131072 -b/-ub 4096` → `-c 32768 -b/-ub 2048` (two settings, one setup: the only f16 combination that fits) | | this commit |
 | 17:39 | gpt-oss loaded at 32K | load 69 s; no "tensor overrides to CPU" line (nothing in RAM); cards 30.9 / 31.4 GB; RAM normal | log, sysfs |
 | 17:40 | `lab speed` probe 3 (all on the cards, 32K, -ub 2048) | **writing 60.7 (+11% vs 54.5), 32K reading 1,731 (+22% vs 1,423)**, first token 17.6 s. Cost: context 32K instead of 128K. Left at 32K (test model; Daniel decides) | MLflow fb17c6de |
+| 17:43 | Daniel: option 2. gpt-oss `-c 32768 -b/-ub 2048` → `-c 131072 -b 2048 -ub 512 -ctk q8_0 -ctv q8_0 -fitt 768` (projected 63,636 MiB) | load 98 s; nothing in RAM, n_ctx_slot 131072; cards 31.7 / 31.2 GB | 4ab0f9e |
+| 17:45 | `lab speed` probe 4 | **writing 78.8 (78.5-79.0), 32K reading 2,208 (1,968 / 2,214 / 2,208)**, first token 13.8 s. **Surprise**: faster than 32K + ub 2048 (60.7 / 1,731); I expected ub 512 to cost reading. Four settings changed together (context, ub, q8_0, fit margin; maybe the card split too), cause not known | MLflow 3ce97c1b |
+| 17:47 | Sanity: `lab quality gpt-oss` core 15 on probe 4 | **83 (25/30)** vs marvin f16 97 (29/30): TC-07 and TC-15 pass → fail (TC-15: exact value not kept across tool calls); behavior flags 0. Cause (q8_0, ub, machine) not separated | MLflow b029689f |
 
