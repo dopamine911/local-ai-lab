@@ -33,7 +33,8 @@ models:
     name: "gpt-oss-120b (marvin, test)"
     description: "OpenAI gpt-oss-120b MXFP4, 128K, one slot. Test entry (plans/gpt-oss-timeline.md); swaps with big."
     # -np 1: the server's default slot count would split 128K into smaller pieces (the 32K speed test needs one big slot).
-    # -ub 2048: 32K reading 557.6 → 764.8 tok/s (+37%), writing same (2026-11-09). EAGLE3 draft tried: writing -26%, reading -10% (MLflow ef305ba2), off.
+    # -b/-ub 4096 (2026-11-09): 32K reading 557.6 (default 512) → 764.8 (2048) → 820.5 tok/s (4096), writing same, +~3 GB.
+    # EAGLE3 draft tried: writing -26%, reading -10% (MLflow ef305ba2), off.
     # Sampling: OpenAI's recommended temp 1.0, top-p 1.0; reasoning effort medium (the model's default).
     cmd: |
       ${server}

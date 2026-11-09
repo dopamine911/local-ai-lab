@@ -37,7 +37,8 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 14:57 | `lab speed gpt-oss` with EAGLE3 | **writing 53.4 → 39.7 (-26%)**, 32K reading 764.8 → 692.0 (-10%), acceptance ~41% on the 400-token code prompt; RAM used 67 → 79 GB. Clearly worse: **reverted** (README loop step 6) | MLflow ef305ba2 |
 | 15:00 | Mistake: my `git revert` had a bad option, and the `--amend` after it renamed 12028ca's message to "off" (content still on; not pushed). Fixed with `git reset --soft 12028ca` (original hash kept, so MLflow's config_commit is right) | | git reflog |
 | 15:09 | Fresh baseline `-ub 2048` (before `-ub 4096`) | writing 53.4, 32K reading 766.6 (765-767; 14:47 was 764.8) | MLflow 1f3ca437 |
-| 15:11 | gpt-oss `-b 2048 -ub 2048` → **`-b 4096 -ub 4096`** (one setting: `-ub` is capped at `-b`) | reload pending | this commit |
+| 15:11 | gpt-oss `-b 2048 -ub 2048` → **`-b 4096 -ub 4096`** (one setting: `-ub` is capped at `-b`); reload, load | running cmd shows it; RAM used 67 → 69 GB | e659e38 |
+| 15:12 | `lab speed gpt-oss` with `-b/-ub 4096` | **32K reading 766.6 → 820.5 (+7%)** (818-821), first token 39.7 → 37.1 s; writing 53.4 (same). Beyond the spread: left on; keep/revert: Daniel. Total vs default 512: 557.6 → 820.5 (+47%). Tool use not re-run | MLflow 2e696318 |
 
 Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
