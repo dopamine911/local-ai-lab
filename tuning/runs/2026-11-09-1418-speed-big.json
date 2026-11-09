@@ -1,0 +1,60 @@
+{
+ "model": "big",
+ "base_url": "http://marvin:8080/v1",
+ "short": [
+  {
+   "writing_tps": 11.0,
+   "tokens": 400,
+   "ttft_s": 0.02,
+   "server_reported_tps": 43.92602680940828
+  },
+  {
+   "writing_tps": 45.0,
+   "tokens": 400,
+   "ttft_s": 0.11,
+   "server_reported_tps": 45.007693608377345
+  },
+  {
+   "writing_tps": 44.3,
+   "tokens": 400,
+   "ttft_s": 0.11,
+   "server_reported_tps": 44.36232657832596
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 32497,
+   "reading_tps": 319.6,
+   "ttft_s": 101.7,
+   "server_reported_tps": 319.84798633168305
+  },
+  {
+   "prompt_tokens": 32502,
+   "reading_tps": 297.7,
+   "ttft_s": 109.2,
+   "server_reported_tps": 297.85453732707435
+  },
+  {
+   "prompt_tokens": 32500,
+   "reading_tps": 298.1,
+   "ttft_s": 109.0,
+   "server_reported_tps": 298.3391678835921
+  }
+ ],
+ "speed_write_tps": 44.3,
+ "speed_read_32k_tps": 298.1,
+ "speed_ttft_32k_s": 109.0,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}
