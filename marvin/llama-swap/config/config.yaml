@@ -29,12 +29,24 @@ models:
       ${qwen-sampling}
       ${mtp}
 
+  gpt-oss:
+    name: "gpt-oss-120b (marvin, test)"
+    description: "OpenAI gpt-oss-120b MXFP4, 128K, one slot. Test entry (plans/gpt-oss-timeline.md); swaps with big."
+    # -np 1: the server's default slot count would split 128K into smaller pieces (the 32K speed test needs one big slot).
+    # Sampling: OpenAI's recommended temp 1.0, top-p 1.0; reasoning effort medium (the model's default).
+    cmd: |
+      ${server}
+      -m /models/gpt-oss-120b-MXFP4.gguf
+      -c 131072 -np 1
+      --temp 1.0 --top-p 1.0 --reasoning-effort medium
+
 profiles:
   training:
     # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
     description: "8060S lent to model training (lab training-mode on)"
     pins:
       big: ~
+      gpt-oss: ~
 hooks:
   on_startup:
     preload: [big]

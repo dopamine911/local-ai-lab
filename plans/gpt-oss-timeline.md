@@ -11,3 +11,6 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 13:20 | Hugging Face lookup | ggml-org/gpt-oss-120b-GGUF rev 7200b74: `gpt-oss-120b-MXFP4.gguf` 63,387,346,208 bytes; also EAGLE3 draft files (Q8_0 0.85 GB, BF16 1.6 GB), for a later separate test | HF API |
 | 13:22 | marvin download speed sample | 500 MB in 15.0 s = 34.8 MB/s (Wi-Fi), so ~30 min for the file (one sample) | curl |
 | 13:25 | Pinned the file in `setup/models-marvin.txt` | | this commit |
+| 13:26 | Download started on marvin (`lab models marvin gpt-oss`, tmux `gptoss`, log `~/gpt-oss-download.log`) | ~46 MB/s (12.6 GB by 13:30) | |
+| 13:31 | Flags checked in marvin's image (b12020) | `--reasoning-effort`, `--chat-template-kwargs`, `--jinja` (on by default), `--spec-type draft-eagle3` all present | `llama-server --help` |
+| 13:36 | Config entry `gpt-oss` written: `-c 131072 -np 1`, temp 1.0, top-p 1.0, reasoning effort medium, through `${server}` (keeps the cache-leak fix); added to the training profile pins | not deployed yet | this commit |
