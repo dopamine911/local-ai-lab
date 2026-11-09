@@ -1,0 +1,60 @@
+{
+ "model": "gpt-oss",
+ "base_url": "http://marvin:8080/v1",
+ "short": [
+  {
+   "writing_tps": 53.6,
+   "tokens": 400,
+   "ttft_s": 0.44,
+   "server_reported_tps": 53.24635272492547
+  },
+  {
+   "writing_tps": 53.6,
+   "tokens": 400,
+   "ttft_s": 0.13,
+   "server_reported_tps": 53.250993151041435
+  },
+  {
+   "writing_tps": 53.6,
+   "tokens": 400,
+   "ttft_s": 0.13,
+   "server_reported_tps": 53.2542625432474
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 30451,
+   "reading_tps": 565.4,
+   "ttft_s": 53.9,
+   "server_reported_tps": 566.2587694321775
+  },
+  {
+   "prompt_tokens": 30451,
+   "reading_tps": 566.7,
+   "ttft_s": 53.7,
+   "server_reported_tps": 567.5420090053385
+  },
+  {
+   "prompt_tokens": 30448,
+   "reading_tps": 565.6,
+   "ttft_s": 53.8,
+   "server_reported_tps": 566.4473941621061
+  }
+ ],
+ "speed_write_tps": 53.6,
+ "speed_read_32k_tps": 565.6,
+ "speed_ttft_32k_s": 53.8,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}
