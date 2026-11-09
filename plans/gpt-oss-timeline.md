@@ -72,4 +72,7 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | 16:56 | Probe 2: `--n-cpu-moe 8` added; reload, load | load 71 s. fit aborted ("tensor_buft_overrides already set by user"), so the card split is llama.cpp's default: **card 1 31.7 GB, card 2 23.0 GB** (9 GB unused); RAM used 23 GB (~14 GB experts) | 6e5256f |
 | 17:00 | `lab speed` probe 2 | **writing 38.5 (-29%), 32K reading 365.6 then 179.9 / 179.9 (-75 to -87%)**. Much worse than fit's partial layout: reverted. Reading halving after the first long prompt not looked into (setting removed) | MLflow af39c4a6 |
 | 17:06 | Probe 2 reverted: gpt-oss back to `--fit` + `-lm none` | | this commit |
+| 17:21 | zaphod's cable reconnected (Daniel) | link 100 Mb/s → **2.5 Gb/s**; LLDP: MikroTik CRS310 port ether4 (marvin: ether5) | `networkctl status eno1` |
+| 17:24 | Cause of "no address on the cable": the router answers on the cable (IPv6 ping 1 ms; zaphod ↔ marvin 0.2 ms), but zaphod's netplan lists `eno1` **without `dhcp4: true`** (installer file, shown by Daniel). host.sh step 6e + `lab setup check` line written | | 7f2113d |
+| 17:30 | Daniel applied step 6e on zaphod (`/etc/netplan/10-eno1-dhcp.yaml`, chmod 600, `netplan apply`) | **eno1 has an IPv4 address** (DHCP, metric 100), default route now the cable (Wi-Fi 600 stays as backup); llama-swap, Caddy, all containers fine; Hugging Face over the cable 40.5 MB/s (Wi-Fi 25-30). marvin not done yet (still Wi-Fi). Address in ~/full-homelab, not here | `ip route get`, curl |
 

@@ -5,7 +5,7 @@ This repo is public. Personal notes live in ~/.claude/CLAUDE.md, not here. Never
 Overview of every feature with links: `FEATURES.md` (keep it updated when adding or changing a feature).
 
 ## Machines
-- zaphod (this machine): Ubuntu 26.04 server, Ryzen 9 3900X, Gigabyte B550I AORUS PRO AX (mini-ITX), 2x Radeon AI PRO R9700 (32 GB each).
+- zaphod (this machine): Ubuntu 26.04 server, Ryzen 9 3900X, Gigabyte B550I AORUS PRO AX (mini-ITX), 2x Radeon AI PRO R9700 (32 GB each). On the cable (eno1, 2.5 Gb/s, MikroTik switch) since 2026-11-09 (host.sh step 6e); Wi-Fi stays as backup.
   - Card 1: PCI 06:00.0, /dev/dri/renderD128, on an OCuLink dock via an M.2 adapter in the back (chipset) M.2 slot, PCIe 3.0 x4.
   - Card 2: PCI 0b:00.0, /dev/dri/renderD129, in the x16 slot (links at x8), drives the screen.
   - llama.cpp numbers them the other way round: card 1 = `Vulkan1`, card 2 = `Vulkan0`. Check with `llama-server --list-devices` (free memory per card). Card 1 is ~10% slower with MTP (its PCIe 3.0 x4 link).
