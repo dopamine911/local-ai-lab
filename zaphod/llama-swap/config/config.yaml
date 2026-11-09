@@ -79,11 +79,13 @@ models:
     # Test (plans/gpt-oss-timeline.md): 63.4 GB does not fit the two cards, so some expert layers stay in RAM.
     # Card 2 first: the RAM-side layers sit next to the x8 card, not card 1's PCIe 3.0 x4 link. Runs alone (helpers off).
     # Same settings as marvin's gpt-oss: 128K, 1 slot, -b/-ub 4096, OpenAI sampling, effort medium.
+    # Measured 2026-11-09 (helpers off): --fit's own layout (card 2 17 layers, card 1 20, 6 partly in RAM) 54.5 writing /
+    # 1,423 32K reading with -lm none (mmap: 1,272). --n-cpu-moe 8 instead: 38.5 / 180-366, worse: keep --fit.
     cmd: |
       ${server-fit}
       --device Vulkan0,Vulkan1
       -m /models/gpt-oss-120b-MXFP4.gguf
-      -c 131072 -np 1 -b 4096 -ub 4096 -lm none --n-cpu-moe 8
+      -c 131072 -np 1 -b 4096 -ub 4096 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 profiles:
   image-mode:

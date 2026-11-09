@@ -69,4 +69,7 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | 16:51 | Daniel: "you can continue to probe". Watchdog still paused (window to the 17:41 memory sync). Probes, one change each: 1) `--load-mode none`; 2) `--n-cpu-moe 8` instead of fit | | |
 | 16:52 | Probe 1: `-lm none` (no mmap), fit unchanged; reload, load | load 71 s (was 73); RAM used 5.7 → 13.9 GB (RAM-side tensors now in memory) | e1b5574 |
 | 16:53 | `lab speed` probe 1 | writing 54.5 (54.3), **32K reading 1,272 → 1,423 (+12%)**, first token 21.4 s. Kept for probe 2 | MLflow f1564c1a |
+| 16:56 | Probe 2: `--n-cpu-moe 8` added; reload, load | load 71 s. fit aborted ("tensor_buft_overrides already set by user"), so the card split is llama.cpp's default: **card 1 31.7 GB, card 2 23.0 GB** (9 GB unused); RAM used 23 GB (~14 GB experts) | 6e5256f |
+| 17:00 | `lab speed` probe 2 | **writing 38.5 (-29%), 32K reading 365.6 then 179.9 / 179.9 (-75 to -87%)**. Much worse than fit's partial layout: reverted. Reading halving after the first long prompt not looked into (setting removed) | MLflow af39c4a6 |
+| 17:06 | Probe 2 reverted: gpt-oss back to `--fit` + `-lm none` | | this commit |
 
