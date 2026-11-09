@@ -35,7 +35,8 @@ Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBU
 | lab CLI: Go | cli/build.sh `IMG=` | golang:1.27.3 by digest (latest) | `cli/build.sh` (vet, tests, build) |
 | lab CLI: libraries | cli/go.mod + go.sum | cobra v1.10.2, bubbletea v2.1.1, lipgloss v2.0.6, go.yaml.in/yaml v3.0.6 (latest stable; yaml v4 is still rc) | same + `lab manifest` (no "unknown") and `lab setup check` |
 | Ubuntu base of llama-swap images | zaphod/ and marvin/llama-swap/Dockerfile | resolute-20261024.1 (was the floating `ubuntu:26.04`); in zaphod's 269-media build (2026-11-02; the comment on the FROM line had broken builds until then) | — |
-| Mesa (Vulkan driver) in the llama-swap images | zaphod/llama-swap/Dockerfile | 26.0.8-1ubuntu0.3 (pinned 2026-11-02, = current Ubuntu 26.04; was unpinned) | `lab speed` before/after a bump |
+| Mesa (Vulkan driver), zaphod image | zaphod/llama-swap/Dockerfile | 26.0.8-1ubuntu0.3 (pinned 2026-11-02, = current Ubuntu 26.04; was unpinned) | `lab speed` before/after a bump |
+| Mesa (Vulkan driver), marvin image | marvin/llama-swap/Dockerfile | 26.2.6~kisak1~r (kisak PPA, key `kisak-mesa.asc`; 2026-11-09; was 26.0.8-1ubuntu0.3) | `lab speed` before/after a bump; PPA drops old versions: saved image in marvin ~/backups |
 
 ## Behind on purpose (each needs a measured before/after; Daniel decides when)
 

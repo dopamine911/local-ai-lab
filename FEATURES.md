@@ -31,6 +31,7 @@ not here.
 | Speech-to-text `stt` (Qwen3-ASR), `stt-whisper` (99 languages); text-to-speech `tts` (Kokoro), `tts-qwen` | working | [zaphod/llama-swap/config/](zaphod/llama-swap/config/) |
 | marvin's llama-swap: `big` = Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3 (24.7 → 39.6 tok/s; ~44 writing, ~318 reading a 32K prompt on BIOS Performance) | working | [marvin/llama-swap/config/config.yaml](marvin/llama-swap/config/config.yaml), [marvin/SETUP.md](marvin/SETUP.md) |
 | marvin linked to zaphod as a peer: appears everywhere as `marvin/big` | working | [README.md](README.md) |
+| marvin `gpt-oss` = gpt-oss-120b MXFP4 (63 GB), 128K, 1 slot; swaps with `big`; reached directly on marvin (not in zaphod's peer list) | test entry (2026-11-09): 53.6 writing, 566 reading 32K; tool use 82 (`big` 90), failed the TC-60 injection test | [plans/gpt-oss-timeline.md](plans/gpt-oss-timeline.md) |
 | Live test of our UnbiasedStrata fork on marvin: appears as `marvin-fork/big-fork` while `fork.sh start` runs (`marvin/big` offline then) | on hold (2026-11-01; was up 23 h, unused) | [plans/strix-strata.md](plans/strix-strata.md) |
 | Both machines on llama-swap 269 (llama.cpp b12020), measured before and after on each: speed and tool use the same (#1, closed) | working | [tuning/results.md](tuning/results.md) "llama-swap 267 -> 269" |
 | The slow-card fix (Resizable BAR off → `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1`, 3-10x faster) | working | [tuning/results.md](tuning/results.md) "The slow-card fix" |
