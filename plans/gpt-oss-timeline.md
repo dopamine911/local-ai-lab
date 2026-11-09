@@ -43,3 +43,14 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
 build time (PPAs drop old versions). Expected gain small: reading 0-6%, writing ~0% (plans/strix-performance-review.md #3).
+
+## zaphod: gpt-oss-120b on both R9700s + `--n-cpu-moe` (2026-11-09)
+
+Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. Plan: entry through `${server}`-like macro
+(keeps the cache-leak fix), card 2 first (`--device Vulkan0,Vulkan1`) so the RAM-side layers sit next to the x8 card;
+`--fit` once to find the split, then a fixed `--n-cpu-moe N`; `lab speed`, compare with marvin 53.4 / 820.5.
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 15:20 | Free memory: card 2 28.9 GB free (stt, stt-whisper, tts), card 1 3.0 GB (coder, embed, rerank); RAM 52 GB available. Download speed: HF 24.9 MB/s, from marvin 28.4 MB/s | ~42 min for 63.4 GB | `--list-devices`, curl |
+
