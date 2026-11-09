@@ -32,6 +32,10 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 14:43 | Fresh gpt-oss baseline on Mesa 26.0.8 (before `-ub`) | writing 53.5, 32K reading 557.6 (555-558). vs Mesa 26.2.6 at 14:29: writing same (53.6), reading -1.4% (565.6): so 26.2.6's small reading gain looks real, its writing gain was not. Daniel already chose rollback | MLflow 535f2a38 |
 | 14:45 | gpt-oss `-ub` 512 (default) → **2048** (`-b` stays 2048); reload, gpt-oss loaded | running cmd shows `-ub 2048` | 3ec91e1 |
 | 14:47 | `lab speed gpt-oss` with `-ub 2048` | **32K reading 557.6 → 764.8 tok/s (+37%)** (763-765), first token 54.6 → 39.8 s; writing 53.5 → 53.4 (same); RAM used ~66 → 67 GB. Clearly beyond run-to-run spread. Kept as the baseline for the EAGLE3 test; keep/revert: Daniel. Tool use not re-run | MLflow 2804538f |
+| 14:50-14:55 | EAGLE3 draft (ggml-org Q8_0, 0.85 GB, rev 7200b74) pinned + downloaded | `MODELS-OK` (Wi-Fi slower this time, ~2.7 MB/s) | 418ac63 |
+| 14:56 | gpt-oss + `--model-draft eagle3… --spec-type draft-eagle3` (draft 3, default); reload, load | loads; one "E … eagle3 requires ctx_other … normal during memory fitting" line; 200-token test 55.1 tok/s, 73% accepted. Draft placement (GPU) not shown in the log at this verbosity | 12028ca |
+| 14:57 | `lab speed gpt-oss` with EAGLE3 | **writing 53.4 → 39.7 (-26%)**, 32K reading 764.8 → 692.0 (-10%), acceptance ~41% on the 400-token code prompt; RAM used 67 → 79 GB. Clearly worse: **reverted** (README loop step 6) | MLflow ef305ba2 |
+| 15:00 | Mistake: my `git revert` had a bad option, and the `--amend` after it renamed 12028ca's message to "off" (content still on; not pushed). Fixed with `git reset --soft 12028ca` (original hash kept, so MLflow's config_commit is right) | | git reflog |
 
 Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
