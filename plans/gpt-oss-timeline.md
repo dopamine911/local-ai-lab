@@ -28,7 +28,8 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 14:29 | `lab speed gpt-oss` on Mesa 26.2.6 | **writing 53.6** (53.6 x3; before 53.2), **32K reading 565.6** (565-567; before 557-559): **+0.8% / +1.3%**. Each set of 3 is tight, but one run each and the GPU was warmer for the second (after the 16-min quality run), so a ~1% gain can't be told apart from heat. Tool use not re-run on the new driver | MLflow e9101b70, `tuning/runs/2026-11-09-1429-speed-gpt-oss.json` |
 | 14:33 | MLflow check: are the two Mesa runs told apart? | `env.image` yes (269 vs 269-mesa262), but **`env.mesa` said 26.0.8 on both**: `lab manifest` reads the host's Mesa (`cli/internal/manifest/manifest.go:29`), not the container's. Tag on e9101b70 corrected by hand (`env.mesa` 26.2.6~kisak1~r + `env.mesa_note`). Manifest fix not made (Daniel) | MLflow API |
 | 14:35 | `big` brought back (one small request; gpt-oss unloaded) | `big` ready 14:35 | `/running` |
+| 14:40 | **Mesa rolled back** (Daniel: "rollback"): Dockerfile back to 26.0.8 (PPA lines and key removed), compose `:269`; marvin restarted on `:269` | container Mesa 26.0.8-1ubuntu0.3; `big` ready 14:40:29 | `docker inspect`, `dpkg-query` |
 
-Next after the gpt-oss tests (Daniel, 2026-11-09): Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
+Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
 build time (PPAs drop old versions). Expected gain small: reading 0-6%, writing ~0% (plans/strix-performance-review.md #3).

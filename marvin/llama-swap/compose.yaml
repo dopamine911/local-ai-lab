@@ -1,10 +1,10 @@
 # llama-swap on marvin (Bosgame M5, Strix Halo, 128 GB shared memory).
-# Build: docker build -t llama-swap-marvin:269-mesa262 ~/llama-swap
+# Build: docker build -t llama-swap-marvin:269 ~/llama-swap
 # Start: docker compose up -d     Logs: docker compose logs -f
 services:
   llama-swap:
     build: .                            # docker compose build
-    image: llama-swap-marvin:269-mesa262   # Mesa 26.2.6 (2026-11-09); rollback: :269 (Mesa 26.0.8), :267
+    image: llama-swap-marvin:269   # issue #1; rollback: :267. Mesa 26.2.6 tried 2026-11-09 (:269-mesa262, +1%, rolled back)
     container_name: llama-swap
     restart: unless-stopped
     # Only marvin itself can reach 8080; `tailscale serve` exposes it to the tailnet.
