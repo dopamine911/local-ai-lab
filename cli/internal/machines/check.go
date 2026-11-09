@@ -124,6 +124,10 @@ func SetupCheck(cfg *config.Config) []Check {
 	tz, _ := out("timedatectl", "show", "-p", "Timezone", "--value")
 	add("6b time zone America/Chicago", tz == "America/Chicago", tz, "sudo timedatectl set-timezone America/Chicago")
 
+	// 6e. wired network: the netplan file is root-only, so check the result (an IPv4 address on eno1)
+	v4, _ := out("ip", "-4", "-o", "addr", "show", "eno1")
+	add("6e eno1 IPv4 by DHCP", strings.Contains(v4, "inet "), firstLine(v4, nil), hostFix)
+
 	if host == "zaphod" {
 		for _, s := range []struct{ step, unit, src string }{
 			{"6c notification buttons (lab-actions)", "lab-actions", "hub/actions/lab-actions.service"},

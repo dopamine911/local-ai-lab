@@ -32,7 +32,7 @@ which may make the `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM` switch unnecessary. Unt
 3. Storage: whole disk with LVM. On the summary screen, **edit `ubuntu-lv` and set it to the maximum size**
    (the default is only 100 GB). If you forget: `sudo lvextend -l +100%FREE -r /dev/ubuntu-vg/ubuntu-lv`.
 4. Tick **Install OpenSSH server**. No extra snaps.
-5. Network: Ethernet cable if possible (marvin is on Wi-Fi as of 2026-10-29).
+5. Network: Ethernet cable if possible. `setup/host.sh` step 6e turns on DHCP for `eno1` (the installer leaves it off when no cable is plugged in; found 2026-11-09, both machines were on Wi-Fi with the cable plugged in).
 
 Good: `ls /sys/firmware/efi` works; `df -h /` shows the full disk.
 

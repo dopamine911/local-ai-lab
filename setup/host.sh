@@ -44,6 +44,17 @@ step "6b. time zone America/Chicago (Daniel's local time; was Ubuntu's default U
 [ "$(timedatectl show -p Timezone --value)" = America/Chicago ] || timedatectl set-timezone America/Chicago
 timedatectl | grep 'Time zone'
 
+step "6e. wired network: IPv4 address by DHCP on eno1 (both machines)"
+# The installer listed eno1 without dhcp4 (it had no cable then), so the cable never asked for an address and all
+# traffic used Wi-Fi (found 2026-11-09). A separate file, so the installer's file (Wi-Fi password) stays untouched;
+# netplan merges both. The cable's route (metric 100) then wins over Wi-Fi (600). Check: ip -br addr show eno1
+f=/etc/netplan/10-eno1-dhcp.yaml
+want=$'network:\n  version: 2\n  ethernets:\n    eno1:\n      dhcp4: true'
+if [ "$(cat $f 2>/dev/null)" != "$want" ]; then
+  printf '%s\n' "$want" > $f; chmod 600 $f; netplan apply
+else echo "already set"; fi
+ip -br addr show eno1
+
 if [ "$H" = zaphod ]; then
   step "6c. zaphod: notification buttons service lab-actions (hub/actions; issue #11)"
   # Needs ACTION_SECRET in hub/.env; until then it retries every 30 s. Check: curl -s http://127.0.0.1:2587/health -> ok
