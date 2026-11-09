@@ -1,5 +1,5 @@
 # llama-swap on marvin (Bosgame M5, Strix Halo, 128 GB shared memory).
-# Build: docker build -t llama-swap-marvin:267 ~/llama-swap   (same Dockerfile as zaphod's text-only image)
+# Build: docker build -t llama-swap-marvin:269-mesa262 ~/llama-swap
 # Start: docker compose up -d     Logs: docker compose logs -f
 services:
   llama-swap:
