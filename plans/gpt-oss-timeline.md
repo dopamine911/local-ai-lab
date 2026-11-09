@@ -54,3 +54,7 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | --- | --- | --- | --- |
 | 15:20 | Free memory: card 2 28.9 GB free (stt, stt-whisper, tts), card 1 3.0 GB (coder, embed, rerank); RAM 52 GB available. Download speed: HF 24.9 MB/s, from marvin 28.4 MB/s | ~42 min for 63.4 GB | `--list-devices`, curl |
 | 15:30 | Network check (Daniel: "marvin should have ethernet") | Both cables have link (marvin eno1 2.5 Gb/s, **zaphod eno1 only 100 Mb/s**) but **neither gets an IPv4 address** (networkd "configuring": no DHCP answer), so both still route over Wi-Fi. Likely the switch is not connected to the router / DHCP (0.7). zaphod's 100 Mb/s: cable or port. Nothing changed; addresses go to ~/full-homelab. Download stays on Wi-Fi (Daniel: wait) | `ip -br addr`, `/sys/class/net/eno1/speed`, `networkctl` |
+| 15:22 | Download started from Hugging Face (`lab models zaphod gpt-oss`, tmux `gptoss-z`) | ~30 MB/s at first | 3e18fed |
+| 15:49 | Download check (Daniel) | **stalled: 5.5 GB after 26 min, 2.4 MB/s**; new HF connection 5.1 MB/s, marvin copy 25.8 MB/s: Hugging Face side | curl, ssh |
+| 15:50 | Switched to copying from marvin: `rsync --append` onto the partial file (same bytes), then `lab models` checks the sha256. Closing tmux did not stop wget (it ran on); stopped by PID. Mistake: my kill also named its parent, which was PID 1 (init); refused for a normal user, no effect | rsync 28 MB/s, ~33 min | `~/gpt-oss-rsync-zaphod.log` |
+
