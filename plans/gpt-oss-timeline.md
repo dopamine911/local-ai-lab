@@ -30,7 +30,8 @@ marvin fits it fully, but `big` is unloaded while gpt-oss runs (llama-swap there
 | 14:35 | `big` brought back (one small request; gpt-oss unloaded) | `big` ready 14:35 | `/running` |
 | 14:40 | **Mesa rolled back** (Daniel: "rollback"): Dockerfile back to 26.0.8 (PPA lines and key removed), compose `:269`; marvin restarted on `:269` | container Mesa 26.0.8-1ubuntu0.3; `big` ready 14:40:29 | `docker inspect`, `dpkg-query` |
 | 14:43 | Fresh gpt-oss baseline on Mesa 26.0.8 (before `-ub`) | writing 53.5, 32K reading 557.6 (555-558). vs Mesa 26.2.6 at 14:29: writing same (53.6), reading -1.4% (565.6): so 26.2.6's small reading gain looks real, its writing gain was not. Daniel already chose rollback | MLflow 535f2a38 |
-| 14:45 | gpt-oss `-ub` 512 (default) → **2048** (`-b` stays 2048) | reload pending | this commit |
+| 14:45 | gpt-oss `-ub` 512 (default) → **2048** (`-b` stays 2048); reload, gpt-oss loaded | running cmd shows `-ub 2048` | 3ec91e1 |
+| 14:47 | `lab speed gpt-oss` with `-ub 2048` | **32K reading 557.6 → 764.8 tok/s (+37%)** (763-765), first token 54.6 → 39.8 s; writing 53.5 → 53.4 (same); RAM used ~66 → 67 GB. Clearly beyond run-to-run spread. Kept as the baseline for the EAGLE3 test; keep/revert: Daniel. Tool use not re-run | MLflow 2804538f |
 
 Done 2026-11-09 (rolled back 14:40), was the next step: Mesa 26.0.8 → 26.2.6 (kisak PPA; Ubuntu has nothing newer) in
 `marvin/llama-swap/Dockerfile`, one change, `lab speed` on `gpt-oss` before and after (Daniel: gpt-oss only). Save the .debs at
