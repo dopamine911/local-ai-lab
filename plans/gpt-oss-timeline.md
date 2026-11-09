@@ -53,4 +53,4 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | Time | Step | Result | Record |
 | --- | --- | --- | --- |
 | 15:20 | Free memory: card 2 28.9 GB free (stt, stt-whisper, tts), card 1 3.0 GB (coder, embed, rerank); RAM 52 GB available. Download speed: HF 24.9 MB/s, from marvin 28.4 MB/s | ~42 min for 63.4 GB | `--list-devices`, curl |
-
+| 15:30 | Network check (Daniel: "marvin should have ethernet") | Both cables have link (marvin eno1 2.5 Gb/s, **zaphod eno1 only 100 Mb/s**) but **neither gets an IPv4 address** (networkd "configuring": no DHCP answer), so both still route over Wi-Fi. Likely the switch is not connected to the router / DHCP (0.7). zaphod's 100 Mb/s: cable or port. Nothing changed; addresses go to ~/full-homelab. Download stays on Wi-Fi (Daniel: wait) | `ip -br addr`, `/sys/class/net/eno1/speed`, `networkctl` |
