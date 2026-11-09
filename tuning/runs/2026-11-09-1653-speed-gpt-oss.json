@@ -1,0 +1,60 @@
+{
+ "model": "gpt-oss",
+ "base_url": "http://127.0.0.1:8080/v1",
+ "short": [
+  {
+   "writing_tps": 54.5,
+   "tokens": 400,
+   "ttft_s": 0.3,
+   "server_reported_tps": 54.31864542639728
+  },
+  {
+   "writing_tps": 54.6,
+   "tokens": 400,
+   "ttft_s": 0.14,
+   "server_reported_tps": 54.39124069282718
+  },
+  {
+   "writing_tps": 54.4,
+   "tokens": 400,
+   "ttft_s": 0.14,
+   "server_reported_tps": 53.998866429811486
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 30451,
+   "reading_tps": 1363.8,
+   "ttft_s": 22.3,
+   "server_reported_tps": 1373.2292374147014
+  },
+  {
+   "prompt_tokens": 30448,
+   "reading_tps": 1423.3,
+   "ttft_s": 21.4,
+   "server_reported_tps": 1433.8054094940417
+  },
+  {
+   "prompt_tokens": 30449,
+   "reading_tps": 1427.9,
+   "ttft_s": 21.3,
+   "server_reported_tps": 1438.3089837204175
+  }
+ ],
+ "speed_write_tps": 54.5,
+ "speed_read_32k_tps": 1423.3,
+ "speed_ttft_32k_s": 21.4,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}

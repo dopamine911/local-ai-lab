@@ -67,4 +67,6 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | 16:48 | What `--fit` chose (gpt-oss unloaded via `/unload`, same command run by hand in the container with `-lv 4`, stopped after load) | Needs 12,287 MiB less than "all on cards". Result: **Vulkan0 (card 2) 17 layers, 1 partly in RAM; Vulkan1 (card 1) 20 layers, 5 partly in RAM** (per-layer partial expert overflow, up/gate types), ~1 GiB margin per card, context unchanged. `--n-cpu-moe N` (whole experts of the first N layers) cannot express this 1:1: a different layout, needs its own measurement | `tuning/runs/2026-11-09-1648-gpt-oss-zaphod-fit.log` |
 | 16:50 | zaphod restored by requests: coder, coder-2, embed, then rerank/stt/stt-whisper/tts via `/upstream/<m>/health` | all 7 ready, like after preload | `/running` |
 | 16:51 | Daniel: "you can continue to probe". Watchdog still paused (window to the 17:41 memory sync). Probes, one change each: 1) `--load-mode none`; 2) `--n-cpu-moe 8` instead of fit | | |
+| 16:52 | Probe 1: `-lm none` (no mmap), fit unchanged; reload, load | load 71 s (was 73); RAM used 5.7 → 13.9 GB (RAM-side tensors now in memory) | e1b5574 |
+| 16:53 | `lab speed` probe 1 | writing 54.5 (54.3), **32K reading 1,272 → 1,423 (+12%)**, first token 21.4 s. Kept for probe 2 | MLflow f1564c1a |
 
