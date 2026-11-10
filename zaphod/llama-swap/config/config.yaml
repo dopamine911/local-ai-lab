@@ -83,12 +83,12 @@ models:
     # 1,423 32K reading with -lm none (mmap: 1,272). --n-cpu-moe 8 instead: 38.5 / 180-366, worse: keep --fit.
     # --fit always leaves part of 1 layer in RAM (whole-layer split, card 1 still 1-2.5 GB free): 32K 60.7 / 1,731.
     # By hand, -ngl 999 (in ${server}, so fit is off) + -ts 18,19: nothing in RAM, 32K: 85.3 / 2,885, tool use 97 (= marvin).
-    # 128K needs ${server-fit} + -c 131072 -b 4096 -ub 4096 (54.5 / 1,423; ~6-8 GB in RAM).
+    # 128K by hand also fits with -c 131072 -b 2048 -ub 512 -ctk q8_0 -ctv q8_0: 82.9 / 2,278, but tool use 90 (TC-15).
     cmd: |
       ${server}
       --device Vulkan0,Vulkan1 -ts 18,19
       -m /models/gpt-oss-120b-MXFP4.gguf
-      -c 131072 -np 1 -b 2048 -ub 512 -ctk q8_0 -ctv q8_0 -lm none
+      -c 32768 -np 1 -b 2048 -ub 2048 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 profiles:
   image-mode:
