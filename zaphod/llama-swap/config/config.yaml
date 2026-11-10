@@ -84,10 +84,10 @@ models:
     # 32K + -b/-ub 2048: the whole model fits on the cards (nothing in RAM): 60.7 / 1,731 (fastest). For 128K go back to
     # -c 131072 -b 4096 -ub 4096 (54.5 / 1,423).
     cmd: |
-      ${server-fit}
-      --device Vulkan0,Vulkan1
+      ${server}
+      --device Vulkan0,Vulkan1 -ts 18,19
       -m /models/gpt-oss-120b-MXFP4.gguf
-      -c 32768 -np 1 -b 2048 -ub 512 -lm none
+      -c 32768 -np 1 -b 2048 -ub 2048 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 profiles:
   image-mode:
