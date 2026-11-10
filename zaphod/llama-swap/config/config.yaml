@@ -81,8 +81,9 @@ models:
     # Same settings as marvin's gpt-oss: 128K, 1 slot, -b/-ub 4096, OpenAI sampling, effort medium.
     # Measured 2026-11-09 (helpers off): --fit's own layout (card 2 17 layers, card 1 20, 6 partly in RAM) 54.5 writing /
     # 1,423 32K reading with -lm none (mmap: 1,272). --n-cpu-moe 8 instead: 38.5 / 180-366, worse: keep --fit.
-    # 32K + -b/-ub 2048: the whole model fits on the cards (nothing in RAM): 60.7 / 1,731 (fastest). For 128K go back to
-    # -c 131072 -b 4096 -ub 4096 (54.5 / 1,423).
+    # --fit always leaves part of 1 layer in RAM (whole-layer split, card 1 still 1-2.5 GB free): 32K 60.7 / 1,731.
+    # By hand, -ngl 999 (in ${server}, so fit is off) + -ts 18,19: nothing in RAM, 32K: 85.3 / 2,885, tool use 97 (= marvin).
+    # 128K needs ${server-fit} + -c 131072 -b 4096 -ub 4096 (54.5 / 1,423; ~6-8 GB in RAM).
     cmd: |
       ${server}
       --device Vulkan0,Vulkan1 -ts 18,19
