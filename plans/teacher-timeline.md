@@ -109,4 +109,5 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 08:13 | Early look at the first 4,500 coverage labels (66% no food) | no food, friend in view, social 7-9: follow 0.17 (before: no such labels at all); bold + energetic without food: dart 0.01 (the 26B hardly darts on sim states) | |
 | 08:30 | Coverage data done: 4 shards, 9,000 labels, no failures or warnings; fish-v4-26b-cov folded and pinned: 29,299 pairs, sha256 d06a7e28, food none 22.4% (was ~4%); seek_food 28.0%, follow 16.1%, explore 20.7%, dart 0.1% | | pocket-tank (datasets.toml) |
 | 08:31 | Training mode on; runs fish-14m-all-26bcov and fish-d256-n6-decision-26bcov (tmux `cov`) | | `out/sweep-cov.log` |
+| 08:50 | Coverage runs done (08:31-08:50, no failures). **Rule: does not fully work** | 14M: F1 0.05 -> **0.35** (bar 0.40; sd 0.15), F3 0.02 -> 0.00, nothing worse (F6 0.04 -> 0.01, F11 0.82 -> 0.91). 4.8M: F1 0.05 -> 0.28. Following was a coverage gap; dart is a teacher gap (the 26B darts on 0.1% of sim states) | issue #1 comment; `out/harness/fish-coverage.md` |
 
