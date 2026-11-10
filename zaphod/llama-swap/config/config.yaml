@@ -64,6 +64,12 @@ models:
     name: "Gemma 4 26B-A4B, candidate trace teacher: 4 slots, thinking off, no vision, card 2"
     cmd: ${server} --device Vulkan0 -m /models/gemma/gemma-4-26B_q4_0-it.gguf -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
     ttl: 900
+  chat-teacher-26b-c1:
+    # Candidate teacher (2026-11-09): Gemma 4 26B-A4B (~4B active per token; the original pocket-tank was taught by
+    # gemma4:26b). Exactly chat-teacher's settings, only the model differs, so pilot.py results compare 1:1.
+    name: "Gemma 4 26B-A4B trace teacher, card 1 (twin of chat-teacher-26b)"
+    cmd: ${server} --device Vulkan1 -m /models/gemma/gemma-4-26B_q4_0-it.gguf -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
+    ttl: 900
   embed:
     name: "Qwen3-Embedding-4B (document search), card 1"
     cmd: ${server} --device Vulkan1 -m /models/search/Qwen3-Embedding-4B-Q6_K.gguf --embedding --pooling last -c 8192 -b 8192 -ub 8192 -np 1
@@ -130,6 +136,7 @@ profiles:
       chat-teacher: ~
       chat-teacher-c1: ~
       chat-teacher-26b: ~
+      chat-teacher-26b-c1: ~
       ornith: ~
       north: ~
       flint: ~
@@ -146,7 +153,7 @@ routing:
           voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
           gpt_oss: "gpt-oss"   # both cards + RAM; runs alone, helpers unload (Daniel 2026-11-09)
-          teachers: "+helpers & chat-teacher-c1 & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"   # card 1 teacher instead of coder
+          teachers: "+helpers & (chat-teacher-c1 | chat-teacher-26b-c1) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"   # card 1 teacher instead of coder
 hooks:
   on_startup:
     preload: [coder, coder-2, embed, rerank, stt, stt-whisper, tts]
