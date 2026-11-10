@@ -144,3 +144,14 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 11:49 | Why: the panel draws the bold9 case's hunger once per panel (p11 0, p23 2, p37 1). Dart by hunger, n=400: stock 0.35 / 0.36 / 0.39 (timid 0.11); 4.8M seeds 1-9 at hunger 1 0.009-0.064. Labels (bold 7+, energy 7+, day): hunger 0 dart 14.5%, **hunger 1 0.9%** (seek_food 169 of 343), hunger 2 3.3%: a data gap at hunger 1 | | `~/pocket-tank/model/out/q4probe/hunger_dart.py` |
 | 11:51 | Pushed pocket-tank 738150d to the fork (the issue comment cites it) | | |
 | 11:53 | Recount with no food in view (bold 7+, energy 7+, day, hunger 0 / 1 / 2): 31B dart 11/32, **3/42**, 4/36; 26B 1/32, 0/37, 1/42. Both a coverage gap (~110 such states per teacher, 0.4%) and the teachers (the 31B darts mostly at hunger 0; the 26B hardly on sim states). Every teacher panel so far (and upstream's 0.50) is panel seed 11: hunger 0 only. `model/dart_by_hunger.py` committed and pushed (d5c9bcc); issue comment corrected (the first version counted states with food in view) | | issue #1 comment 6774853475 (edited) |
+
+### 2026-11-10 afternoon: upstream's acceptance checks (Daniel: "run upstream's acceptance checks on the 4.8M and stock")
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 11:58 | probe_dist.py (new `--device cuda`) on both q4-derived checkpoints, held-out 1,000 labels (26B + 31B, sim seed 1) | stock FAILS bubbles-kept at bored 0-1 (0.21 / 0.20, bar 0.4); 4.8M 0.89 / 0.85; both drop bubbles at bored 8-9, rest at night, eat when starving (0.97 / 0.95). Dart cliff: stock 0.03 -> 0.19, 4.8M 0.00 -> 0.01 (v3m 0.40); follow 0.05 -> 0.54 vs 0.01 -> 0.82 | pocket-tank `model/candidates/mixcov-d256n6/acceptance/` |
+| 12:03 | `docker/Dockerfile.sim` (ubuntu:26.04 by digest, SDL2, LVGL v9.2.2 7f07a129, curl added 12:05) builds sim/fishsim + model/runq4; no host change | | pocket-tank e5d5903 |
+| 12:03 | Census 1 min x3 each | noisy: landmark stock 58/54/64, 4.8M 70/70/45; longest 59/54/59 vs 60/60/30 s | |
+| 12:04-12:14 | Census 10 min x2 each | landmark 59/54 vs 54/54%; longest stretch **256/261 vs 82/82 s**; mean bored 4.5/4.7 vs 4.2 (both over 3.3) | |
+| 12:06-12:20 | Teacher agreement (eval.py `--api openai --label-seed 7`, n=300, seed 1, runq4 greedy); 26B on card 2, 31B on card 1. First 4.8M runs lost to a script bug (`set --` overwrote the teacher name), rerun 12:14 | 26B: stock 68%, 4.8M 71% (bar 72; +-2.6); 31B: stock 58%, 4.8M 73%; 0 failed teacher calls | |
+| 12:27 | Results committed and pushed (pocket-tank 3ddcbb7), posted | neither passes every check, the shipped model included | issue #1 comment |
