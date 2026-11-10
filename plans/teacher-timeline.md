@@ -62,4 +62,11 @@ Work in `~/pocket-tank` (fork, branch feat/training-harness-31b). Test outputs i
 | 20:21 | Same, 1 worker, full 450, twice | **100% (450/450) goal and urgency**; 1 worker vs 4 workers 98.9%. So parallel requests cause the ~1% differences; 1 worker repeats exactly. 395 s per run (~68/min) | `out/check-31b-t0.7-ls7-w1-r{1,2}.json` |
 | 20:37 | `chat-teacher-c1` (twin on card 1, routing set `teachers`: coder off card 1, helpers stay) applied, loaded | load 21 s; card 1 32,235 of 32,624 MiB, GTT +110 MB (small spill, no speed cost) | 7ab3bf0 |
 | 20:39 | Card 1 vs card 2: seeded n 8 panel, 1 worker | **100% (90/90) goal and urgency**, same time (84 s): either card can make any shard | `out/check-31b-card1-t0.7-ls7-n8-w1.json` |
+| 20:40 | Gemma 4 31B file pinned for marvin, copied from zaphod over the cable (17.7 GB in 80 s, 211 MB/s), `lab models` sha256 OK; marvin `chat-teacher` entry (zaphod's settings, ttl 900, training pin) deployed while idle | loads in 9 s (unloads big) | 25aac1f |
+| 20:46 | marvin vs zaphod card 2: seeded n 8 panel, 1 worker | 194 s (card: 84 s, **2.3x slower**, ~28/min); answers **differ slightly**: same goal 98.9% (89/90), goal+urgency 94.4% (other GPU type, other numbers) | `out/check-31b-marvin-t0.7-ls7-n8-w1.json` |
+| 20:50 | marvin repeat (1 worker) and 4 workers | repeats exactly (90/90 goal and urgency, 192 s); 4 workers 99 s (~55/min). big restored afterwards | `out/check-31b-marvin-*` |
+
+Capacity for phase 3 (31B, temperature 0.7): exact (1 worker each): card 1 + card 2 ~68/min each + marvin ~28 = ~164/min
+(24,000 labels ~2.4 h); ~99% repeatable (4 workers each): ~135 + ~135 + ~55 = ~325/min (~1.2 h). A shard made on
+marvin repeats only on marvin; zaphod's two cards are interchangeable.
 
