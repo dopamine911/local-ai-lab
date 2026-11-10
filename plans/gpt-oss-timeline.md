@@ -1,5 +1,7 @@
 # Timeline: gpt-oss-120b test on marvin (2026-11-09)
 
+Short how-to and results: `plans/gpt-oss-notes.md`.
+
 Daniel asked for a benchmark of gpt-oss-120b. Times are Chicago, from `date` / logs.
 
 Why marvin: the file is 63.4 GB. zaphod's two cards give at most ~62-63 GB with every other model off
