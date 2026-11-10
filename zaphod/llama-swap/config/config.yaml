@@ -51,6 +51,13 @@ models:
     name: "Gemma 4 31B, pocket-terrarium trace teacher: 4 slots, thinking off, no vision, card 2"
     cmd: ${server} --device Vulkan0 -m /models/gemma/gemma-4-31B_q4_0-it.gguf -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
     ttl: 900   # unloads after 15 idle minutes so card 2 returns to normal use
+  chat-teacher-c1:
+    # chat-teacher's twin on card 1 (2026-11-09, pocket-tank issue #1): the same file and settings, only the card
+    # differs, so a second card makes labels and the same seeded question gets the same answer on either card (to be
+    # checked). Pushes coder off card 1 while loaded; the helpers stay. Tight: ~24.7 GB next to embed + rerank.
+    name: "Gemma 4 31B trace teacher, card 1 (twin of chat-teacher)"
+    cmd: ${server} --device Vulkan1 -m /models/gemma/gemma-4-31B_q4_0-it.gguf -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
+    ttl: 900
   chat-teacher-26b:
     # Candidate teacher (2026-11-09): Gemma 4 26B-A4B (~4B active per token; the original pocket-tank was taught by
     # gemma4:26b). Exactly chat-teacher's settings, only the model differs, so pilot.py results compare 1:1.
@@ -121,6 +128,7 @@ profiles:
       coder-long: ~
       chat: ~
       chat-teacher: ~
+      chat-teacher-c1: ~
       chat-teacher-26b: ~
       ornith: ~
       north: ~
@@ -138,6 +146,7 @@ routing:
           voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
           gpt_oss: "gpt-oss"   # both cards + RAM; runs alone, helpers unload (Daniel 2026-11-09)
+          teachers: "+helpers & chat-teacher-c1 & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"   # card 1 teacher instead of coder
 hooks:
   on_startup:
     preload: [coder, coder-2, embed, rerank, stt, stt-whisper, tts]
