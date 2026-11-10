@@ -47,7 +47,7 @@ models:
     # took 2.1 s to read ~120 new tokens; with it 0.135 s. Measured 2026-11-04: 145 calls/min at 4 workers vs 27 before
     # (tuning/results.md). Full SWA cache is large: 32K f16 spilled 15 GB, so 16K and q8_0.
     name: "Gemma 4 31B, pocket-terrarium trace teacher: 4 slots, thinking off, no vision, card 2"
-    cmd: ${server} --device Vulkan0 -m /models/gemma/gemma-4-31B_q4_0-it.gguf -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
+    cmd: ${server} --device Vulkan0 -m /models/gemma/gemma-4-31B_q4_0-it.gguf -c 16384 -np 8 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
     ttl: 900   # unloads after 15 idle minutes so card 2 returns to normal use
   chat-teacher-26b:
     # Candidate teacher (2026-11-09): Gemma 4 26B-A4B (~4B active per token; the original pocket-tank was taught by
