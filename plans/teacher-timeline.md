@@ -70,3 +70,13 @@ Capacity for phase 3 (31B, temperature 0.7): exact (1 worker each): card 1 + car
 (24,000 labels ~2.4 h); ~99% repeatable (4 workers each): ~135 + ~135 + ~55 = ~325/min (~1.2 h). A shard made on
 marvin repeats only on marvin; zaphod's two cards are interchangeable.
 
+### Night of 2026-11-09 (Daniel asleep; all three GPUs allocated; goal: a smaller fish model without losing quality)
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 21:31 | Preflight | training images on both hosts (pt-train-rocm gfx120X / gfx1151); pocket-tank has sim/ (needs SDL2 dev: not installed, so the sim census is optional); `~/pocket-tank` upstream push URL set to `no_push`; **watchdog still stopped since 16:35** (needs sudo) | |
+| 21:35 | Decision rules posted before any result | temperature rule and tier A / tier B for "no quality loss" | pocket-tank issue #1 comment 6758187708 |
+| 21:33 | Phase 2 started: `run_teacher_jobs.sh` queues in tmux p2-card1 / p2-card2: panels 0.7/0.85/1.0 x label seeds 7, 8 (0.7 s7 reused from 20:21), generator runs of 500 at each temperature, 26B calibration | | `~/pocket-tank/model/out/phase2/` |
+| 21:36 | `ssh zaphod` from zaphod: "Host key verification failed"; zaphod's ed25519 host key added to `~/.ssh/known_hosts` after checking it equals `/etc/ssh/ssh_host_ed25519_key.pub` (the harness reaches zaphod over ssh) | ssh zaphod ok | |
+| 21:38-21:44 | Phase 4 in a separate worktree `~/pocket-tank-port` (branch feat/harness-port; the running jobs use the frozen `~/pocket-tank`): harness.py, train.py (decision loss), prompt_check v4_table (+fedfood), student.py, probe_fish.py, sweep_report.py, TOML configs; llama2.c 350e04f copied from the 11-06 harness code | harness selftest OK; probe selftest OK; panel unchanged (sha256); smoke + smoke-decision through the whole chain on marvin (opportunistic: zaphod's cards serve teachers) | pocket-tank 9ab8506, 158b940, ee04ebf |
+
