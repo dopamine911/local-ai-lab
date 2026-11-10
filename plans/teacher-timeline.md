@@ -177,3 +177,12 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 14:59 | Pendant bundle for candidate 2 (Daniel: "prepare the pendant bundle for candidate 2"): `model/out/pendant-c2/` + `pendant-c2.tar` (sha256 346309d0); runq4 on 4 states: bold fed -> dart_play, starving -> seek_food, night -> rest, social 9 -> follow_friend; app tokenizer identical | sending needs sudo (Daniel runs `sudo tailscale file cp`) | `~/pocket-tank/model/out/pendant-c2/README.txt` |
 | ~15:04-15:16 | Candidate 2 on the pendant (Daniel flashed and logged on dark; "the fish seem more responsive but it could just be my bias"); log received 15:16 | 1,466 ms per decision (= candidate 1), heap 62 KB flat, PSRAM 1,591 KB; goal changes per fish-minute 2.17 (c1 2.10, stock 2.16); dart 9/149, 4 by timid fish | `~/pocket-tank/model/candidates/mixcovbigplay-d256n6/pendant/` |
 | 15:20 | Timid darts checked: no teacher labels a timid dart (big 0/111, 26B+31B 0/86); replaying each session's states (new `pendant_replay.py`): candidate 2's timid P(dart) at or below stock's in every session (its own session: stock 0.050, c2 0.024) | the responsive feel is the darting, not more switching | pocket-tank f500e61, 9d6e376; issue #1 comment |
+
+### 2026-11-10 afternoon: eating when not hungry (Daniel: "fix the eating when not hungry first")
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 15:20 | Labels: P(seek_food), hunger 1-3, food near, day: 31B 77%, 26B 34%, big 30%; by hunger x distance the 31B eats more at 1-3 everywhere, hunger 0 mixed (near 26B 20% vs 31B 6%) | 26B-only students F14 0.28 (fish-teacher-mix.md): the floor for this change, not stock's 0.15 | |
+| 15:24 | Method changed from "less 31B" (that cuts following) to: the 26B relabels the 31B's pairs at hunger 1-3 with food in view (4,021 of 13,500; new `relabel.py`, ls 4701, both cards); rule posted | | issue #1 comment 6779643960 |
+| 15:26 | Baselines: eat_by_hunger (food near, h0-h8): stock 0.01 0.23 0.05 0.14 0.33 0.50 0.72 0.98 0.99; candidate 2 0.12 0.77 0.46 0.62 0.77 0.84 0.90 0.97 0.98. Pendant states replayed, fed with food in view (182): stock 0.056, c1 0.258, c2 0.261 | | pocket-tank e888a5b |
+| 15:29 | Relabel ~250/min both cards (slower while my probes shared card 1); chain started: counts, train relabel run, checks | | `out/dartcheck/chain-relabel.out` |
