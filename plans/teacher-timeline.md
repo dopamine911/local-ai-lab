@@ -106,4 +106,7 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | --- | --- | --- | --- |
 | 07:50 | `gen_traces.py --no-food P` (clears the pellets before a sample with chance P; default 0, dry-run identical; 0.6 gives food none in 66% of states, default 3%); rule posted before running | | pocket-tank 0968ddb; issue #1 comment 6769121272 |
 | 07:53 | Coverage data: 26B with NO_FOOD=0.6, shards sim 301-302 (card 2) and 311-312 (card 1) x 2,250, label seeds 2301-2312, T 0.7, 1 worker (coder / coder-2 off meanwhile) | ~105/min per card, done ~08:35 | `~/pocket-tank/model/out/data/fish26b-cov/` |
+| 08:13 | Early look at the first 4,500 coverage labels (66% no food) | no food, friend in view, social 7-9: follow 0.17 (before: no such labels at all); bold + energetic without food: dart 0.01 (the 26B hardly darts on sim states) | |
+| 08:30 | Coverage data done: 4 shards, 9,000 labels, no failures or warnings; fish-v4-26b-cov folded and pinned: 29,299 pairs, sha256 d06a7e28, food none 22.4% (was ~4%); seek_food 28.0%, follow 16.1%, explore 20.7%, dart 0.1% | | pocket-tank (datasets.toml) |
+| 08:31 | Training mode on; runs fish-14m-all-26bcov and fish-d256-n6-decision-26bcov (tmux `cov`) | | `out/sweep-cov.log` |
 
