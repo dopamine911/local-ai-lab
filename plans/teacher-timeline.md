@@ -188,3 +188,6 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 15:29 | Relabel ~250/min both cards (slower while my probes shared card 1); chain started: counts, train relabel run, checks | | `out/dartcheck/chain-relabel.out` |
 | 15:40 | Relabel done: 4,021 (0 failed, 1,757 changed goal), seek_food 17% (31B ~58%); kept 9,479 + 4,021 = 13,500 | dataset 28,948 pairs, f16bd193 | |
 | 15:41-15:45 | Run relabel (seeds 1-3), training mode on, then off; checks | F14 0.27 (was 0.65), every panel row passes, dart and timid OK, panel 37 OK; **hunger 4/5 eating 0.62/0.74 vs candidate 2 0.77/0.84: the guard fails (rule not met)**; stock 0.33/0.50. Pendant replay fed eating 0.14 (c2 0.26, stock 0.06) | pocket-tank ba54349; issue #1 comment 6780102993 |
+| 15:50 | Daniel: "accept it and run the acceptance checks" (the hunger 4-5 drop accepted) | | |
+| 15:52-16:03 | Acceptance on relabel seed 1 (the harness's pick) | agreement 75 / 74%; bubbles kept 0.59 / 0.51 (passes); follow cliff 0.55; **dart cliff 0.15** (seeds 2 / 3: 0.35 / 0.28; candidate 2 0.46); census 1 min landmark 30/43/31, longest 36/60/36; 10 min 58%, 87 s, bored 3.5. Misses 3 bars (c2 4, stock 6) | |
+| 16:08 | Candidate 3 committed and pushed (pocket-tank fd7f3d5: `model/candidates/relabel-d256n6/`), posted | | issue #1 comment |
