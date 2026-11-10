@@ -95,5 +95,5 @@ Daniel: gpt-oss only, helpers unloaded while it runs, 128K, download and test. P
 | 18:11 | `lab speed` + core tool use, test 3 | **writing 85.3 (+41% vs fit's 60.7), 32K reading 2,885 (+67% vs 1,731)**, first token 10.6 s; **tool use 97** (unchanged). The fit's one partial layer in RAM cost ~40% writing. Kept. Probe 4's speed is likely the same effect (less in RAM at its real load), not proven | MLflow b45a8daa, 24aaf728 |
 | 18:13 | Test 4: hand split kept, 32K f16 ub2048 → **128K, -ub 512, q8_0** | loads (66 s), n_ctx_slot 131072, no memory errors; tight: card 1 32.1 of 32.6 GB | 8e12419 |
 | 18:15 | `lab speed` + core tool use, test 4 | **writing 82.9, 32K reading 2,278**, first token 13.4 s; tool use **90 (27/30)**: TC-15 fails in both 128K setups (fit probe 4 and this), passes in every 32K setup (also q8_0 alone, ub 512 alone). So it comes with 128K's settings (context size, or q8_0 + ub 512 together). One fixed-seed run: a hint, not proof | MLflow b1e1dfb0, cbbd9653 |
-| 18:19 | gpt-oss back to the 32K hand split (85.3 / 2,885, tool use 97): best measured | | this commit |
+| 18:17 | gpt-oss back to the 32K hand split (85.3 / 2,885, tool use 97): best measured | | this commit |
 
