@@ -100,3 +100,10 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 05:57 | Port branch merged into the PR branch (bd25870: --max-tokens / --reasoning-effort), re-verified (dry-run identical, harness and probe selftests), pushed to the fork only (upstream push blocked: `no_push`) | | dopamine911/pocket-tank PR #2 |
 | 05:58 | **State:** training mode off on both; zaphod: coder, coder-2, embed, rerank, stt, stt-whisper, tts ready; marvin: big ready, power mode performance; no tmux jobs left. **Watchdog still stopped since 16:35 (needs `sudo systemctl start lab-watchdog`).** Lab entries added tonight and kept: zaphod `chat-teacher-c1`, `chat-teacher-26b-c1`; marvin `chat-teacher` (+ its Gemma 31B file) | | |
 
+### 2026-11-10 morning: coverage experiment (Daniel: "do 2")
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 07:50 | `gen_traces.py --no-food P` (clears the pellets before a sample with chance P; default 0, dry-run identical; 0.6 gives food none in 66% of states, default 3%); rule posted before running | | pocket-tank 0968ddb; issue #1 comment 6769121272 |
+| 07:53 | Coverage data: 26B with NO_FOOD=0.6, shards sim 301-302 (card 2) and 311-312 (card 1) x 2,250, label seeds 2301-2312, T 0.7, 1 worker (coder / coder-2 off meanwhile) | ~105/min per card, done ~08:35 | `~/pocket-tank/model/out/data/fish26b-cov/` |
+
