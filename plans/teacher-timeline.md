@@ -28,3 +28,24 @@ Times are Chicago.
 | 18:44 | pilot k=6 (222 calls) at 4 and at 8 workers | 4 workers **154 / min**, latency 1.47 s, 99.1%; 8 workers **163 / min (+6%)**, latency 2.77 s, 100%. The card is the limit (31B dense). **Reverted** (+6% not worth losing the 4K room per request) | `~/pt-train/lab-pilot/np8-w{4,8}.json` |
 | 18:47 | Gemma 4 31B MTP drafter ("-assistant"): only community GGUFs (no google / ggml-org / unsloth), llama.cpp support for its drafter type not confirmed: not tried | | HF search |
 
+## Upstream fish line (what Daniel asked for; the rows above were the lizard line by mistake)
+
+Daniel 18:50: "I was asking about the upstream" (github.com/mediacutlet/pocket-tank, the fish line). Upstream's
+pipeline is Ollama-only (gen_traces / prompt_check, last changed 2026-09-15). The builder's copy
+(`~/pt-train/probe-img/model`) has the same fish v2/v3/v4 prompts (text identical), the same fish panel cases
+(the copy only adds L1 cases) and the same state encoder, plus `--api openai`; requests match upstream's
+(temperature 0.7, 48 tokens, thinking off). So `prompt_check.py --schema 4 --api openai` = upstream's v4 check on the
+lab. Only difference: upstream's gemma4:26b is Ollama's Q4_K_M, ours Google's QAT Q4_0. Downloaded upstream files
+were compared as text only (running them was refused by the auto-mode check).
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 18:55-19:08 | prompt_check `--schema 4` (450 calls, seed 11) twice each on chat-teacher-26b and chat-teacher (31B) | **26B**: run 1 all checks OK but the content attractor (inspect_reef 0.53; upstream try 3: 0.50), run 2 follow|social 9 0.38 BAD (want ≥ 0.40), attractor OK 0.35: reproduces upstream, noisy at the bars. **31B**: both runs follow|social 9 0.88, bubbles kept 0.85, night rest 1.00, but **dart|bold 9 0.03 BAD** (want ≥ 0.10) both times; attractor 0.53 / 0.42. Speed: 26B 133-151 s (~180-200/min), 31B 208 s (~130/min); upstream Mac Mini ~49/min | `~/pt-train/lab-pilot/fish-v4-*.{log,json}` |
+| 19:09 | Self-agreement (same states in both runs) | **26B 80.0%** (upstream measured 82% for its teacher: reproduced); **31B 92.7%**. 26B noisiest on social/bold/content cases (65-75%), 31B 78-100% | scratchpad fish_selfagree.py |
+
+Reading: for upstream, the lab gives (1) **speed**: the same teacher 4x faster (~190/min vs 49; an 8 h, 20K-pair night
+becomes ~2 h), the 31B ~2.7x; (2) **quality**: the 31B's labels are much steadier (93% vs 80% self-agreement; the
+original's notes say teacher noise caps the student: 82% → 75%), at the cost of one prompt sentence to restore bold
+fish playing (dart). Using either needs upstream to talk to an OpenAI-compatible server (the builder's copy already
+has `--api openai`): an upstream change, the builder's call.
+
