@@ -49,3 +49,17 @@ original's notes say teacher noise caps the student: 82% → 75%), at the cost o
 fish playing (dart). Using either needs upstream to talk to an OpenAI-compatible server (the builder's copy already
 has `--api openai`): an upstream change, the builder's call.
 
+## pocket-tank issue #1: seeded 31B labels on the lab (dopamine911/pocket-tank PR #2)
+
+Daniel 2026-11-09: goal = help upstream shrink the fish model (pocket-terrarium's methods), teacher the 31B over
+llama.cpp, prompt unchanged, seeds added, several temperatures, everything replicable; all machines may be used.
+Work in `~/pocket-tank` (fork, branch feat/training-harness-31b). Test outputs in `~/pocket-tank/model/out/` (git-ignored).
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 19:38 | Seeded v4 panel on chat-teacher (card 2), temperature 0.7, label seed 7, 4 workers, twice | same goal 98.7% (444/450), goal+urgency 95.3%; checks as before (dart bold 9 0.05/0.03 BAD, the rest OK) | `out/check-31b-t0.7-ls7-r{1,2}.json` |
+| 19:55 | Same, 1 worker, n 8 (90 questions), twice | 100% / 100% (84 / 79 s) | `out/check-31b-t0.7-ls7-n8-w1-r{1,2}.json` |
+| 20:21 | Same, 1 worker, full 450, twice | **100% (450/450) goal and urgency**; 1 worker vs 4 workers 98.9%. So parallel requests cause the ~1% differences; 1 worker repeats exactly. 395 s per run (~68/min) | `out/check-31b-t0.7-ls7-w1-r{1,2}.json` |
+| 20:37 | `chat-teacher-c1` (twin on card 1, routing set `teachers`: coder off card 1, helpers stay) applied, loaded | load 21 s; card 1 32,235 of 32,624 MiB, GTT +110 MB (small spill, no speed cost) | 7ab3bf0 |
+| 20:39 | Card 1 vs card 2: seeded n 8 panel, 1 worker | **100% (90/90) goal and urgency**, same time (84 s): either card can make any shard | `out/check-31b-card1-t0.7-ls7-n8-w1.json` |
+
