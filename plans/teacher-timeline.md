@@ -114,3 +114,12 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 09:30 | 31B coverage shards done (2 x 2,250); one timeout on each shard's first request (the 31B still loading after pushing coder off; that state skipped). fish-v4-mix-cov folded and pinned: 26,698 pairs, sha256 d76fd64a, food none 24.5%, seek_food 36.5%, follow 10.8%, dart 0.3%; training mode on, runs started (tmux `mixcov`) | | `out/sweep-mixcov.log` |
 | 09:52 | Mix-with-coverage runs done (09:31-09:52, no failures). **Rule: does not fully work** (14M F3 0.03; F6 flagged 0.04 vs 0.01, tiny) | **Best dataset so far:** 14M passes every upstream bar but F3 (F1 0.62); **4.8M passes every bar but F4 (0.03, at the bar) and passes F3 (0.13)**; seek_food 36.5% in the data, fed + food near 0.56 | issue #1 comment; `out/harness/fish-mixcov.md` |
 
+
+### 2026-11-10: pendant test of the 4.8M (Daniel ran the commands on dark, option C)
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| ~11:00 | Bundle prepared: fish-d256-n6-decision-mixcov seed 2, `model_q4.bin` 2,579,888 B (sha256 72fa241c…) + `model_trailer.bin` (tag mixcov-d256n6), README with backup and restore steps; sent via Taildrop | runq4.c decisions sensible; the app's embedded tokenizer is byte-identical to schema 4 | `~/pocket-tank/model/out/pendant/` |
+| ~11:40 | Daniel flashed (esptool 5.6.0, after a read-only backup of the model partition) and logged 12.5 min, 2-3 fish | 119 asks, 119 decisions, starve-ignored 0 | `~/pocket-tank/model/out/pendant/log/pendant-test.log` (894 lines) |
+| 12:10 | Log analysed | **1.47 s per decision** median (1.22-1.60), 29.8 tok/s; internal heap 62 KB and PSRAM 1,669 KB flat; all 7 goals used (seek_food 25 of 111, dart 6); fed + food in view: seek_food 16 of 56. vs a 14M on the same board (pocket-terrarium PR #9, other session): 4.05 s, 11.6 tok/s, 57 KB, so ~2.7x faster. 18 pairs of I2C "transaction failed" lines, often near touch taps, likely the board (0.75) | issue #1 comment 6773501901 |
+| | Open | Shipped-model log in the same session (direct comparison, and whether the I2C lines appear too); backup restore is Daniel's call | |
