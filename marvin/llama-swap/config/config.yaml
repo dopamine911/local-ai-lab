@@ -42,6 +42,18 @@ models:
       -c 131072 -np 1 -b 4096 -ub 4096
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
 
+  chat-teacher:
+    name: "Gemma 4 31B trace teacher (marvin)"
+    description: "zaphod's chat-teacher on marvin (pocket-tank issue #1): same file and settings; swaps with big."
+    # Same flags as zaphod's chat-teacher (4 slots of 4K, --swa-full, q8_0, thinking off, Google's sampling defaults);
+    # the macro adds -lm dio (load mode only). Tested 2026-11-09 against zaphod's: speed and answers in plans/teacher-timeline.md.
+    cmd: |
+      ${server}
+      -m /models/gemma/gemma-4-31B_q4_0-it.gguf
+      -c 16384 -np 4 --swa-full -ctk q8_0 -ctv q8_0 --reasoning off
+      --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
+    ttl: 900   # back to big's slot after 15 idle minutes (big loads on its next request)
+
 profiles:
   training:
     # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
@@ -49,6 +61,7 @@ profiles:
     pins:
       big: ~
       gpt-oss: ~
+      chat-teacher: ~
 hooks:
   on_startup:
     preload: [big]
