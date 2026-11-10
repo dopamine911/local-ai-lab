@@ -155,3 +155,11 @@ marvin repeats only on marvin; zaphod's two cards are interchangeable.
 | 12:04-12:13 | Census 10 min x2 each | landmark 59/54 vs 54/54%; longest stretch **256/261 vs 82/82 s**; mean bored 4.5/4.7 vs 4.2 (both over 3.3) | |
 | 12:06-12:20 | Teacher agreement (eval.py `--api openai --label-seed 7`, n=300, seed 1, runq4 greedy); 26B on card 2, 31B on card 1. First 4.8M runs lost to a script bug (`set --` overwrote the teacher name), rerun 12:14 | 26B: stock 68%, 4.8M 71% (bar 72; +-2.6); 31B: stock 58%, 4.8M 73%; 0 failed teacher calls | |
 | 12:21 | Results committed and pushed (pocket-tank 3ddcbb7), posted | neither passes every check, the shipped model included | issue #1 comment |
+
+### 2026-11-10 afternoon: dart fix (Daniel: "fix dart first, then rerun the checks")
+
+| Time | Step | Result | Record |
+| --- | --- | --- | --- |
+| 12:31-12:46 | Teacher panels at panel seeds 23 (bold case hunger 2) and 37 (hunger 1): 26B card 2, 31B card 1, big via marvin peer; T 0.7, label seed 7, 1 worker | P(dart \| bold 9): 26B h0 0.23/0.20, h1 0.23, h2 0.10; 31B h0 0.03-0.05, h1 0.82, h2 0.12; big h0 0.57-0.68, h1 0.33, h2 0.55; timid 0.00-0.03 all. Both our teachers dart at every hunger: the student gap is mostly coverage | `~/pocket-tank/model/out/dartcheck/` |
+| 12:45 | `gen_traces.py --play P` (rested, fed, no food, day, bold 0-9); default byte-identical (300-state dry run) | --play 0.3: 30% of 2,000 dry-run states in that context | pocket-tank (committed with the configs) |
+| 12:47 | Rule posted; play shards started: 26B sim 501 ls 2501 (card 2), 31B sim 511 ls 1511 (card 1), 2,250 each, PLAY=0.6, tmux play-* | 26B ~130/min, 31B ~65/min | issue #1 comment 6776162754; `out/data/fish{26b,31b}-play/` |
