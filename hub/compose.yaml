@@ -184,7 +184,7 @@ services:
 
   # Tool: web search through our SearXNG. Reached only by mcpjungle over the compose network; no published port.
   mcp-searxng:
-    image: isokoliuk/mcp-searxng:2.9.0@sha256:8f1dd92a9e2875cb4e8df7036785ec4c088b7600cefb611de472a352a3dcba60
+    image: isokoliuk/mcp-searxng:2.10.1@sha256:39176ff787129814aa7fbc96250e35b01ccc1bb6586d98ad3963551ba53e405d
     container_name: mcp-searxng
     restart: unless-stopped
     read_only: true
