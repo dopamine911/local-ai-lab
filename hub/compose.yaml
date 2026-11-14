@@ -316,7 +316,7 @@ services:
   # `daniel` (phone, read-only on lab-* topics), user `sender` (scripts, write-only, token NTFY_SENDER_TOKEN).
   # Topics: lab-done (jobs finished), lab-alert (problems), lab-research (autoresearch reports). Send: hub/notify.
   ntfy:
-    image: binwiederhier/ntfy:v2.37.1@sha256:a1dde1f3210b68ac0c29e53298c96a988d06c320d1201d72f3e8e224d1a546f3
+    image: binwiederhier/ntfy:v2.38.0@sha256:771309aecfce18d8fe2bfb8069994ddd6be6ca6ccdd7badace3d791a0045ff0d
     container_name: ntfy
     restart: unless-stopped
     user: "1000:1000"
