@@ -1,5 +1,6 @@
-# llama-swap 269 (2026-11-01; llama.cpp 0ec4027 = b12020), pinned by digest. Was 267 (b11870): issue #1.
-FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-269@sha256:bcb532139b072e4c34ba1dece004db1c5c25cbffd8d099fa26d92caa29edc2a3 AS official
+# llama-swap 273 (2026-11-15; llama.cpp e574a17 = v1.0.0 + 48), pinned by digest. Was 269 (llama.cpp 0ec4027 = b12020):
+# plans/llama-cpp-v1-timeline.md. Rollback: image llama-swap-marvin:269 (269 digest sha256:bcb53213...a2edc2a3).
+FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-273@sha256:c5f59a9bf87eebd716ca61c7dfe8bb9f1466dd356d4b2ef8b85d1e6cc9e1824f AS official
 
 # Ubuntu 26.04, pinned (was the floating ubuntu:26.04). Docker allows no comment after an instruction (fixed 2026-11-02).
 FROM ubuntu:resolute-20261024.1@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c

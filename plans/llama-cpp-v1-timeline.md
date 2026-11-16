@@ -130,3 +130,18 @@ Good result: speed within ±3%, tool use within the seed spread, grammar variant
 | 15:26 | After on 273: chat-teacher `prompt_check.py --schema L1 --workers 4`, warm, localhost | 464 calls, **188 s = 148.1 calls/min** (+1%), 0 failures. Checks: 0 BAD (269 run: 1 BAD, A2 0.83 vs want 0.86; 273 0.96: 20 vs 23 of 24, read as noise) | — |
 | 15:29 | After on 273: inline PNG to `chat` | 200, "Red" (same as 269) | — |
 | 15:30 | **Result: kept on 273.** Speed within ±3% writing, reading +13.8%; tool use within the seed spread; grammar bug fixed; multi-slot same; images same. Rollback: `image: llama-swap-zaphod:269-media` in compose.yaml. marvin still on 269 (next, needs Daniel's go-ahead) | | this commit |
+
+## 2026-11-16: step 2, marvin 269 -> 273 (America/Chicago time)
+Same as zaphod: before on 269, swap, same tests after. Tests through zaphod's peer (`marvin/big`), as on 2026-11-02:
+grammar-repro, `lab speed marvin/big`, `lab quality marvin/big --full --temperature 0.6` seeds 1-3, marvin's
+`chat-teacher` (4 slots) `prompt_check.py --schema L1 --workers 4` direct to marvin:8080. No image test: marvin has no
+vision model. marvin's image has no whisper-server, so zaphod's FFmpeg problem does not apply.
+Good result: speed within ±3%, tool use within the seed spread, grammar variants 3-5 OK on 273.
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 15:32 | marvin idle (nothing loaded, 0 requests in 30 min), power_mode performance; marvin's files = repo HEAD (its git copy is behind, files are copied) | start | — |
+| 15:32 | Before on 269: `tuning/grammar-repro.py marvin/big` | variants 3, 4, 5 give 400; others OK (bug present) | — |
+| 15:33 | Before on 269: `lab speed marvin/big` | 43.8 writing / 301.0 reading 32K (long runs 319, 301, 297: the known drop after the first long prompt with the cache-leak flags); runs/2026-11-16-1533-speed-marvin-big.json, MLflow 37062caf | — |
+| 15:39-16:30 | Before on 269: `lab quality marvin/big --full --temperature 0.6` seeds 1-3, series `big-ls269-v1` | 93 / 95 / 91 (121/130, 123/130, 116/128; MLflow c1297d1d, 62203c79, f6eb7f3f). Grammar 400s TC-65, 66, 67, 69 in every run. Seed 3: TC-45 left out of the score by the test (could not confirm tool_choice enforcement), so 128 points | — |
+| 16:30 | Before on 269: marvin `chat-teacher` `prompt_check.py --schema L1 --workers 4`, warm, direct to marvin:8080 | 464 calls, **462 s = 60.3 calls/min**, 0 failures; 1 BAD (A2 0.83, same as zaphod's 269 run) | — |
