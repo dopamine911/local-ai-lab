@@ -182,7 +182,7 @@ Fresh before-numbers on 269: the 2026-11-02 ones predate `--cache-ram 0 --no-cac
 
 Kept. Reading gain likely llama.cpp #31323 (RDNA3/4 prefill flash attention, in image 273 only). MLflow series
 `coder-ls269-v1`, `coder-ls273-v1`; speed 6e1bf84a (269), a932f051 (273). Rollback: `image: llama-swap-zaphod:269-media`.
-Log: plans/llama-cpp-v1-timeline.md. marvin: still 269.
+Log: plans/llama-cpp-v1-timeline.md. marvin: next section.
 
 ## llama-swap 267 -> 269 on zaphod (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
 
@@ -201,6 +201,24 @@ Note: the official `unified-vulkan-N` images are nightly builds; the "269" image
 Within the issue's limits (speed ±3%, tool use within the seed spread): kept. TC-14 and TC-68 fail in all six runs;
 the other misses move between seeds. MLflow series `coder-ls267`, `coder-ls269`; speed 431518f5 (267) and the 13:15
 run (269). Rollback: `image: llama-swap-zaphod:267-media`. marvin: next section.
+
+## llama-swap 269 -> 273 on marvin (llama.cpp b12020 -> v1.0.0 + 48 = e574a17, 2026-11-16)
+
+Same `big` (256K, 2 slots, unified KV, MTP draft 3), same settings; only the image changed (Mesa pinned, same version).
+Tests through zaphod's peer (`marvin/big`); chat-teacher direct to marvin:8080. Before/after back to back.
+
+| | 269 (b12020) | 273 (v1.0.0 + 48) |
+| --- | --- | --- |
+| writing (`lab speed`, median of 3) | 43.8 tok/s | **45.4 tok/s (+3.7%)** |
+| reading 32K (median; runs drop after the first long prompt) | 301.0 tok/s (319, 301, 297) | **329.3 tok/s (+9.4%)** (355, 329, 326) |
+| tool use, full suite, temp 0.6, seeds 1/2/3 | 93 / 95 / 91 (of 130, 130, 128) | 96 / 91 / 93 (of 138) |
+| same without TC-65/66/67/69 | 121 / 123 / 116 | 124 / 117 / 120 (of 130) |
+| "failed to parse grammar" | 4 per run; repro 3, 4, 5 fail | **0: fixed** |
+| TC-45 runaway (`tool_choice: required`) | 0 of 2 scored (seed 3 left out by the test) | 1 of 3 |
+| marvin chat-teacher, 464 calls, 4 workers (warm) | 462 s (60.3/min) | 475 s (58.6/min, -2.7%) |
+
+Kept. MLflow series `big-ls269-v1`, `big-ls273-v1`; speed 37062caf (269), db14d348 (273). Rollback: `image:
+llama-swap-marvin:269`. Log: plans/llama-cpp-v1-timeline.md.
 
 ## llama-swap 267 -> 269 on marvin (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
 

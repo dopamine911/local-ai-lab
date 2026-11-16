@@ -15,7 +15,7 @@ Status (2026-11-02): both machines run, every service below is in daily use, and
 | **marvin** | Bosgame M5: Ryzen AI Max+ 395 (Strix Halo), 128 GB shared memory (120 GB for the GPU), Ubuntu 26.04 | The big model |
 
 Both serve models with [llama-swap](https://github.com/mostlygeek/llama-swap) (one OpenAI-compatible API that loads and
-swaps models on demand) on llama.cpp with Vulkan: zaphod image `unified-vulkan-273` (llama.cpp v1.0.0 + 48), marvin `unified-vulkan-269` (llama.cpp b12020). marvin is a llama-swap
+swaps models on demand) on llama.cpp with Vulkan: image `unified-vulkan-273` (llama.cpp v1.0.0 + 48) on both. marvin is a llama-swap
 peer of zaphod, so its models also answer on zaphod as `marvin/<name>`.
 
 ## Models
