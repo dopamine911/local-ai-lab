@@ -228,7 +228,7 @@ services:
   # A sandboxed Linux shell + files for the models (connected in Open WebUI as a terminal).
   # The AI works inside this container only: own home folder, no Docker socket, no host files.
   open-terminal:
-    image: ghcr.io/open-webui/open-terminal:0.14.7@sha256:f231354ca43b5ab68e383548f1ed24fc7ce0ac5f6b542ddff0b2421e2b0154ce
+    image: ghcr.io/open-webui/open-terminal:0.17.20@sha256:0b5efee30aad238aa4f9268e29f674c5b1ca47022a1d84c5ec8083047bf826ed
     container_name: open-terminal
     restart: unless-stopped
     ports:
