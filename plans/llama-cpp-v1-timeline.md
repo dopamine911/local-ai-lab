@@ -103,3 +103,19 @@ most-used experts on the card. On a miss the expert is uploaded, or (new) the CP
 2. Later, as its own test: MoE cache for `gpt-oss` at 128K f16 on zaphod. Baseline `--moe-cache-mib` on 269
    first (exists there), then 1.0's `--moe-cache-cpu-share`. Needs the cards alone (watchdog paused).
 3. Later: re-tune MTP draft count after the upgrade (#30146 changes small-batch speed).
+
+## 2026-11-16: step 1, zaphod 269 -> 273 (America/Chicago time)
+Plan: before on 269 (fresh: the 2026-11-02 numbers predate the cache-leak flags), swap image, same tests after.
+Tests: grammar-repro (coder), `lab speed coder`, `lab quality coder --full --temperature 0.6` seeds 1-3,
+chat-teacher `prompt_check.py --schema L1 --workers 4` (multi-slot, was ~147 calls/min), one image request to `chat`.
+Good result: speed within ±3%, tool use within the seed spread, grammar variants 3-5 OK on 273.
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 12:50 | zaphod idle (only helpers loaded, no requests in 15 min); marvin no peer traffic | start | — |
+| 12:50 | Before on 269: `tuning/grammar-repro.py coder` | variants 3, 4, 5 give 400 "failed to parse grammar"; 1, 2, 6, 7, 8 OK (bug present, as expected) | — |
+| 12:51 | Before on 269: `lab speed coder` | 54.0 writing / 823.3 reading 32K (runs/2026-11-16-1251-speed-coder.json, MLflow 6e1bf84a) | — |
+| 12:53-13:44 | Before on 269: `lab quality coder --full --temperature 0.6` seeds 1-3, series `coder-ls269-v1` | 96 / 94 / 92 (MLflow b959407a, 98b3d012, 2297d6be). Grammar 400s TC-65, 66, 67, 69 in every run (4 per run, as 2026-11-02); TC-14 partial and TC-68 fail in all 3 | — |
+| 13:44 | Before on 269: chat-teacher `prompt_check.py --schema L1 --workers 4`, cold (model load included, via Tailscale) | 464 calls, 198 s, 0 failures (not the comparison number) | — |
+| 13:48 | Same, warm, `--host http://127.0.0.1:8080/v1` | 464 calls, **190 s = 146.5 calls/min**, 0 failures (matches the earlier ~147) | — |
+| 13:51 | Before on 269: one inline PNG (solid red, data URL) to `chat`, max_tokens 1000 | 200, "Red" (first try with max_tokens 50: empty, all thinking) | — |

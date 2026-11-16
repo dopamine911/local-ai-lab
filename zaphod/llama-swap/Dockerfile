@@ -1,5 +1,10 @@
-# llama-swap 269 (2026-11-01; llama.cpp 0ec4027, 2026-10-31), pinned by digest. Was 267 (llama.cpp 74bca39): issue #1.
-FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-269@sha256:bcb532139b072e4c34ba1dece004db1c5c25cbffd8d099fa26d92caa29edc2a3 AS official
+# llama-swap 273 (2026-11-15; llama.cpp e574a17 = v1.0.0 + 48, 2026-11-15), pinned by digest. Was 269 (llama.cpp 0ec4027 = b12020):
+# plans/llama-cpp-v1-timeline.md. Rollback: image llama-swap-zaphod:269-media (269 digest sha256:bcb53213...a2edc2a3).
+FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-273@sha256:c5f59a9bf87eebd716ca61c7dfe8bb9f1466dd356d4b2ef8b85d1e6cc9e1824f AS official
+# whisper-server stays the 269 one (with its own libggml/libwhisper): 273's is built against Ubuntu 24.04's FFmpeg 6
+# (libavformat.so.60 + ~90 more libraries), and Ubuntu 26.04 only has FFmpeg 8. Only whisper-server uses these shared
+# libraries (llama-server has ggml built in). Checked 2026-11-16; plans/llama-cpp-v1-timeline.md.
+FROM ghcr.io/mostlygeek/llama-swap:unified-vulkan-269@sha256:bcb532139b072e4c34ba1dece004db1c5c25cbffd8d099fa26d92caa29edc2a3 AS whisper269
 
 # Ubuntu 26.04, pinned (was the floating ubuntu:26.04). Docker allows no comment after an instruction (fixed 2026-11-02).
 FROM ubuntu:resolute-20261024.1@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
@@ -17,10 +22,11 @@ COPY --from=official /usr/local/bin/llama-swap /usr/local/bin/llama-server \
 # libraries; llama-server has ggml built in, so these libraries don't affect it.
 RUN apt-get update && apt-get install -y --no-install-recommends libmp3lame0 \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=official /usr/local/bin/whisper-server /usr/local/bin/sd-server \
+COPY --from=whisper269 /usr/local/bin/whisper-server /usr/local/bin/
+COPY --from=official /usr/local/bin/sd-server \
      /usr/local/bin/audiocpp_server /usr/local/bin/llama-tts /usr/local/bin/
 COPY --from=official /usr/local/bin/espeak-ng-data /usr/local/bin/espeak-ng-data
-COPY --from=official /usr/local/lib/libggml*.so* /usr/local/lib/libwhisper.so* /usr/local/lib/
+COPY --from=whisper269 /usr/local/lib/libggml*.so* /usr/local/lib/libwhisper.so* /usr/local/lib/
 RUN ldconfig && ! ldd /usr/local/bin/llama-server /usr/local/bin/llama-bench \
       /usr/local/bin/whisper-server /usr/local/bin/sd-server /usr/local/bin/audiocpp_server \
       /usr/local/bin/llama-tts | grep 'not found'
