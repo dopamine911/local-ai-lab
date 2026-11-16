@@ -163,6 +163,27 @@ Published full runs in the benchmark repo (other people's machines, for referenc
 (EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
 Qwen3.8-27B UD-Q4_K_XL (our `coder` model) on Strix Halo 18/19. A smoke pass shows the setup works; only full runs compare.
 
+## llama-swap 269 -> 273 on zaphod (llama.cpp b12020 -> v1.0.0 + 48 = e574a17, 2026-11-16)
+
+Same `coder` (card 1), same settings; only the image changed (Mesa pinned, same version; whisper-server kept from 269:
+273's needs Ubuntu 24.04's FFmpeg 6). Before/after back to back. The "273" image's llama-swap program reports v272.
+Fresh before-numbers on 269: the 2026-11-02 ones predate `--cache-ram 0 --no-cache-idle-slots`.
+
+| | 269 (b12020) | 273 (v1.0.0 + 48) |
+| --- | --- | --- |
+| writing (`lab speed`, median of 3) | 54.0 tok/s | 54.2 tok/s (+0.4%) |
+| reading 32K | 823.3 tok/s | **937.0 tok/s (+13.8%)** |
+| tool use, full suite, temp 0.6, seeds 1/2/3 | 96 / 94 / 92 (of 130 points) | 96 / 93 / 92 (of 138: grammar scenarios now count) |
+| same without TC-65/66/67/69 (points of 130) | 125 / 122 / 119 | 124 / 120 / 119 |
+| "failed to parse grammar" (TC-65, 66, 67, 69; `tuning/grammar-repro.py`) | 4 per run; repro 3, 4, 5 fail | **0: fixed** (llama.cpp #31956) |
+| TC-45 runaway (`tool_choice: required`, 16,384 tokens of text, no tool call) | 1 of 3 | 3 of 3 (watch) |
+| chat-teacher, 464 calls, 4 workers (warm) | 190 s (146.5/min) | 188 s (148.1/min) |
+| image request to `chat` (inline PNG) | "Red" | "Red" |
+
+Kept. Reading gain likely llama.cpp #31323 (RDNA3/4 prefill flash attention, in image 273 only). MLflow series
+`coder-ls269-v1`, `coder-ls273-v1`; speed 6e1bf84a (269), a932f051 (273). Rollback: `image: llama-swap-zaphod:269-media`.
+Log: plans/llama-cpp-v1-timeline.md. marvin: still 269.
+
 ## llama-swap 267 -> 269 on zaphod (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
 
 Same `coder` (card 1), same settings; only the image changed (Mesa pinned, same version). Before/after back to back.

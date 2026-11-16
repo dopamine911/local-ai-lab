@@ -35,3 +35,8 @@ the model always answers with the JSON.
 
 Workaround for clients now: send `tool_choice: "required"` or `"none"` together with a response format, or drop
 `tools` from the request that asks for the JSON answer.
+
+## 2026-11-16: fixed upstream
+llama.cpp PR #31956 (merged 2026-11-10, same change as #31395) closed #31342; in v1.0.0. zaphod on image 273:
+`tuning/grammar-repro.py coder` all 8 variants OK (13:55), tool-eval TC-65/66/67/69 pass in 3 of 3 runs.
+marvin still on 269: bug still there until it moves. Log: plans/llama-cpp-v1-timeline.md.

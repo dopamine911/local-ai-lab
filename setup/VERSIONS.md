@@ -41,7 +41,7 @@ Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBU
 
 | What | Pinned | Latest | Why not bumped in the audit |
 | --- | --- | --- | --- |
-| llama-swap (and the llama.cpp build inside it), issue #1 | **image `unified-vulkan-269` on both machines** (nightly; its llama-swap program reports v268; llama.cpp b12020; zaphod and marvin 2026-11-02, measured before/after: tuning/results.md) | v269 (2026-11-01) | — |
+| llama-swap (and the llama.cpp build inside it), issue #1 | **zaphod: image `unified-vulkan-273`** (nightly; its llama-swap program reports v272; llama.cpp v1.0.0 + 48, e574a17; 2026-11-16, measured before/after: tuning/results.md, plans/llama-cpp-v1-timeline.md; whisper-server kept from 269). **marvin: `unified-vulkan-269`** (llama.cpp b12020, 2026-11-02) | v273 (2026-11-15) | — |
 | harbor (Terminal-Bench runner), issue #2 | 0.20.0 | 0.25.0 (2026-10-25) | **Wait for upstream** (Daniel, 2026-11-02): Terminal-Bench-Local pins 0.20.0, and its prompt hook doesn't run on 0.25 (tested: plans/harbor-0.25-notes.md). Bump when Terminal-Bench-Local does, with a fresh baseline |
 | pi (inside Enso) | 1.1.0 | 1.4.0 | Enso supports only pi >=1.1.0 <1.2.0 (`SUPPORTED_PI_VERSIONS`); moves when Enso does |
 | tool-eval-bench | 3.0.0 | 3.0.0 | current |
