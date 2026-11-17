@@ -227,18 +227,19 @@ Halogen Flash (closed engine for this one model on Strix Halo) started by the en
 
 | | `big` (llama.cpp) | `big-halogen` |
 | --- | --- | --- |
-| writing (lab speed) | 45.6 tok/s | **83.6** (+83%) |
-| reading 32K (lab speed) | 328 tok/s | **2,144** (6.5x) |
+| writing (lab speed, same session) | 44.8 tok/s | **83.6** (1.9x) |
+| reading 32K (lab speed, same session) | 325.7 tok/s | **2,144** (6.6x) |
 | reading at 30K / 62K / 123K (tuning/depth.py) | 360 / 313 / 267 | **2,145 / 2,118 / 2,007** |
 | first token, 123K prompt | 462 s | **61 s** |
 | tool use, full suite, temp 0.6, seeds 1-3 | 96 / 91 / 93 | 93 / 93 / 91 (same range) |
-| conversation leak test (sequential; 4 at once) | 0 (with the leak flags) | 0; 0, with its prompt cache on |
+| conversation leak tests (cache-switch; 4 at once; cache-evict: 8 x 12K, 5 x 120K over its pool) | 0 (with the leak flags) | 0; 0; 0 (22/22), with its prompt cache on |
 | returning to a 12K conversation after another | re-read in full (leak flags) | 0.17 s |
 | memory | ~93 GB weights + KV | 88.9 GiB in all (weights 62.1 locked, 47.7 GiB lookup table read from disk) |
 
-Misses differ: Halogen fails TC-03 2 of 3 and is partial on TC-57 3 of 3 (`big` passes both every time); `big` misses
+Misses differ: Halogen fails TC-03 2 of 3 (drafts the email and asks before sending: a model choice) and is partial on
+TC-57 3 of 3 (refuses the injection but quotes the attacker's address; behaviour check: attacker echo 3 of 3); `big` passes both every time; `big` misses
 TC-30/33/59/60 once each and ran away on TC-45 once. Not tested: hours of agent use, Terminal-Bench, vision.
-Log: plans/halogen-timeline.md. MLflow: speed c8ddb903; tool use series `big-halogen-v1`.
+Log: plans/halogen-timeline.md. MLflow: speed c8ddb903 (`big` 3b2e81ff); tool use series `big-halogen-v1` (engine tags corrected: `lab manifest` records llama-swap's llama.cpp, not the engine).
 
 ## zaphod `coder` MTP draft 2 -> 3 (image 273, 2026-11-16)
 

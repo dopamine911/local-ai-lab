@@ -83,7 +83,8 @@ models panel as the one page for both machines, with `lab` doing the same from t
 ## 7. Steps (one change at a time; each needs Daniel's go-ahead)
 1. **Decide 5.1** (launch method). Done 2026-11-17: B, built and tested on marvin (plans/engine-launcher-timeline.md:
    no leftovers in any failure test; a GPU engine as fast as native, 61.3 vs 61.7 calls/min).
-2. **Halogen Flash vs `big` on marvin** (same model, the biggest possible gain):
+2. **Halogen Flash vs `big` on marvin** (same model, the biggest possible gain). Tested 2026-11-17: see tuning/results.md
+   and plans/halogen-timeline.md; daily use is Daniel's decision.
    - pin the image by digest and the weights by revision + sha256 (`setup/models-marvin.txt`);
    - check privacy first: its prompt cache and cache modes against our cache-leak rule (CLAUDE.md, #27148);
      two unrelated long prompts in a row must not leak;
