@@ -8,7 +8,7 @@
 S=${LAB_ENGINED_SOCK:-/run/lab-engined/engined.sock}
 case "$1" in
   run)    [ -n "$2" ] || exit 2; exec curl -sS -N --fail-with-body --unix-socket "$S" -X POST "http://engined/run/$2" ;;
-  stop)   [ -n "$2" ] || exit 2; exec curl -sS --fail-with-body --max-time 90 --unix-socket "$S" -X POST "http://engined/stop/$2" ;;
+  stop)   [ -n "$2" ] || exit 2; exec curl -sS --fail-with-body --max-time 600 --unix-socket "$S" -X POST "http://engined/stop/$2" ;;
   status) exec curl -sS --unix-socket "$S" http://engined/status ;;
   *)      echo "usage: lab-engine run|stop <name> | status" >&2; exit 2 ;;
 esac

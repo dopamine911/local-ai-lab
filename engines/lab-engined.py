@@ -18,7 +18,8 @@ API on the Unix socket (llama-swap's side is engines/lab-engine):
 
 Engines run as containers named lab-engine-<name>, labelled lab.engine=<name>, on the Docker network lab-engines
 (created --internal: no internet, no published ports). llama-swap joins that network and proxies to the name.
-Every engine gets: --init, --cap-drop ALL, no-new-privileges, the allowlist's devices and read-only mounts only.
+Every engine gets: --init, --cap-drop ALL, no-new-privileges, the allowlist's devices and read-only mounts only
+(plus, per engine: groups, env, user, --ipc, --ulimit, a stop timeout).
 On start the service removes leftover lab.engine containers; on SIGTERM it stops the ones it runs.
 
 Good result: `lab-engined.py check` prints one docker command per engine; `curl --unix-socket <sock> http://x/status`
@@ -33,7 +34,7 @@ SPEC = os.environ.get("LAB_ENGINES", os.path.join(HERE, f"{socket.gethostname()}
 SOCK = os.environ.get("LAB_ENGINED_SOCK", os.path.expanduser("~/.local/state/lab-engined/engined.sock"))
 NET, PREFIX, LABEL = "lab-engines", "lab-engine-", "lab.engine"
 NAME = re.compile(r"^[a-z0-9][a-z0-9-]{0,40}$")
-STOP_WAIT = 30  # seconds docker stop waits before killing
+STOP_WAIT = 30  # seconds docker stop waits before killing (default; an engine can set "stop_timeout")
 
 running = {}  # name -> True while a /run request holds it
 lock = threading.Lock()
@@ -81,6 +82,12 @@ def run_args(name, e):
         a += ["--shm-size", str(e["shm_size"])]
     if e.get("read_only"):
         a += ["--read-only"]
+    if e.get("ipc"):  # e.g. "host": Halogen Flash asks for it (shares the host's IPC namespace)
+        a += ["--ipc", str(e["ipc"])]
+    for u in e.get("ulimits", []):  # e.g. "memlock=-1:-1"
+        a += ["--ulimit", str(u)]
+    if e.get("stop_timeout"):
+        a += ["--stop-timeout", str(int(e["stop_timeout"]))]
     for t in e.get("tmpfs", []):
         a += ["--tmpfs", t]
     if e.get("entrypoint"):
@@ -94,11 +101,20 @@ def exists(cname):
     return r.returncode in (0, 124)
 
 
+def stop_wait(name):
+    """The engine's own stop timeout from the allowlist, else STOP_WAIT (also for a name no longer listed)."""
+    try:
+        return int(load_spec().get(name, {}).get("stop_timeout", STOP_WAIT))
+    except Exception:
+        return STOP_WAIT
+
+
 def stop(name):
     """Stop and remove lab-engine-<name>; return when it is gone."""
     cname = PREFIX + name
+    wait = stop_wait(name)
     if exists(cname):
-        docker("stop", "-t", str(STOP_WAIT), cname, timeout=STOP_WAIT + 60)
+        docker("stop", "-t", str(wait), cname, timeout=wait + 60)
     end = time.time() + 180
     while time.time() < end:
         if not exists(cname):
