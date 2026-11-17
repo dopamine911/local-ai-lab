@@ -77,9 +77,10 @@ Usable on the two empty cards: about 65,400 MiB (fit keeps 1 GiB spare per card 
 Model `gpt-oss` on marvin's own llama-swap (`http://marvin:8080`, key `MARVIN_KEY`); it is **not** in zaphod's
 peer list. Loading it unloads `big`; `big` comes back on its next request (~30 s).
 
-1. Check marvin is idle: on marvin, `curl -s localhost:8080/upstream/big/slots -H "Authorization: Bearer $MARVIN_KEY"`
-   shows `"is_processing": false` for every slot (live; through zaphod's peer this gives 404). Every finished request is
-   in `~/llama-swap/data/activity.sqlite`; llama-swap does not print requests in its log, so a `POST /v1` count is always 0.
+1. Check marvin is idle: on marvin, for every model in `/running` (e.g. `big`, `chat-teacher`),
+   `curl -s localhost:8080/upstream/<model>/slots -H "Authorization: Bearer $MARVIN_KEY"` shows `"is_processing": false`
+   for every slot (live, seen true during a request on 2026-11-17; through zaphod's peer this gives 404). Every finished request is
+   in `~/llama-swap/data/activity.sqlite` (a row appears only when the request ends); llama-swap does not print requests in its log, so a `POST /v1` count is always 0.
 2. Tests from zaphod (`~/homelab/tuning`, after `source ~/llama-swap/.env`):
    `MACHINE=marvin BASE_URL=http://marvin:8080/v1 API_KEY=$MARVIN_KEY lab speed gpt-oss "<note>"`
    (same for `lab quality`).

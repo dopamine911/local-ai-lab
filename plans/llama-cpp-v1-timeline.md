@@ -196,5 +196,6 @@ Good result: writing ≥ 56.1 (+3% over A), reading within ±3%, tool use 97.
 ## 2026-11-17: correction (found in plans/audit-2026-11-17.md)
 The 19:35 row is partly wrong. llama-swap does record every request, in `data/activity.sqlite` (a row when the request
 ends), just not in its log. The `launch_slot_ --since 10m` check also misses a request that started earlier and still
-runs. Live check: `/upstream/<model>/slots` `is_processing` on the serving machine. The 19:36 and 19:38 reloads were
+runs. Live check: `/upstream/<model>/slots` `is_processing` on the serving machine (seen true for a whole 35 s / 93 s
+request on each machine 2026-11-17, false within 12 s of the end; the activity row appeared only at the end). The 19:36 and 19:38 reloads were
 still safe: marvin's activity.sqlite has no `big` request after 17:52. plans/gpt-oss-notes.md updated.
