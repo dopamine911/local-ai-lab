@@ -77,7 +77,8 @@ Usable on the two empty cards: about 65,400 MiB (fit keeps 1 GiB spare per card 
 Model `gpt-oss` on marvin's own llama-swap (`http://marvin:8080`, key `MARVIN_KEY`); it is **not** in zaphod's
 peer list. Loading it unloads `big`; `big` comes back on its next request (~30 s).
 
-1. Check marvin is idle (`docker compose logs --since 10m | grep -c "POST /v1"` on marvin = 0).
+1. Check marvin is idle (`docker compose logs --since 10m | grep -c launch_slot_` on marvin = 0: one line per model task;
+   llama-swap itself does not log requests, so a `POST /v1` count is always 0).
 2. Tests from zaphod (`~/homelab/tuning`, after `source ~/llama-swap/.env`):
    `MACHINE=marvin BASE_URL=http://marvin:8080/v1 API_KEY=$MARVIN_KEY lab speed gpt-oss "<note>"`
    (same for `lab quality`).

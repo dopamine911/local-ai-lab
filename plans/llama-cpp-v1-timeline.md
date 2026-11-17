@@ -153,3 +153,23 @@ Good result: speed within ±3%, tool use within the seed spread, grammar variant
 | 17:43 | After on 273: marvin `chat-teacher` `prompt_check.py --schema L1 --workers 4`, warm | 464 calls, **475 s = 58.6 calls/min (-2.7%)**, 0 failures, 0 BAD | — |
 | 17:52 | `big` loaded again (chat-teacher had swapped it out), as before the tests | big ready | — |
 | 17:55 | **Result: kept on 273.** Writing +3.7%, reading +9.4%, tool use within the seed spread, grammar fixed, chat-teacher -2.7% (inside ±3%). Rollback: `image: llama-swap-marvin:269` in marvin/llama-swap/compose.yaml, copy to marvin, `docker compose up -d llama-swap`. Both machines now on 273 | | this commit |
+
+## 2026-11-16: step 3, zaphod `coder` MTP draft 2 -> 3 on 273 (America/Chicago time)
+Daniel chose this over the MoE cache test (19:30). Draft 3 was never tested on `coder` (tuning/results.md idea 2).
+#30146 (in 1.0) left draft 3 speed the same upstream, so expect little. One change: `--spec-draft-n-max 2` -> `3`
+in the `mtp` macro (used by `coder`, `coder-2`, `coder-tb`). marvin `big` already uses draft 3; not changed.
+Steps:
+1. Check zaphod and marvin idle (a config reload cuts marvin peer requests).
+2. Before: fresh `lab speed coder` on draft 2 (tool use before = today's 273 runs: 96 / 93 / 92).
+3. Change draft to 3, wait for the reload, `lab speed coder`.
+4. Only if writing is +3% or more: `lab quality coder --full --temperature 0.6` seeds 1-3.
+Good result: writing +3% or more, reading within ±3%, tool use within the seed spread (92-96). Otherwise back to 2.
+
+| Time | Action | Result | Commit |
+| --- | --- | --- | --- |
+| 19:33 | zaphod and marvin idle (0 requests in 15 min); loaded: coder, chat, embed, rerank, stt, stt-whisper, tts | start | — |
+| 19:33 | Before, draft 2: `lab speed coder` | 54.2 writing / 938.5 reading 32K (same as 13:56); runs/2026-11-16-1933-speed-coder.json, MLflow ec1516a3 | — |
+| 19:35 | Idle check: llama-swap does not log requests (not on 269 either: marvin's log has 0 `POST /v1` lines across today's quality runs), so `grep -c "POST /v1"` always gives 0, and the 15:32 "0 requests" check proved nothing (marvin had nothing loaded, so it was idle anyway). Used llama-server's `launch_slot_` lines (one per task) instead: marvin's last task 17:52 (my `big` reload), so the reload cut nothing. plans/gpt-oss-notes.md fixed | ok | — |
+| 19:36 | `--spec-draft-n-max 2` -> `3`, reload | coder ready | 7ab65df |
+| 19:36 | After, draft 3: `lab speed coder` | **55.3 writing (+2.0%) / 935.0 reading (-0.4%)**, 74% of drafted tokens accepted; runs/2026-11-16-1936-speed-coder.json, MLflow 5776c5a8 | — |
+| 19:38 | **Result: under the +3% bar, back to draft 2.** Tool use not run (step 4 only on +3%). marvin unchanged (draft 3) | | this commit |

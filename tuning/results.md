@@ -220,6 +220,20 @@ Tests through zaphod's peer (`marvin/big`); chat-teacher direct to marvin:8080. 
 Kept. MLflow series `big-ls269-v1`, `big-ls273-v1`; speed 37062caf (269), db14d348 (273). Rollback: `image:
 llama-swap-marvin:269`. Log: plans/llama-cpp-v1-timeline.md.
 
+## zaphod `coder` MTP draft 2 -> 3 (image 273, 2026-11-16)
+
+One change: `--spec-draft-n-max` in the `mtp` macro. Back to back, 19:33 and 19:36, card 1.
+
+| | draft 2 | draft 3 |
+| --- | --- | --- |
+| writing (lab speed, median of 3) | 54.2 tok/s | 55.3 tok/s (+2.0%) |
+| reading 32K | 938.5 tok/s | 935.0 tok/s (-0.4%) |
+| drafted tokens accepted (short test) | | 74% |
+
+Below the +3% bar set before the test, so tool use was not run and draft stays 2. The short test is temp 0 code,
+MTP's best case; at real temperatures a deeper draft is accepted less often, so +2% is the most draft 3 would give.
+Speed runs: runs/2026-11-16-1933-speed-coder.json (ec1516a3), -1936- (5776c5a8). Log: plans/llama-cpp-v1-timeline.md.
+
 ## llama-swap 267 -> 269 on marvin (llama.cpp b11870 -> b12020, 2026-11-02, issue #1)
 
 Same `big` (Qwen3.8-Flash-Next UD-IQ4_XS, 128K, MTP draft 3), same settings, fan curve on, BIOS Performance; only the
@@ -323,7 +337,7 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 
 ## Ideas to test next
 1. Answered 2026-10-28: the ~10% slower card with MTP is card 1 (OCuLink, PCIe 3.0 x4), not a model setting; the gap moved with the models when the device mix-up was fixed. Fix would be a faster link for card 1.
-2. MTP draft depth 3, then 4.
+2. Answered 2026-11-16 (image 273): draft 3 gives `coder` +2.0% writing, under the +3% bar; kept 2. Draft 4 not tried (draft 3 already accepts less: 74%).
 3. `-ub` 512 / 1024 / 2048 (reading speed).
 4. `coder-long` speed (both cards).
 5. New models: Qwen3-Coder-Next, Gemma 4 31B.
