@@ -17,9 +17,10 @@ services:
       - ./config:/etc/llama-swap/config
       - ./data:/data
       # Engine launcher (engines/lab-engined.py, plans/engine-launcher-timeline.md): its socket folder and the client
-      # llama-swap runs as cmd/cmdStop. The folder, not the socket file, so a launcher restart keeps the mount valid.
+      # llama-swap runs as cmd/cmdStop (/engines/lab-engine). Folders, not single files: a launcher restart (new socket)
+      # or a git pull (new file) would leave a single-file mount pointing at the old one.
       - ${HOME}/.local/state/lab-engined:/run/lab-engined
-      - ${HOME}/homelab/engines/lab-engine:/engines/lab-engine:ro
+      - ${HOME}/homelab/engines:/engines:ro
     networks: [default, lab-engines]   # lab-engines: internal network the engine containers run on (no internet)
     env_file: .env
     # No GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM here: marvin's GPU shares system memory,
