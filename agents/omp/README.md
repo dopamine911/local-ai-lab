@@ -12,17 +12,19 @@ from anywhere zaphod is reachable. Tested 2026-11-03 with omp 18.15.0.
    `export ZAPHOD_KEY=...`. The file only names the variable; the key is never in it.
 5. Test: `omp -p --no-session --model lab/marvin/big "Reply with exactly one word: ready"`.
    Good result: `ready`. `401 unauthorized` means ZAPHOD_KEY is not set in that shell.
-6. Use: `omp --model lab/marvin/big` (or `lab/coder`).
+6. Use: `omp --model lab/marvin/big` (or `lab/coder`, `lab/coder-2`).
 7. Subagents: run [subagents.sh](subagents.sh) once. omp's defaults allow 32 subagents at once on the main model;
    on 2026-11-04 that put 3-4 conversations on marvin's 2 slots (450K tokens read vs 29K written in an hour, writing
    0.4-5 tok/s). After the script: main conversation and reviewer on `marvin/big`; task/scout/sonic subagents on
-   `coder` (zaphod card 1), one at a time, no subagents of subagents. Good result: `omp config list --scope global`
-   shows `task.maxConcurrency = 1` and the `modelRoles` line.
+   `coder-2` (zaphod card 2; was `coder` on card 1 until 2026-11-17, #51: card 2 writes 9% faster), one at a time, no
+   subagents of subagents. **Run it again on each machine after this change.** Good result: `omp config list --scope global`
+   shows `task.maxConcurrency = 1` and the `modelRoles` line with `lab/coder-2`.
 
 ## Notes
 
 - `marvin/big`: 128K per conversation, ~40 tok/s writing. Two people/agents can use it at once (2 slots).
-- `coder` and `coder-tb` share card 1, so asking for one unloads the other.
+- `coder` and `coder-tb` share card 1, so asking for one unloads the other. `coder-2` shares card 2 with `chat`, `ornith`
+  and the teachers: loading one of those unloads it until the next subagent request.
 - `big` has **256K shared by its 2 slots** (`-np 2 -kvu`, since 2026-11-03 21:19). Until then it was 128K, and one long
   conversation plus a second request (another person, or omp running a sub-task) overflowed it ("Context size has been
   exceeded", 54 times in 24 h). `contextWindow: 131072` in models.yml keeps each conversation at half, so two

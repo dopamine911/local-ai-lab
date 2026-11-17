@@ -7,14 +7,17 @@
 #
 # After this:
 #   - main conversation (role default) and reviewer (role slow): marvin/big
-#   - task, scout, sonic subagents (roles task and smol): coder on zaphod card 1 (64K, 1 slot)
-#   - at most 1 subagent at a time (coder has 1 slot; 2 would swap it and re-read), and subagents can't start their own
+#   - task, scout, sonic subagents (roles task and smol): coder-2 on zaphod card 2 (64K, 1 slot); since 2026-11-17
+#     (issue #51): card 2 writes 9% faster (58.9 vs 54.0 tok/s) and reads 6% faster than card 1 (PCIe 3.0 x4). Loading
+#     chat, ornith or a teacher on card 2 unloads it until the next subagent request reloads it; in image mode llama-swap
+#     answers coder-2 requests with coder (card 1). Back to card 1: replace lab/coder-2 with lab/coder below.
+#   - at most 1 subagent at a time (coder-2 has 1 slot; 2 would swap it and re-read), and subagents can't start their own
 # Tested 2026-11-04 in an empty omp folder: @task and @smol both answered from coder (zaphod activity log, status 200).
-# Note: coder rejects thinking "off"/"minimal" (Qwen template: low, medium, xhigh only); omp's agents use medium/auto.
+# Note: coder and coder-2 reject thinking "off"/"minimal" (Qwen template: low, medium, xhigh only); omp's agents use medium/auto.
 #
 # Check: omp config list --scope global      Undo: omp config reset <key>
 set -euo pipefail
 omp config set task.maxConcurrency 1
 omp config set task.maxRecursionDepth 1
-omp config set modelRoles '{"default":"lab/marvin/big","slow":"lab/marvin/big","task":"lab/coder","smol":"lab/coder"}'
+omp config set modelRoles '{"default":"lab/marvin/big","slow":"lab/marvin/big","task":"lab/coder-2","smol":"lab/coder-2"}'
 omp config list --scope global

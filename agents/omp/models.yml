@@ -2,8 +2,8 @@
 # Copy to ~/.omp/agent/models.yml on that machine. The key is NOT in this file: `apiKey` names an
 # environment variable; set ZAPHOD_KEY (from Proton Pass, or zaphod/llama-swap/.env) before starting omp.
 # If ZAPHOD_KEY is unset, omp sends the literal text "ZAPHOD_KEY" and gets 401.
-# Use: omp --model lab/marvin/big   (or lab/coder, lab/ornith, lab/chat)
-# Then run ./subagents.sh once: subagents go to coder, one at a time (omp defaults to 32 at once on the main model).
+# Use: omp --model lab/marvin/big   (or lab/coder, lab/coder-2, lab/ornith, lab/chat)
+# Then run ./subagents.sh once: subagents go to coder-2, one at a time (omp defaults to 32 at once on the main model).
 providers:
   lab:
     baseUrl: http://zaphod.tail740235.ts.net:8080/v1   # Tailscale; zaphod forwards marvin/* to marvin
@@ -15,6 +15,8 @@ providers:
       # contextWindow 131072 on purpose: big has 256K shared by 2 slots, so each conversation must stay at half of it.
       - { id: marvin/big, name: "marvin/big: Qwen3.8-Flash-Next, marvin, 128K per conversation", reasoning: true, contextWindow: 131072, maxTokens: 32768 }
       - { id: coder, name: "coder: Qwen3.8-27B, zaphod card 1, 64K", reasoning: true, contextWindow: 65536, maxTokens: 16384 }
+      # coder-2: the same model on card 2 (9% faster writing; #51): subagents use it (subagents.sh). Card-2 models swap with it.
+      - { id: coder-2, name: "coder-2: Qwen3.8-27B, zaphod card 2, 64K", reasoning: true, contextWindow: 65536, maxTokens: 16384 }
       # ornith: 256K in 1 slot, so the full window is its own. Loading it on card 2 unloads coder-2 (and the other way round).
       - { id: ornith, name: "ornith: Ornith-1.5 35B-A3B, zaphod card 2, 256K", reasoning: true, contextWindow: 262144, maxTokens: 32768 }
       # chat: Gemma 4 31B, 128K in 1 slot (-c 131072). Also on card 2: loading it unloads ornith or coder-2.
