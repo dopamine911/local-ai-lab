@@ -20,17 +20,18 @@ peer of zaphod, so its models also answer on zaphod as `marvin/<name>`.
 
 ## Models
 
-| Name | Machine | Model | Speed (measured) |
+| Name | Machine | Model | Notes |
 | --- | --- | --- | --- |
-| `coder`, `coder-2` | zaphod card 1 / card 2 | Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context | ~54 tok/s writing, ~765 tok/s reading a 32K prompt |
+| `coder`, `coder-2` | zaphod card 1 / card 2 | Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context | daily coding model |
 | `coder-tb` | zaphod card 1 | the same, 256K context (benchmarks) | |
-| `ornith` | zaphod card 2 | Ornith-1.5 35B-A3B, vision; best tool-use score so far | ~90 tok/s writing |
+| `ornith` | zaphod card 2 | Ornith-1.5 35B-A3B, vision; best tool-use score so far | |
 | `chat` | zaphod card 2 | Gemma 4 31B (QAT Q4_0), vision, 128K | |
 | `chat-teacher` | zaphod card 2 | Same Gemma file: 4 slots of 4K, full sliding-window cache, thinking off, no vision; many short parallel requests (unloads after 15 idle min) | |
 | `embed`, `rerank` | zaphod card 1 | Qwen3-Embedding-4B, Qwen3-Reranker (document search) | always loaded |
 | `stt`, `stt-whisper`, `tts`, `tts-qwen` | zaphod card 2 | Qwen3-ASR, Whisper, Kokoro, Qwen TTS | always loaded (`tts-qwen` on demand) |
-| `big` (`marvin/big`) | marvin | Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3, 128K | ~44 tok/s writing, ~318 tok/s reading a 32K prompt |
+| `big` (`marvin/big`) | marvin | Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3, 256K shared by 2 slots (128K per conversation) | strongest model |
 
+Speeds and scores for every model: [tuning/results.md, "Current numbers"](tuning/results.md#current-numbers).
 Every model file is pinned to an exact revision and sha256 (`setup/models-<machine>.txt`).
 
 ## Services

@@ -2,7 +2,7 @@
 
 Everything this lab does, in one place, with links to the documents and files that hold the details.
 Status words: **working** (in use, tested), **ready** (built and tested, used on demand), **planned**.
-Last updated 2026-11-02.
+Last updated 2026-11-17.
 
 Start here for how-to: [README.md](README.md). Every command: [docs/cli/](docs/cli/README.md). Rebuild a machine: [setup/REBUILD.md](setup/REBUILD.md).
 Notes for Claude Code sessions: [CLAUDE.md](CLAUDE.md). Results of every test: [tuning/results.md](tuning/results.md).
@@ -24,19 +24,19 @@ not here.
 | Feature | Status | Details |
 | --- | --- | --- |
 | llama-swap on zaphod: one OpenAI-compatible API for all models, loads and swaps them on demand, per-card routing | working | [zaphod/llama-swap/config/config.yaml](zaphod/llama-swap/config/config.yaml), [README.md](README.md) |
-| Coding models `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B with MTP speculative decoding (~54 tok/s writing, ~765 tok/s reading a 32K prompt; `lab speed`) | working | [tuning/results.md](tuning/results.md) |
+| Coding models `coder` (card 1) and `coder-2` (card 2): Qwen3.8-27B with MTP speculative decoding (speeds: `lab speed`, [tuning/results.md](tuning/results.md#current-numbers)) | working | [tuning/results.md](tuning/results.md#current-numbers) |
 | `ornith` (best tool use so far, vision), `chat` (Gemma 4 31B, vision), `chat-teacher` (same Gemma, 4 short parallel slots, thinking off), `north`, `flint` (on hold), `coder-tb` (256K, benchmarks), `coder-long` (both cards) | working | [CLAUDE.md](CLAUDE.md) |
 | Vision: send screenshots to `ornith` or `chat` | working | [plans/more-models.md](plans/more-models.md) |
 | Document search models: `embed` (Qwen3-Embedding-4B) + `rerank` (Qwen3-Reranker), always loaded on card 1 | working | [plans/more-models.md](plans/more-models.md) |
 | Speech-to-text `stt` (Qwen3-ASR), `stt-whisper` (99 languages); text-to-speech `tts` (Kokoro), `tts-qwen` | working | [zaphod/llama-swap/config/](zaphod/llama-swap/config/) |
-| marvin's llama-swap: `big` = Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3 (24.7 → 39.6 tok/s; ~44 writing, ~318 reading a 32K prompt on BIOS Performance) | working | [marvin/llama-swap/config/config.yaml](marvin/llama-swap/config/config.yaml), [marvin/SETUP.md](marvin/SETUP.md) |
+| marvin's llama-swap: `big` = Qwen3.8-Flash-Next UD-IQ4_XS (93 GB), MTP draft 3, 256K shared by 2 slots | working | [marvin/llama-swap/config/config.yaml](marvin/llama-swap/config/config.yaml), [marvin/SETUP.md](marvin/SETUP.md), [tuning/results.md](tuning/results.md#current-numbers) |
 | marvin linked to zaphod as a peer: appears everywhere as `marvin/big` | working | [README.md](README.md) |
-| marvin `gpt-oss` = gpt-oss-120b MXFP4 (63 GB), 128K, 1 slot; swaps with `big`; reached directly on marvin (not in zaphod's peer list) | test entry (2026-11-09): 53.4 writing, 820 reading 32K with `-b/-ub 4096` (557 at the default 512); EAGLE3 draft tried, slower, off; tool use 82 (`big` 90), failed the TC-60 injection test | [plans/gpt-oss-timeline.md](plans/gpt-oss-timeline.md) |
-| zaphod `gpt-oss` (how to run: [plans/gpt-oss-notes.md](plans/gpt-oss-notes.md)) = gpt-oss-120b MXFP4 on both R9700s (`-ngl 999 -ts 18,19`, `-lm none`), 32K so it fits entirely on the cards, runs alone | test entry (2026-11-09): 85.3 writing, 2,885 reading 32K (marvin 53.4 / 820; 128K with ~6 GB in RAM 54.5 / 1,423); evicted by any `embed` call (memory search every minute) unless the watchdog is paused | [plans/gpt-oss-timeline.md](plans/gpt-oss-timeline.md) |
+| marvin `gpt-oss` = gpt-oss-120b MXFP4 (63 GB), 128K, 1 slot; swaps with `big`; reached directly on marvin (not in zaphod's peer list) | test entry (2026-11-09); EAGLE3 draft tried, slower, off; failed the TC-60 injection test | [plans/gpt-oss-timeline.md](plans/gpt-oss-timeline.md), [tuning/results.md](tuning/results.md#current-numbers) |
+| zaphod `gpt-oss` (how to run: [plans/gpt-oss-notes.md](plans/gpt-oss-notes.md)) = gpt-oss-120b MXFP4 on both R9700s (`-ngl 999 -ts 18,19`, `-lm none`), 32K so it fits entirely on the cards, runs alone | test entry (2026-11-09); evicted by any `embed` call (memory search every minute) unless the watchdog is paused | [plans/gpt-oss-timeline.md](plans/gpt-oss-timeline.md), [tuning/results.md](tuning/results.md#current-numbers) |
 | Live test of our UnbiasedStrata fork on marvin: appears as `marvin-fork/big-fork` while `fork.sh start` runs (`marvin/big` offline then) | on hold (2026-11-01; was up 23 h, unused) | [plans/strix-strata.md](plans/strix-strata.md) |
-| Both machines on llama-swap 269 (llama.cpp b12020), measured before and after on each: speed and tool use the same (#1, closed) | working | [tuning/results.md](tuning/results.md) "llama-swap 267 -> 269" |
-| Engine launcher on marvin (`lab-engined`): llama-swap starts other inference engines as containers (Halogen Flash, Gufo, DS4, ROCm llama.cpp next), only those in `engines/marvin.json`, on an internal network (no internet, no host ports); a test entry `test-http` | built and working since 2026-11-17 (no leftovers in any failure test; a GPU engine as fast as native: 61.3 vs 61.7 calls/min) | [plans/engines-and-frontend.md](plans/engines-and-frontend.md), [plans/engine-launcher-timeline.md](plans/engine-launcher-timeline.md), [engines/](engines/lab-engined.py) |
-| `big-halogen` on marvin (test): `big`'s model on the Halogen Flash engine (closed binary, no telemetry), started by the launcher; swaps with `big` | test entry (2026-11-17): writing 83.6 vs 45.6 tok/s, reading 32K 2,144 vs 328, 123K first token 61 vs 462 s; tool use 93/93/91 vs 96/91/93; 0 leaks with its prompt cache on; repeats attacker text in TC-57 (3 of 3); not for daily use yet (Daniel decides) | [plans/halogen-timeline.md](plans/halogen-timeline.md), [tuning/results.md](tuning/results.md) |
+| Both machines on llama-swap 273 (llama.cpp v1.0.0 + 48), measured before and after on each: tool use the same, reading faster, grammar bug fixed | working (2026-11-16) | [tuning/results.md](tuning/results.md) "llama-swap 269 -> 273", [plans/llama-cpp-v1-timeline.md](plans/llama-cpp-v1-timeline.md) |
+| Engine launcher (`lab-engined`) on marvin and zaphod: llama-swap starts other inference engines as containers (Halogen Flash, Radiance; Gufo, DS4, ROCm llama.cpp next), only those in `engines/<machine>.json`, on an internal network (no internet, no host ports); a test entry `test-http` on each | working since 2026-11-17 (no leftovers in any failure test; a GPU engine as fast as native) | [plans/engines-and-frontend.md](plans/engines-and-frontend.md), [plans/engine-launcher-timeline.md](plans/engine-launcher-timeline.md), [engines/](engines/lab-engined.py) |
+| `big-halogen` on marvin (test): `big`'s model on the Halogen Flash engine (closed binary, no telemetry), started by the launcher; swaps with `big` | test entry (2026-11-17): much faster reading and writing, tool use in `big`'s range, 0 leaks with its prompt cache; repeats attacker text in TC-57; Terminal-Bench running; not for daily use yet (Daniel decides) | [plans/halogen-timeline.md](plans/halogen-timeline.md), [tuning/results.md](tuning/results.md#current-numbers) |
 | The slow-card fix (Resizable BAR off → `GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM=1`, 3-10x faster) | working | [tuning/results.md](tuning/results.md) "The slow-card fix" |
 
 ## 3. Web services on zaphod (the hub)
@@ -98,13 +98,7 @@ How-to for all tools: [tuning/README.md](tuning/README.md). Every result: [tunin
 | Real-use speed during every test (from llama-swap's request log) | working | [lab log](docs/cli/log.md) |
 | Per-test and per-task tables in MLflow (compare one scenario across models) | working | [tuning/tool-eval/sort_to_mlflow.py](tuning/tool-eval/sort_to_mlflow.py) |
 
-Main results so far (details in [tuning/results.md](tuning/results.md)):
-- Tool use (full suite, temperature 0.6, 3 seeds): `coder` 96/93/94 on llama-swap 269, marvin `big` 94/91/88; common score
-  (without the 4 scenarios llama.cpp's grammar bug removes): marvin Flash-Next on Strata (thinking medium) 94.0, Ornith 92.0,
-  marvin Flash-Next 91.7, Strata Flash-Next (zaphod) 90.0, Flint 86.0. No model made anything up.
-- Terminal-Bench on marvin, Flash-Next, full runs: llama.cpp **19/19** in 5.5 h (2026-10-29, BIOS Quiet) and **18/19** in
-  5.37 h (2026-11-01, BIOS Performance); Strata 0.2.7 19/19 in 13.3 h (thinking xhigh) and 17/19 in 4.39 h (medium);
-  our UnbiasedStrata fork **19/19** in 3.29 h (medium, 2026-10-31). One run each: Terminal-Bench varies run to run.
+Every speed and score, with dates: [tuning/results.md](tuning/results.md#current-numbers). Terminal-Bench results are there too.
 - Terminal-Bench's runner stays on harbor 0.20.0: the benchmark pins it, and 0.25.0 fails in its prompt hook (tested,
   [plans/harbor-0.25-notes.md](plans/harbor-0.25-notes.md); #2 waits for upstream).
 - Strata (another inference engine) tested on zaphod: same quality, needs both cards: [plans/strata.md](plans/strata.md).

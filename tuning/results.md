@@ -2,7 +2,29 @@
 
 Written summary. Every individual test with its exact settings is in MLflow: https://mlflow.ai.dopamine911.com (experiment `llama-tuning`).
 
-## Current setup (2026-10-28)
+## Current numbers
+
+The one place for speeds and scores (README and FEATURES link here). Update a row whenever a new measurement replaces it; the dated sections below keep the history. Writing and 32K
+reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature 0.6`, seeds 1-3. A date before
+2026-11-16 means it was measured on an older llama.cpp (b12020 or earlier) and not re-measured since.
+
+| Model | Where | Writing tok/s | Reading 32K tok/s | Tool use (3 seeds) | Measured |
+| --- | --- | ---: | ---: | --- | --- |
+| `coder` | zaphod card 1, llama.cpp v1.0.0+48 | 54.0-54.3 | 936-938 | 96 / 93 / 92 | 2026-11-17 (speed), 11-16 (tool use) |
+| `coder-2` | zaphod card 2 | 59.5-59.7 | not measured | not run | 2026-10-28 (older llama.cpp) |
+| `ornith` | zaphod card 2 | ~90 | 2,433 (llama-bench) | 93 (temp 0 short suite) | 2026-10-28 (older llama.cpp) |
+| `chat-teacher` | zaphod card 2, 4 slots | 148.1 calls/min (4 workers) | | | 2026-11-16 |
+| `big` | marvin, llama.cpp v1.0.0+48 | 44.8 | 325.7 (30K / 62K / 123K: 360 / 313 / 267) | 96 / 91 / 93 | 2026-11-17 (speed, depth), 11-16 (tool use) |
+| `chat-teacher` | marvin | 61.7 calls/min (4 workers) | | | 2026-11-17 |
+| `gpt-oss` (test) | zaphod, both cards, 32K | 85.3 | 2,885 | 97 (core 15) | 2026-11-09 (older llama.cpp) |
+| `gpt-oss` (test) | marvin, 128K | 53.4 | 820 | 82 (full) | 2026-11-09 (older llama.cpp) |
+| `big-halogen` (test) | marvin, Halogen Flash 0.20.6 | 83.6 | 2,144 (30K / 62K / 123K: 2,145 / 2,118 / 2,007) | 93 / 93 / 91 | 2026-11-17 |
+
+Terminal-Bench (Core-19, pass@2), latest full run per setup: marvin `big` on llama.cpp 18/19 in 5.37 h (2026-11-01,
+older llama.cpp; 19/19 in 5.5 h on 10-29); Strata 0.2.7 17/19 (medium) and 19/19 (xhigh); our UnbiasedStrata fork
+19/19 in 3.29 h; zaphod `north` 9/19 (stopped early). `big-halogen`: running 2026-11-17.
+
+## 2026-10-28: card setup (history)
 
 Both `coder` (card 1) and `coder-2` (card 2) run Qwen3.8-27B UD-Q4_K_XL with MTP speculative decoding, draft depth 2.
 
