@@ -9,7 +9,7 @@
 # Pinned: Go 1.27.3 image by digest; libraries exactly in go.mod/go.sum (latest at 2026-11-02, setup/VERSIONS.md).
 set -euo pipefail
 CLI=$(cd "$(dirname "$0")" && pwd)
-IMG=golang:1.27.3@sha256:2920bb124f1a2e12a1d39f0cab756ae0068441ee1da7655dec7f5e374944095b
+IMG=golang:1.27.3@sha256:e519d3b0a5b285e5aa53ab9eef02bc6bbb9cb04608389b743a136a9ce75f0d1e
 VER=$(git -C "$CLI" describe --always --dirty 2>/dev/null || echo dev)
 CACHE=$HOME/.cache/lab-go; mkdir -p "$CACHE"
 go() { docker run --rm -u "$(id -u):$(id -g)" -e HOME=/tmp -e GOCACHE=/cache/build -e GOMODCACHE=/cache/mod \
