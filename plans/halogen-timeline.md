@@ -43,3 +43,4 @@ decides about daily use. `big` on llama.cpp stays as it is either way.
 | 11:53 | Download started on marvin (`lab models marvin halogen`, detached; log ~/.cache/halogen-download.log) | ~40 MB/s: about 50 min + checksums | — |
 | 11:57 | Image pulled on marvin by digest (4.72 GB). Its entrypoint: runs as root, no privilege steps (only `ulimit -c 0`), default command `all` (engine + API in one container, API on 8731) | — | — |
 | 11:59 | `big-halogen` in the allowlist (devices kfd+dri, render+video, ipc host, memlock unlimited, weights read-only, big's sampling and effort medium, stop timeout 120 s) and in marvin's llama-swap config (proxy :8731, checkEndpoint /health, unloadTimeout 300, training pin). Not deployed yet: the launcher service must be restarted for the new allowlist fields (sudo) | — | this commit |
+| 11:59 | Daniel restarted lab-engined (new allowlist fields) | active | — |
