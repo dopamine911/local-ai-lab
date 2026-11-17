@@ -174,7 +174,8 @@ Good result: writing +3% or more, reading within ±3%, tool use within the seed 
 | 19:36 | After, draft 3: `lab speed coder` | **55.3 writing (+2.0%) / 935.0 reading (-0.4%)**, 74% of drafted tokens accepted; runs/2026-11-16-1936-speed-coder.json, MLflow 5776c5a8 | — |
 | 19:38 | **Result: under the +3% bar, back to draft 2.** Tool use not run (step 4 only on +3%). marvin unchanged (draft 3) | | this commit |
 
-## Step 4 (planned, not started): MoE expert cache for `gpt-oss` at 128K f16 on zaphod
+## Step 4 (skipped by Daniel 2026-11-17): MoE expert cache for `gpt-oss` at 128K f16 on zaphod
+Skipped: small expected gain on a test-only model; 128K q8_0 on the cards is already faster. Plan kept for later.
 Why only this model: it is the only one that does not fit the cards (128K f16 needs 69.9-75.7 GB, ~63.4 GB usable),
 so `--fit` puts part of the experts in RAM: 54.5 writing / 1,423 reading on 269. The cache keeps the most-used of
 those RAM experts on the cards. All on 273: the review's "baseline on 269 first" no longer applies (zaphod is on 273).
