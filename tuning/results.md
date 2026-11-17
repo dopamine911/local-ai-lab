@@ -220,6 +220,26 @@ Tests through zaphod's peer (`marvin/big`); chat-teacher direct to marvin:8080. 
 Kept. MLflow series `big-ls269-v1`, `big-ls273-v1`; speed 37062caf (269), db14d348 (273). Rollback: `image:
 llama-swap-marvin:269`. Log: plans/llama-cpp-v1-timeline.md.
 
+## marvin: Halogen Flash 0.20.6 vs `big` (same model, Qwen3.8-Flash-Next; 2026-11-17)
+
+Halogen Flash (closed engine for this one model on Strix Halo) started by the engine launcher as `big-halogen`, with
+`big`'s sampling and thinking effort (medium). `big` = llama.cpp on 273, UD-IQ4_XS, MTP draft 3, cache-leak flags.
+
+| | `big` (llama.cpp) | `big-halogen` |
+| --- | --- | --- |
+| writing (lab speed) | 45.6 tok/s | **83.6** (+83%) |
+| reading 32K (lab speed) | 328 tok/s | **2,144** (6.5x) |
+| reading at 30K / 62K / 123K (tuning/depth.py) | 360 / 313 / 267 | **2,145 / 2,118 / 2,007** |
+| first token, 123K prompt | 462 s | **61 s** |
+| tool use, full suite, temp 0.6, seeds 1-3 | 96 / 91 / 93 | 93 / 93 / 91 (same range) |
+| conversation leak test (sequential; 4 at once) | 0 (with the leak flags) | 0; 0, with its prompt cache on |
+| returning to a 12K conversation after another | re-read in full (leak flags) | 0.17 s |
+| memory | ~93 GB weights + KV | 88.9 GiB in all (weights 62.1 locked, 47.7 GiB lookup table read from disk) |
+
+Misses differ: Halogen fails TC-03 2 of 3 and is partial on TC-57 3 of 3 (`big` passes both every time); `big` misses
+TC-30/33/59/60 once each and ran away on TC-45 once. Not tested: hours of agent use, Terminal-Bench, vision.
+Log: plans/halogen-timeline.md. MLflow: speed c8ddb903; tool use series `big-halogen-v1`.
+
 ## zaphod `coder` MTP draft 2 -> 3 (image 273, 2026-11-16)
 
 One change: `--spec-draft-n-max` in the `mtp` macro. Back to back, 19:33 and 19:36, card 1.
