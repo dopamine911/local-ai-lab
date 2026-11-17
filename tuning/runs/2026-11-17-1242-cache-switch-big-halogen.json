@@ -1,0 +1,115 @@
+{
+ "model": "big-halogen",
+ "base_url": "http://marvin:8080/v1/chat/completions",
+ "rounds": [
+  {
+   "round": 1,
+   "codeword_a": "ALPHA-14613DFE",
+   "codeword_b": "BRAVO-C4A3FFB1",
+   "a1": {
+    "ttft_s": 5.78,
+    "answer": "ALPHA-14613DFE",
+    "prompt_tokens": 12119,
+    "cached_tokens": null,
+    "prompt_n": 12119,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 6.55,
+    "answer": "BRAVO-C4A3FFB1",
+    "prompt_tokens": 13702,
+    "cached_tokens": null,
+    "prompt_n": 13702,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 0.18,
+    "answer": "ALPHA-14613DFE",
+    "prompt_tokens": 12157,
+    "cached_tokens": 12096,
+    "prompt_n": 61,
+    "cache_n": 12096,
+    "own_codeword": true,
+    "leak": false
+   }
+  },
+  {
+   "round": 2,
+   "codeword_a": "ALPHA-BC3F28DC",
+   "codeword_b": "BRAVO-08F06A65",
+   "a1": {
+    "ttft_s": 5.72,
+    "answer": "ALPHA-BC3F28DC",
+    "prompt_tokens": 12118,
+    "cached_tokens": null,
+    "prompt_n": 12118,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 6.47,
+    "answer": "BRAVO-08F06A65",
+    "prompt_tokens": 13704,
+    "cached_tokens": null,
+    "prompt_n": 13704,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 0.17,
+    "answer": "ALPHA-BC3F28DC",
+    "prompt_tokens": 12155,
+    "cached_tokens": 12096,
+    "prompt_n": 59,
+    "cache_n": 12096,
+    "own_codeword": true,
+    "leak": false
+   }
+  },
+  {
+   "round": 3,
+   "codeword_a": "ALPHA-F789C5E0",
+   "codeword_b": "BRAVO-F70C3A31",
+   "a1": {
+    "ttft_s": 5.72,
+    "answer": "ALPHA-F789C5E0",
+    "prompt_tokens": 12119,
+    "cached_tokens": null,
+    "prompt_n": 12119,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 6.47,
+    "answer": "BRAVO-F70C3A31",
+    "prompt_tokens": 13703,
+    "cached_tokens": null,
+    "prompt_n": 13703,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 0.17,
+    "answer": "ALPHA-F789C5E0",
+    "prompt_tokens": 12157,
+    "cached_tokens": 12096,
+    "prompt_n": 61,
+    "cache_n": 12096,
+    "own_codeword": true,
+    "leak": false
+   }
+  }
+ ],
+ "leaks": 0,
+ "median_ttft_a_again_s": 0.17,
+ "median_ttft_a_s": 5.72,
+ "median_prompt_read_a_again": 61
+}

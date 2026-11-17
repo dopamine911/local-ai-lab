@@ -1,0 +1,60 @@
+{
+ "model": "big-halogen",
+ "base_url": "http://marvin:8080/v1",
+ "short": [
+  {
+   "writing_tps": 83.6,
+   "tokens": 400,
+   "ttft_s": 0.14,
+   "server_reported_tps": 83.843
+  },
+  {
+   "writing_tps": 84.1,
+   "tokens": 400,
+   "ttft_s": 0.01,
+   "server_reported_tps": 84.31
+  },
+  {
+   "writing_tps": 82.8,
+   "tokens": 400,
+   "ttft_s": 0.01,
+   "server_reported_tps": 84.331
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 32494,
+   "reading_tps": 2147.4,
+   "ttft_s": 15.1,
+   "server_reported_tps": 2152.605
+  },
+  {
+   "prompt_tokens": 32498,
+   "reading_tps": 2142.2,
+   "ttft_s": 15.2,
+   "server_reported_tps": 2147.393
+  },
+  {
+   "prompt_tokens": 32496,
+   "reading_tps": 2143.6,
+   "ttft_s": 15.2,
+   "server_reported_tps": 2149.206
+  }
+ ],
+ "speed_write_tps": 83.6,
+ "speed_read_32k_tps": 2143.6,
+ "speed_ttft_32k_s": 15.2,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}

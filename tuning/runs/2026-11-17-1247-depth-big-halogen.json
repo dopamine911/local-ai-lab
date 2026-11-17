@@ -1,0 +1,30 @@
+{
+ "model": "big-halogen",
+ "base_url": "http://marvin:8080/v1/chat/completions",
+ "rows": [
+  {
+   "depth_k": 32,
+   "prompt_tokens": 30347,
+   "ttft_s": 14.1,
+   "reading_tps": 2144.9,
+   "tokens_out": 81,
+   "writing_tps": 50.7
+  },
+  {
+   "depth_k": 64,
+   "prompt_tokens": 62101,
+   "ttft_s": 29.3,
+   "reading_tps": 2118.0,
+   "tokens_out": 75,
+   "writing_tps": 54.7
+  },
+  {
+   "depth_k": 128,
+   "prompt_tokens": 123296,
+   "ttft_s": 61.4,
+   "reading_tps": 2006.9,
+   "tokens_out": 71,
+   "writing_tps": 46.4
+  }
+ ]
+}
