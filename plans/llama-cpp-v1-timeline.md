@@ -173,3 +173,21 @@ Good result: writing +3% or more, reading within ±3%, tool use within the seed 
 | 19:36 | `--spec-draft-n-max 2` -> `3`, reload | coder ready | 7ab65df |
 | 19:36 | After, draft 3: `lab speed coder` | **55.3 writing (+2.0%) / 935.0 reading (-0.4%)**, 74% of drafted tokens accepted; runs/2026-11-16-1936-speed-coder.json, MLflow 5776c5a8 | — |
 | 19:38 | **Result: under the +3% bar, back to draft 2.** Tool use not run (step 4 only on +3%). marvin unchanged (draft 3) | | this commit |
+
+## Step 4 (planned, not started): MoE expert cache for `gpt-oss` at 128K f16 on zaphod
+Why only this model: it is the only one that does not fit the cards (128K f16 needs 69.9-75.7 GB, ~63.4 GB usable),
+so `--fit` puts part of the experts in RAM: 54.5 writing / 1,423 reading on 269. The cache keeps the most-used of
+those RAM experts on the cards. All on 273: the review's "baseline on 269 first" no longer applies (zaphod is on 273).
+What it can win (my estimate, not measured): the RAM part costs ~6.5 ms per token (54.5 vs 85.3 tok/s when nothing is
+in RAM). The cache takes card memory, so more experts move to RAM; at best maybe ~60-65 tok/s. That is still below
+128K **q8_0** all on the cards (82.9 / 2,278). f16's only reason is tool use: 128K q8_0 scored 90 (TC-15 failed),
+but that is one fixed-seed run, and 128K f16 was never tool-tested. Reading will not improve (prefill skips the cache).
+Steps (one change each; a test entry `gpt-oss-128k` added, removed at the end; real `gpt-oss` untouched):
+1. zaphod and marvin idle (`docker compose logs --since 10m | grep -c launch_slot_` = 0 on marvin).
+2. Daniel stops the watchdog (sudo). Window: memory sync at :41 calls `embed`, which evicts gpt-oss.
+3. A, baseline: `${server-fit}` 128K f16 -b/-ub 4096 -lm none (the 269 setup). `lab speed` + core tool use.
+   **Stop here if A's tool use is under 97**: then 128K f16 has no advantage over q8_0 and the cache is moot.
+4. Dry run with `-lv 4`: does fit count `--moe-cache-mib` in its plan (projected memory with and without)?
+5. B: A + `--moe-cache-mib` (size from step 4). C: B + `--moe-cache-cpu-share 0.95`. `lab speed` each.
+6. Remove the test entry, bring the 7 usual models back, Daniel restarts the watchdog.
+Good result: writing ≥ 56.1 (+3% over A), reading within ±3%, tool use 97.
