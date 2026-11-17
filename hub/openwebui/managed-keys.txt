@@ -16,6 +16,13 @@ rag.reranking_engine
 rag.external_reranker_url
 rag.external_reranker_api_key
 rag.reranking_model
+rag.chunk_size
+rag.top_k
+rag.top_k_reranker
+subagents.max_concurrent
+subagents.max_async
+subagents.max_iterations
+subagents.max_output
 audio.stt.engine
 audio.stt.model
 audio.stt.openai.api_base_url

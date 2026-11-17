@@ -14,25 +14,25 @@ Mesa (apt pin in both llama-swap Dockerfiles); Enso's Ubuntu snapshot date (`UBU
 
 | What | Where pinned | Version | Check after a bump |
 | --- | --- | --- | --- |
-| Open WebUI | hub/compose.yaml | v0.12.5 (bumped from 0.12.4) | `lab webui drift` and `lab webui models`: 0 differ |
-| Open Terminal | hub/compose.yaml | 0.14.7 (from 0.14.5) | container up |
+| Open WebUI | hub/compose.yaml | v0.13.4 (from 0.12.5, Renovate #36, 2026-11-17; image settings now stored as an "image connection" in the DB after the first start, env read only then) | `lab webui drift` and `lab webui models`: 0 differ |
+| Open Terminal | hub/compose.yaml | 0.17.20 (from 0.14.7, Renovate #32, 2026-11-17) | container up; a command through its API (`/execute`), key required (401 without) |
 | MCPJungle server + CLI | hub/compose.yaml, cli/lab.yaml `mcpjungle.version` | 0.4.7 (from 0.4.6) | `lab mcp setup`: every server and client line |
-| mcp-searxng | hub/compose.yaml | 2.9.0 (from 2.6.0; 2.8.x fixed 4 CVEs) | a search through the `search` tool |
+| mcp-searxng | hub/compose.yaml | 2.11.0 (from 2.9.0, Renovate #37, 2026-11-17) | a search through the `search` tool |
 | SearXNG | hub/compose.yaml | 2026.10.30-ffa88e3ba (from 2026.10.25) | same |
-| Squid (browser proxy) | hub/compose.yaml | 7.2-26.04_edge (from 6.6-24.04; `squid-gnutls -k parse` OK) | browser: public page loads, `http://192.168.1.1/` gets 403 |
-| ntfy | hub/compose.yaml | v2.35.0 (latest, added 2026-10-30) | `hub/notify "test" "x"` arrives on the phone (verified 2026-11-01) |
+| Squid (browser proxy) | hub/compose.yaml | 7.2-26.04_edge, digest 42decc7 (Renovate #35, 2026-11-17; `squid-gnutls -k parse` OK) | browser: public page loads, `http://192.168.1.1/` gets 403 |
+| ntfy | hub/compose.yaml | v2.38.1 (from 2.37.1, Renovate #39, 2026-11-17, a security release; 2.35.0 → 2.37.1 was #27, 2026-11-02) | `hub/notify "test" "x"` arrives on the phone; the 10 access checks (plans/notifications-timeline.md) |
 | Playwright MCP | hub/compose.yaml | v0.0.83 (latest) | same |
 | Beszel + agent | hub/compose.yaml, marvin/llama-swap/compose.yaml | 0.21.1 (latest; digest added) | Beszel page |
 | MLflow | hub/compose.yaml | v3.17.2 (latest; digest added) | MLflow page |
 | Homepage | hub/compose.yaml | v2.7.0 (latest; digest added) | start page |
 | Caddy | hub/caddy/Dockerfile | 2.11.7 (latest; digest added: Docker republished the tag, takes effect at the next Caddy rebuild) | every `*.ai.<domain>` page |
-| ComfyUI | hub/comfyui/Dockerfile | v0.43.0 (latest); Python base pinned 3.13.18 at next build | image mode |
+| ComfyUI | hub/comfyui/Dockerfile + the image tag in hub/compose.yaml (Renovate changes only the Dockerfile: fix the tag by hand) | v0.45.0 (from 0.43.0, Renovate #38, 2026-11-17) | image mode |
 | LocalRecall + Postgres | hub/compose.yaml | v0.6.6 (latest) | `memory` search |
-| LocalRecall MCP / mcp-proxy | hub/memory/mcp-localrecall.Dockerfile | mcps v0.0.4, mcp-proxy 0.14.0 (Renovate #28, 2026-11-02; needs `--allowed-host mcp-localrecall:8080` since 0.13.3); Python 3.12.16 | `memory` search through MCPJungle |
-| Mnemosyne | hub/memory/mnemosyne.Dockerfile | 4.0.0 (latest); Python 3.12.16 | `recall` finds the REBUILD rule |
+| LocalRecall MCP / mcp-proxy | hub/memory/mcp-localrecall.Dockerfile | mcps v0.0.4, mcp-proxy 0.14.0 (Renovate #28, 2026-11-02; needs `--allowed-host mcp-localrecall:8080` since 0.13.3); Python 3.12.16 (digest 5e2bdb1, Renovate #42, 2026-11-17) | `memory` search through MCPJungle |
+| Mnemosyne | hub/memory/mnemosyne.Dockerfile | 4.0.0 (latest); Python 3.12.16 (digest 5e2bdb1, Renovate #42, 2026-11-17) | `recall` finds the REBUILD rule |
 | Python (relays, sync, stats, webui drift) | compose files, cli/lab.yaml `images.python`, cli/internal/webui (lab webui drift) | 3.13.18-slim-trixie, 3.12.16-slim (were floating `3.13-slim-trixie` / a bare digest) | containers up |
 | Enso image | agents/enso/Dockerfile | Ubuntu resolute-20261024.1, snapshot 2026-10-30, bun 1.4.4 (from 1.4.0), Enso 537559a, pi 1.1.0 | `lab enso check` |
-| lab CLI: Go | cli/build.sh `IMG=` | golang:1.27.3 by digest (latest) | `cli/build.sh` (vet, tests, build) |
+| lab CLI: Go | cli/build.sh `IMG=` | golang:1.27.3 by digest (e519d3b, Renovate #43, 2026-11-17) | `cli/build.sh` (vet, tests, build) |
 | lab CLI: libraries | cli/go.mod + go.sum | cobra v1.10.2, bubbletea v2.1.1, lipgloss v2.0.6, go.yaml.in/yaml v3.0.6 (latest stable; yaml v4 is still rc) | same + `lab manifest` (no "unknown") and `lab setup check` |
 | Ubuntu base of llama-swap images | zaphod/ and marvin/llama-swap/Dockerfile | resolute-20261024.1 (was the floating `ubuntu:26.04`); in zaphod's 269-media build (2026-11-02; the comment on the FROM line had broken builds until then) | — |
 | Mesa (Vulkan driver) in the llama-swap images | zaphod/llama-swap/Dockerfile, marvin/llama-swap/Dockerfile | 26.0.8-1ubuntu0.3 (pinned 2026-11-02, = current Ubuntu 26.04; was unpinned) | `lab speed` before/after a bump |

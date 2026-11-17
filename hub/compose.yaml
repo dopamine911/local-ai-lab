@@ -59,6 +59,15 @@ services:
       RAG_EXTERNAL_RERANKER_URL: http://127.0.0.1:8080/v1/rerank
       RAG_EXTERNAL_RERANKER_API_KEY: ${ZAPHOD_KEY}
       RAG_RERANKING_MODEL: rerank
+      # Open WebUI 0.13 defaults, chosen by Daniel 2026-11-17 (the DB had kept 0.12's 1000 / 3 / 3 and sub-agent
+      # limits 20 / 20 / 30 / 30000); written here so a rebuild gives the same. Empty = no limit.
+      CHUNK_SIZE: "1024"
+      RAG_TOP_K: "10"
+      RAG_TOP_K_RERANKER: "10"
+      SUBAGENTS_MAX_CONCURRENT: ""
+      SUBAGENTS_MAX_ASYNC: ""
+      SUBAGENTS_MAX_ITERATIONS: ""
+      SUBAGENTS_MAX_OUTPUT: ""
       # Speech from llama-swap: stt (Qwen3-ASR), tts (Kokoro, voice af_heart)
       AUDIO_STT_ENGINE: openai
       AUDIO_STT_MODEL: stt
@@ -242,7 +251,7 @@ services:
   # `lab image-mode off` stops it and gives card 2 back to llama-swap.
   comfyui:
     build: ./comfyui                    # docker compose --profile images build comfyui
-    image: comfyui-zaphod:v0.43.0-torch2.15.0-rocm7.14
+    image: comfyui-zaphod:v0.45.0-torch2.15.0-rocm7.14
     container_name: comfyui
     profiles: [images]
     restart: "no"
