@@ -38,6 +38,7 @@ Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
   TARGET=marvin lab tbench smoke "flash-next"     (marvin's model, labelled as marvin)
   TARGET=marvin-strata lab tbench full "strata"   (Strata on marvin; start it first: marvin's strata-test.sh start)
   TARGET=marvin-fork lab tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
+  TARGET=marvin-halogen lab tbench full "halogen" (Halogen Flash on marvin, launcher engine big-halogen; marvin idle)
   RERUN=1 TARGET=marvin lab tbench full "again"   (same model and profile again: without RERUN=1 the suite skips it)
 `
 
@@ -80,6 +81,15 @@ func tbFromEnv() tbSettings {
 		s.Platform, s.PlatformName = "strixhalo", strix
 		or(&s.Context, "131072")
 		s.Endpoint, s.Engine, s.Backend, s.BackendVersion = "http://marvin:8099/v1", "strata", "hip", "rocm-gfx1151"
+		os.Setenv("MACHINE", "marvin")
+	case "marvin-halogen": // Halogen Flash on marvin (launcher engine big-halogen), direct to marvin's llama-swap
+		or(&s.Model, "big-halogen")
+		or(&s.ModelName, "Qwen3.8-Flash-Next")
+		or(&s.Quant, "halogen-v2-4.16bpw")
+		or(&s.Profile, "halogen0.20.6-mtp-128k-np4-medium")
+		s.Platform, s.PlatformName = "strixhalo", strix
+		or(&s.Context, "131072") // the same limit as the other marvin runs (Halogen itself allows 262144 per request)
+		s.Endpoint, s.Engine, s.Backend, s.BackendVersion = "http://marvin:8080/v1", "halogen-flash", "hip", "0.20.6"
 		os.Setenv("MACHINE", "marvin")
 	case "marvin-fork": // our UnbiasedStrata gfx1151 build on marvin, started with fork.sh start
 		or(&s.Model, "big-fork")
@@ -207,6 +217,12 @@ func tbKey(cfg *config.Config, s tbSettings) error {
 			return fmt.Errorf("Strata key from marvin: %v", err)
 		}
 		key = strings.TrimRight(string(b), "\n")
+	case "halogen-flash": // marvin's llama-swap key (MARVIN_KEY in marvin's ~/llama-swap/.env)
+		b, err := exec.Command("ssh", "marvin", "grep", "^MARVIN_KEY=", "llama-swap/.env").Output()
+		if err != nil {
+			return fmt.Errorf("MARVIN_KEY from marvin: %v", err)
+		}
+		key = strings.TrimPrefix(strings.TrimRight(string(b), "\n"), "MARVIN_KEY=")
 	case "unbiasedstrata": // fork.sh start
 		b, err := exec.Command("ssh", "marvin", "cat", "strata-fork/key").Output()
 		if err != nil {
