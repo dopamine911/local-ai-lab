@@ -24,7 +24,10 @@ func TestPlanMatchesScript(t *testing.T) {
 	s := string(src)
 	i, j := strings.Index(s, "<<'PY'\n"), strings.LastIndex(s, "\nPY\n")
 	if i < 0 || j < 0 {
-		t.Fatal("python block not found in models.sh")
+		// Since the #6 clean-up (9bf8bce, 2026-11-02) models.sh is a wrapper that calls `lab webui models`: the Python
+		// this test compared against is gone (still in git history before 9bf8bce). The port was checked side by side
+		// then. Found by CI (#49): cli/build.sh mounts only cli/, so locally this test never saw the script.
+		t.Skip("models.sh is a wrapper now (no Python block to compare with); the port was checked at #6")
 	}
 	py := s[i+len("<<'PY'\n") : j]
 	if exec.Command("python3", "-c", "import yaml").Run() != nil {
