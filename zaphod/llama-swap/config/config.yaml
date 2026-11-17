@@ -112,6 +112,24 @@ models:
       -m /models/gpt-oss-120b-MXFP4.gguf
       -c 32768 -np 1 -b 2048 -ub 2048 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
+  # Engines started by the launcher (engines/lab-engined.py; allowlist engines/zaphod.json); llama-swap runs the client.
+  test-http:
+    name: "Launcher test (no GPU)"
+    description: "Test entry for the engine launcher (plans/engine-launcher-timeline.md); answers ok, no model."
+    proxy: http://lab-engine-test-http:8080
+    cmd: /engines/lab-engine run test-http
+    cmdStop: /engines/lab-engine stop test-http
+    checkEndpoint: /
+    unloadTimeout: 90
+  coder-radiance:
+    name: "Qwen3.8-27B on Radiance, both cards (test)"
+    description: "coder's model as IQ8R + DFlash2 on the Radiance engine, tp 2 (plans/radiance-timeline.md). Test only. Runs alone: helpers unload."
+    # Radiance 2.1.0, config engines/radiance-zaphod.yaml (coder's sampling, effort medium; Radiance's own row for this model).
+    proxy: http://lab-engine-coder-radiance:8000
+    cmd: /engines/lab-engine run coder-radiance
+    cmdStop: /engines/lab-engine stop coder-radiance
+    checkEndpoint: /health
+    unloadTimeout: 180   # its stop timeout is 60 s (engines/zaphod.json)
 profiles:
   image-mode:
     description: "Card 2 lent to ComfyUI (hub/image-mode on): coder-2 answered by coder; other card-2 chat models off"
@@ -125,6 +143,7 @@ profiles:
       chat-teacher-26b: ~
       tts-qwen: ~
       gpt-oss: ~           # uses card 2
+      coder-radiance: ~    # uses card 2
   training:
     # lab training-mode on|off|status. A training harness checks GET /api/profiles for active == "training".
     description: "Both cards lent to model training (lab training-mode on); search and speech helpers stay"
@@ -143,6 +162,8 @@ profiles:
       flint: ~
       tts-qwen: ~          # only loads next to coder-2 (voice set)
       gpt-oss: ~
+      coder-radiance: ~
+      test-http: ~
 routing:
   router:
     use: matrix
@@ -154,6 +175,8 @@ routing:
           voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
           gpt_oss: "gpt-oss"   # both cards + RAM; runs alone, helpers unload (Daniel 2026-11-09)
+          radiance: "coder-radiance"   # Radiance on both cards; runs alone, helpers unload (test, 2026-11-17)
+          launcher_test: "+helpers & test-http"   # no GPU
           teachers: "+helpers & (chat-teacher-c1 | chat-teacher-26b-c1) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"   # card 1 teacher instead of coder
 hooks:
   on_startup:

@@ -19,7 +19,7 @@ API on the Unix socket (llama-swap's side is engines/lab-engine):
 Engines run as containers named lab-engine-<name>, labelled lab.engine=<name>, on the Docker network lab-engines
 (created --internal: no internet, no published ports). llama-swap joins that network and proxies to the name.
 Every engine gets: --init, --cap-drop ALL, no-new-privileges, the allowlist's devices and read-only mounts only
-(plus, per engine: groups, env, user, --ipc, --ulimit, a stop timeout).
+(plus, per engine: groups, env, user, --ipc, --ulimit, a seccomp profile from engines/, a stop timeout).
 On start the service removes leftover lab.engine containers; on SIGTERM it stops the ones it runs.
 
 Good result: `lab-engined.py check` prints one docker command per engine; `curl --unix-socket <sock> http://x/status`
@@ -86,6 +86,11 @@ def run_args(name, e):
         a += ["--ipc", str(e["ipc"])]
     for u in e.get("ulimits", []):  # e.g. "memlock=-1:-1"
         a += ["--ulimit", str(u)]
+    if e.get("seccomp"):  # a seccomp profile file in engines/ (e.g. Radiance's: Docker's default + io_uring, NUMA)
+        f = os.path.join(HERE, os.path.basename(e["seccomp"]))
+        if not os.path.isfile(f):
+            raise ValueError(f"{name}: seccomp profile {f} not found")
+        a += ["--security-opt", f"seccomp={f}"]
     if e.get("stop_timeout"):
         a += ["--stop-timeout", str(int(e["stop_timeout"]))]
     for t in e.get("tmpfs", []):

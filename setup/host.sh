@@ -55,9 +55,9 @@ if [ "$(cat $f 2>/dev/null)" != "$want" ]; then
 else echo "already set"; fi
 ip -br addr show eno1
 
-if [ "$H" = marvin ]; then
-  step "6f. marvin: engine launcher lab-engined (engines/; plans/engine-launcher-timeline.md)"
-  # Starts only the containers in engines/marvin.json, for llama-swap (cmd/cmdStop: engines/lab-engine).
+if [ "$H" = marvin ] || [ "$H" = zaphod ]; then
+  step "6f. engine launcher lab-engined (engines/; plans/engine-launcher-timeline.md)"
+  # Starts only the containers in engines/<machine>.json, for llama-swap (cmd/cmdStop: engines/lab-engine).
   # Network lab-engines: internal (no internet, no host ports); llama-swap joins it. Check:
   # curl -s --unix-socket ~/.local/state/lab-engined/engined.sock http://x/status -> []
   sudo -u $U mkdir -p /home/$U/.local/state/lab-engined

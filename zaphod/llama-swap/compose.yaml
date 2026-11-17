@@ -13,10 +13,14 @@ services:
       - /srv/models:/models:ro
       - ./config:/etc/llama-swap/config
       - ./data:/data
+      # Engine launcher (engines/lab-engined.py, plans/engine-launcher-timeline.md): its socket folder and the client
+      # (/engines/lab-engine). Folders, not single files: a launcher restart or a git pull keeps the mounts valid.
+      - ${HOME}/.local/state/lab-engined:/run/lab-engined
+      - ${HOME}/homelab/engines:/engines:ro
     env_file: .env
     environment:
       GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM: "1"
-    networks: [default, agents-internal]
+    networks: [default, agents-internal, lab-engines]   # lab-engines: the engine containers (internal, no internet)
 
 networks:
   # Containerised agents (agents/enso) reach llama-swap here as http://llama-swap:8080, and nothing else: no route
@@ -24,3 +28,5 @@ networks:
   agents-internal:
     name: agents-internal
     internal: true
+  lab-engines:
+    external: true   # created by setup/host.sh step 6f (or the launcher) with --internal

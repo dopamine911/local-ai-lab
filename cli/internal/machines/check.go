@@ -144,7 +144,7 @@ func SetupCheck(cfg *config.Config) []Check {
 		}
 	}
 
-	if host == "marvin" {
+	if host == "marvin" || host == "zaphod" {
 		en, _ := out("systemctl", "is-enabled", "lab-engined")
 		ac, _ := out("systemctl", "is-active", "lab-engined")
 		same := sameFile(filepath.Join(cfg.Repo, "engines/lab-engined.service"), "/etc/systemd/system/lab-engined.service")
