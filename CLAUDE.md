@@ -69,4 +69,6 @@ need our own fixes: a small patch set on top of a pinned official tag, built fro
 a long-lived fork.
 
 Disk: root LVM volume expanded 2026-10-28 from 100 GB to the full 929 GB SSD.
+Before a big download or image build: `df -h /` and `~/homelab/hub/watchdog/watchdog.py status` (sessions don't see the phone
+alerts: on 2026-11-17 zaphod sat under 10% free for 4 h before anyone looked; #50). Build cache is pruned weekly (host.sh 6g).
 Hub: DOMAIN=ai.dopamine911.com; Cloudflare A records ai + *.ai -> zaphod's Tailscale IP (DNS only). models-panel/index.html still needs copying from the claude.ai project (#64).

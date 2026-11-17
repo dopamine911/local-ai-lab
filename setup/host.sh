@@ -55,6 +55,13 @@ if [ "$(cat $f 2>/dev/null)" != "$want" ]; then
 else echo "already set"; fi
 ip -br addr show eno1
 
+step "6g. weekly Docker build-cache prune (both machines; issue #50)"
+# Builds filled zaphod's disk on 2026-11-17 (ComfyUI 30 GB + cache). Sundays 03:23, before the 04:17 backup; removes only
+# build cache unused for 7 days (images and volumes untouched). Log ~/.cache/docker-prune.log. Check: crontab -l
+PRUNE='23 3 * * 0 docker builder prune -f --filter until=168h >> $HOME/.cache/docker-prune.log 2>&1'
+( crontab -u $U -l 2>/dev/null | grep -v 'docker builder prune'; echo "$PRUNE" ) | crontab -u $U -
+crontab -u $U -l | grep 'docker builder prune'
+
 if [ "$H" = marvin ] || [ "$H" = zaphod ]; then
   step "6f. engine launcher lab-engined (engines/; plans/engine-launcher-timeline.md)"
   # Starts only the containers in engines/<machine>.json, for llama-swap (cmd/cmdStop: engines/lab-engine).

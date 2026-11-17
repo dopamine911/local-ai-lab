@@ -144,6 +144,9 @@ func SetupCheck(cfg *config.Config) []Check {
 		}
 	}
 
+	ct, _ := out("crontab", "-l")
+	add("6g weekly build-cache prune (cron)", strings.Contains(ct, "docker builder prune"), map[bool]string{true: "in crontab", false: "missing"}[strings.Contains(ct, "docker builder prune")], hostFix)
+
 	if host == "marvin" || host == "zaphod" {
 		en, _ := out("systemctl", "is-enabled", "lab-engined")
 		ac, _ := out("systemctl", "is-active", "lab-engined")
