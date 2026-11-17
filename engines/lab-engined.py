@@ -44,7 +44,12 @@ def log(msg):
 
 
 def docker(*args, timeout=120):
-    return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
+    """Never raises on a slow Docker (it can take long while a big model loads): a timeout comes back as code 124."""
+    try:
+        return subprocess.run(["docker", *args], capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        log(f"docker {args[0]} timed out after {timeout} s")
+        return subprocess.CompletedProcess(["docker", *args], 124, "", "timed out")
 
 
 def load_spec():
@@ -84,19 +89,22 @@ def run_args(name, e):
 
 
 def exists(cname):
-    return docker("inspect", "-f", "{{.State.Status}}", cname, timeout=30).returncode == 0
+    """True if the container exists. A timed-out answer counts as "exists" (the safe guess when stopping)."""
+    r = docker("inspect", "-f", "{{.State.Status}}", cname, timeout=60)
+    return r.returncode in (0, 124)
 
 
 def stop(name):
     """Stop and remove lab-engine-<name>; return when it is gone."""
     cname = PREFIX + name
     if exists(cname):
-        docker("stop", "-t", str(STOP_WAIT), cname, timeout=STOP_WAIT + 30)
-        docker("rm", "-f", cname, timeout=60)
-    for _ in range(60):
+        docker("stop", "-t", str(STOP_WAIT), cname, timeout=STOP_WAIT + 60)
+    end = time.time() + 180
+    while time.time() < end:
         if not exists(cname):
             return True
-        time.sleep(0.5)
+        docker("rm", "-f", cname, timeout=60)
+        time.sleep(1)
     return False
 
 
@@ -161,11 +169,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def do_POST(self):
         verb = self.path.strip("/").split("/")[0]
         if verb == "stop":
-            t, err = self.target("stop")
-            if err:
-                return self.reply(404 if "allowlist" in err else 400, err)
-            ok = stop(t[0])
-            log(f"stop {t[0]}: {'gone' if ok else 'STILL THERE'}")
+            # Stopping is always allowed for a valid name, also one no longer in the allowlist (removing an engine
+            # from the allowlist and llama-swap's config at the same time must not leave it running: 2026-11-17).
+            parts = self.path.strip("/").split("/")
+            if len(parts) != 2 or not NAME.match(parts[1]):
+                return self.reply(400, "bad path")
+            ok = stop(parts[1])
+            log(f"stop {parts[1]}: {'gone' if ok else 'STILL THERE'}")
             return self.reply(200 if ok else 500, "stopped" if ok else "container still there")
         if verb != "run":
             return self.reply(404, "unknown")
@@ -181,8 +191,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             running[name] = True
         try:
             self.run_engine(name, e)
+        except Exception as err:  # a broken caller connection or a Docker error: the cleanup below still runs
+            log(f"run {name}: {type(err).__name__}: {err}")
         finally:
-            ok = stop(name)
+            ok = False
+            try:
+                ok = stop(name)
+            except Exception as err:
+                log(f"run {name}: stop failed: {type(err).__name__}: {err}")
             with lock:
                 running.pop(name, None)
             log(f"run {name} ended; container {'gone' if ok else 'STILL THERE'}")
