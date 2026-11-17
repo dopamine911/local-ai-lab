@@ -218,7 +218,7 @@ services:
 
   # The browser's only way out (hub/browser-proxy/squid.conf): web ports only, private destinations refused.
   browser-proxy:
-    image: ubuntu/squid:7.2-26.04_edge@sha256:74a4935c1329cde41522d2fbc8351101b9ac3be0b5129c49e1803ff6df589027
+    image: ubuntu/squid:7.2-26.04_edge@sha256:42decc7f79b4e1044f4fe9b3a855af2cbfc76652f3191694726e21058443edc9
     container_name: browser-proxy
     restart: unless-stopped
     networks: [default, browser-internal]
