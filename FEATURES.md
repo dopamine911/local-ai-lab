@@ -113,15 +113,7 @@ Every speed and score, with dates: [tuning/results.md](tuning/results.md#current
 | Secrets: only in `.env` files (mode 600) + Proton Pass, never in git; checked before commits | working | [setup/REBUILD.md](setup/REBUILD.md) section 5 |
 | Services listen only on 127.0.0.1 or the Tailscale address; every image pinned (most by digest) | working | [hub/compose.yaml](hub/compose.yaml) |
 
-## 7. Plans
+## 7. Plans and open work
 
-| Plan | What | Status |
-| --- | --- | --- |
-| [plans/agent-infra.md](plans/agent-infra.md) | Infrastructure for all agents: Enso on local models, own-task test, gateway, memory, tracing, reliability, hardening | in progress (gateway done) |
-| [plans/strix-strata.md](plans/strix-strata.md) | Strata on marvin (sealed off), then port UnbiasedStrata to AMD gfx1151 and contribute upstream | on hold (fork built and benchmarked: 19/19 Terminal-Bench) |
-| [plans/maya.md](plans/maya.md) | Project Maya: much bigger models (GLM-5.3-Flash 321B) on marvin; ideas for the fork | to check (after the port) |
-| [plans/strata.md](plans/strata.md) | Strata tests on zaphod | done |
-| [plans/more-models.md](plans/more-models.md) | Vision, chat, document search, speech, images | done |
-| [plans/morning-guide-2026-10-29.md](plans/morning-guide-2026-10-29.md) | Overnight work summary and steps for Daniel | done |
-| [GitHub issues](https://github.com/dopamine911/local-ai-lab/issues) | Reservations (#3), card pool (#4), autoresearch (#5), prompt cache back on once llama.cpp fixes the leak (#34; the workaround from #10 is in place), backups to the NAS with a tested restore (#13, #30), ROCm llama.cpp (#16); README.md "What's next" | open |
-| [CLAUDE.md](CLAUDE.md) "Next steps" | marvin 256K context, MTP tuning, Terminal-Bench full runs, llama.cpp update policy | ongoing |
+- Open work: [GitHub issues](https://github.com/dopamine911/local-ai-lab/issues), the one backlog.
+- Plans and timelines, each with its status: [plans/README.md](plans/README.md).

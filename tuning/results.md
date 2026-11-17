@@ -381,7 +381,9 @@ Test: `llama-bench -m Qwen3.8-27B-UD-Q4_K_XL.gguf -ngl 999 -fa 1 -p 512 -n 128` 
 ## Ideas to test next
 1. Answered 2026-10-28: the ~10% slower card with MTP is card 1 (OCuLink, PCIe 3.0 x4), not a model setting; the gap moved with the models when the device mix-up was fixed. Fix would be a faster link for card 1.
 2. Answered 2026-11-16 (image 273): draft 3 gives `coder` +2.0% writing, under the +3% bar; kept 2. Draft 4 not tried (draft 3 already accepts less: 74%).
-3. `-ub` 512 / 1024 / 2048 (reading speed).
-4. `coder-long` speed (both cards).
-5. New models: Qwen3-Coder-Next, Gemma 4 31B.
-6. Flint: on hold (2026-10-28) until a newer Flint release or llama.cpp update. Then re-run 3 seeds at temp 1.0 and compare with the table above (average 87).
+3. `-ub` 512 / 1024 / 2048 (reading speed): issue #45 (`big` first, then `coder`).
+4. `coder-long` speed (both cards): issue #60.
+5. New models: Qwen3-Coder-Next: issue #61 (Gemma 4 31B is done: `chat`, `chat-teacher`).
+6. Flint: on hold, issue #62.
+
+New ideas go into GitHub issues (#49: one backlog).

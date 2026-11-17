@@ -1,0 +1,29 @@
+# The lab CLI's checks on every push and pull request that touches cli/ (#49): the same `go vet` and `go test` that
+# cli/build.sh runs before every build, in the same pinned Go image (cli/build.sh IMG=), so a broken test shows up on
+# GitHub too, not only on the machine that builds. Only GitHub's own checkout action, pinned by commit; no secrets.
+# Good result: a green check on the commit; a deliberately broken test turns it red.
+name: CLI tests
+on:
+  push:
+    paths: ["cli/**", ".github/workflows/cli-test.yml"]
+  pull_request:
+    paths: ["cli/**", ".github/workflows/cli-test.yml"]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    # Keep in step with cli/build.sh IMG=. Renovate should update both (its github-actions manager reads `container:`; not yet seen)
+    container: golang:1.27.3@sha256:e519d3b0a5b285e5aa53ab9eef02bc6bbb9cb04608389b743a136a9ce75f0d1e
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+      - name: go vet
+        working-directory: cli
+        run: go vet ./...
+      - name: go test
+        working-directory: cli
+        env:
+          GOFLAGS: -mod=readonly
+        run: go test ./...

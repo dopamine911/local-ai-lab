@@ -61,15 +61,12 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 ## Results
 `tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `lab speed`, `quality`, `bench`, `kl`, `tbench`, `compare-skill`, `series` (one CLI for the lab: `lab --help`, docs/cli/; the old scripts are wrappers); see tuning/README.md.
 
-## Next steps
-1. Terminal-Bench full run of `coder-tb`, with and without the-craft (overnight, in tmux).
-2. Done 2026-10-29: marvin MTP draft 3 (24.7 → 39.6 tok/s writing), tool-use x3, Terminal-Bench 19/19.
-2b. marvin Terminal-Bench done (19/19, 2026-10-29). Next, each needs Daniel's go-ahead: a the-craft run for comparison; add `--metrics` to llama-server on both machines (Homepage "pending" count),
-    `big` at 256K done 2026-11-03 (omp overflows; −3.8 GB; plans/switch-move-timeline.md).
-3. Tuning ideas in tuning/results.md. marvin `big` uses llama.cpp's default batch (-b 2048 -ub 512); try -ub 2048 on
-   the 32K test (`lab speed`), one change, before the Strata comparison is final.
-4. llama.cpp: stay on the pinned build and watch for fixes (grammar bug above). If we need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not a long-lived fork. Separate the llama.cpp version from llama-swap's first (official llama.cpp image + llama-swap binary), changing one thing at a time.
-5. Optional: RAM runs at 2666 instead of XMP 3600; card 2 links at x8 not x16.
+## Open work
+GitHub issues are the one backlog (https://github.com/dopamine911/local-ai-lab/issues); `plans/README.md` indexes the plans
+with their status. Add new work as an issue, not as a list here.
+Standing policy (not a task): llama.cpp stays on the pinned build, updated measured (plans/llama-cpp-v1-timeline.md). If we
+need our own fixes: a small patch set on top of a pinned official tag, built from source, each patch offered upstream; not
+a long-lived fork.
 
 Disk: root LVM volume expanded 2026-10-28 from 100 GB to the full 929 GB SSD.
-Hub: DOMAIN=ai.dopamine911.com; Cloudflare A records ai + *.ai -> zaphod's Tailscale IP (DNS only). models-panel/index.html still needs copying from the claude.ai project.
+Hub: DOMAIN=ai.dopamine911.com; Cloudflare A records ai + *.ai -> zaphod's Tailscale IP (DNS only). models-panel/index.html still needs copying from the claude.ai project (#64).
