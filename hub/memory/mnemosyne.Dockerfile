@@ -4,7 +4,7 @@
 # Embeddings: its default local model (FastEmbed BAAI/bge-small-en-v1.5, 384 dims, CPU), downloaded HERE at build
 # time; at run time nothing is downloaded (HF_HUB_OFFLINE) and there is no internet. Not llama-swap: 4.0 refuses to
 # send an API key over plain http, and the local model keeps memory working while llama-swap swaps models.
-FROM docker.io/library/python:3.12.16-slim@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30
+FROM docker.io/library/python:3.12.16-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
 ENV MNEMOSYNE_FASTEMBED_CACHE_DIR=/opt/fastembed
 RUN pip install --no-cache-dir "mnemosyne-memory[mcp,embeddings]==4.0.0" \
     && python -c "from fastembed import TextEmbedding; TextEmbedding('BAAI/bge-small-en-v1.5', cache_dir='/opt/fastembed')" \
