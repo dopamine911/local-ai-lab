@@ -81,7 +81,8 @@ My lean: engines as llama-swap entries first (step 1-3 below), so llama-swap's U
 models panel as the one page for both machines, with `lab` doing the same from the terminal.
 
 ## 7. Steps (one change at a time; each needs Daniel's go-ahead)
-1. **Decide 5.1** (launch method). Good result: written in this file, with the reason.
+1. **Decide 5.1** (launch method). Done 2026-11-17: B, built and tested on marvin (plans/engine-launcher-timeline.md:
+   no leftovers in any failure test; a GPU engine as fast as native, 61.3 vs 61.7 calls/min).
 2. **Halogen Flash vs `big` on marvin** (same model, the biggest possible gain):
    - pin the image by digest and the weights by revision + sha256 (`setup/models-marvin.txt`);
    - check privacy first: its prompt cache and cache modes against our cache-leak rule (CLAUDE.md, #27148);
