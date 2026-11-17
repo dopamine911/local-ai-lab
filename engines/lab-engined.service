@@ -1,0 +1,26 @@
+# Engine launcher (engines/lab-engined.py, plans/engine-launcher-timeline.md). Installed by setup/host.sh step 6f
+# into /etc/systemd/system/. Runs as daniel (docker group): starts only the containers in engines/<machine>.json.
+# Socket: ~/.local/state/lab-engined/engined.sock (that folder is mounted into llama-swap as /run/lab-engined).
+# Log: journalctl -u lab-engined. Check: curl -s --unix-socket ~/.local/state/lab-engined/engined.sock http://x/status
+[Unit]
+Description=Lab engine launcher (lab-engined)
+After=docker.service
+Requires=docker.service
+
+[Service]
+User=daniel
+Group=daniel
+SupplementaryGroups=docker
+ExecStart=/usr/bin/python3 /home/daniel/homelab/engines/lab-engined.py serve
+Restart=always
+RestartSec=2
+# On stop it stops its engines first (docker stop waits up to 30 s per engine)
+TimeoutStopSec=90
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+[Install]
+WantedBy=multi-user.target

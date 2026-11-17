@@ -1,0 +1,14 @@
+#!/bin/sh
+# llama-swap's side of lab-engined (engines/lab-engined.py), mounted into the llama-swap container:
+#   cmd:     /engines/lab-engine run <name>    holds the connection and prints the engine's log; when llama-swap stops
+#                                             this process, the launcher stops the engine
+#   cmdStop: /engines/lab-engine stop <name>   returns when the container is gone
+#   /engines/lab-engine status                 what runs
+# Only a name is sent; what runs is decided by the launcher's allowlist.
+S=${LAB_ENGINED_SOCK:-/run/lab-engined/engined.sock}
+case "$1" in
+  run)    [ -n "$2" ] || exit 2; exec curl -sS -N --fail-with-body --unix-socket "$S" -X POST "http://engined/run/$2" ;;
+  stop)   [ -n "$2" ] || exit 2; exec curl -sS --fail-with-body --max-time 90 --unix-socket "$S" -X POST "http://engined/stop/$2" ;;
+  status) exec curl -sS --unix-socket "$S" http://engined/status ;;
+  *)      echo "usage: lab-engine run|stop <name> | status" >&2; exit 2 ;;
+esac

@@ -54,6 +54,17 @@ models:
       --temp 1.0 --top-p 0.95 --top-k 64 --min-p 0.0
     ttl: 900   # back to big's slot after 15 idle minutes (big loads on its next request)
 
+  # Engines started by the launcher (engines/lab-engined.py; allowlist engines/marvin.json). llama-swap runs the client;
+  # the engine is a container on the internal lab-engines network, reached by its name.
+  test-http:
+    name: "Launcher test (no GPU)"
+    description: "Test entry for the engine launcher (plans/engine-launcher-timeline.md); answers ok, no model. Swaps with big."
+    proxy: http://lab-engine-test-http:8080
+    cmd: /engines/lab-engine run test-http
+    cmdStop: /engines/lab-engine stop test-http
+    checkEndpoint: /
+    unloadTimeout: 90
+
 profiles:
   training:
     # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
@@ -62,6 +73,7 @@ profiles:
       big: ~
       gpt-oss: ~
       chat-teacher: ~
+      test-http: ~
 hooks:
   on_startup:
     preload: [big]

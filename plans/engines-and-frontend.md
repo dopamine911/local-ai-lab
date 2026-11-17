@@ -62,6 +62,9 @@ marvin llama-swap  ── marvin engines: llama.cpp Vulkan `big` (now), Halogen 
      to start or stop one. Safer, more work.
    - C. Run llama-swap on the host instead of in a container. Changes how both machines are built.
    - My lean: B, or A on marvin only if B is too slow to build. Unverified which is less work.
+   - **Decided 2026-11-17 (Daniel): B.** Reason: the Docker socket stays with one small host service that only
+     starts what the repo's allowlist names; llama-swap sends only an engine name. Build log:
+     plans/engine-launcher-timeline.md.
 2. **The frontend** (section 6).
 3. **The order of engines** (section 7).
 

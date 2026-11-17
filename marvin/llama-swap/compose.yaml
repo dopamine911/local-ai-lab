@@ -16,6 +16,11 @@ services:
       - /srv/models:/models:ro
       - ./config:/etc/llama-swap/config
       - ./data:/data
+      # Engine launcher (engines/lab-engined.py, plans/engine-launcher-timeline.md): its socket folder and the client
+      # llama-swap runs as cmd/cmdStop. The folder, not the socket file, so a launcher restart keeps the mount valid.
+      - ${HOME}/.local/state/lab-engined:/run/lab-engined
+      - ${HOME}/homelab/engines/lab-engine:/engines/lab-engine:ro
+    networks: [default, lab-engines]   # lab-engines: internal network the engine containers run on (no internet)
     env_file: .env
     # No GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM here: marvin's GPU shares system memory,
     # so the zaphod fix doesn't apply.
@@ -77,3 +82,7 @@ services:
       - ./data/beszel-agent:/var/lib/beszel-agent
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
+
+networks:
+  lab-engines:
+    external: true   # created by setup/host.sh step 6f (or the launcher) with --internal

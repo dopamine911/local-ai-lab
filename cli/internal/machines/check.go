@@ -145,6 +145,17 @@ func SetupCheck(cfg *config.Config) []Check {
 	}
 
 	if host == "marvin" {
+		en, _ := out("systemctl", "is-enabled", "lab-engined")
+		ac, _ := out("systemctl", "is-active", "lab-engined")
+		same := sameFile(filepath.Join(cfg.Repo, "engines/lab-engined.service"), "/etc/systemd/system/lab-engined.service")
+		d := en + ", " + ac
+		if !same {
+			d += ", unit file differs from the repo"
+		}
+		add("6f engine launcher (lab-engined)", en == "enabled" && ac == "active" && same, d, hostFix)
+	}
+
+	if host == "marvin" {
 		f := "/etc/default/grub.d/90-gpu-memory.cfg"
 		wantG := `GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT amdgpu.gttsize=122880 ttm.pages_limit=31457280"`
 		b, _ := os.ReadFile(f)
