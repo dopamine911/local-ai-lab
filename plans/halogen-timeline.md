@@ -40,3 +40,6 @@ decides about daily use. `big` on llama.cpp stays as it is either way.
 | --- | --- | --- | --- |
 | 11:52 | Launcher: allowlist fields `ipc`, `ulimits`, `stop_timeout` (docker `--stop-timeout` and the launcher's own stop wait); client stop waits up to 600 s | — | this commit |
 | 11:54 | setup/models-marvin.txt: 9 Halogen files at revision 5c72aeff (sizes and sha256 from the HF tree; the 6 small tokenizer files fetched and hashed) | 111.2 GiB | this commit |
+| 11:53 | Download started on marvin (`lab models marvin halogen`, detached; log ~/.cache/halogen-download.log) | ~40 MB/s: about 50 min + checksums | — |
+| 11:57 | Image pulled on marvin by digest (4.72 GB). Its entrypoint: runs as root, no privilege steps (only `ulimit -c 0`), default command `all` (engine + API in one container, API on 8731) | — | — |
+| 11:59 | `big-halogen` in the allowlist (devices kfd+dri, render+video, ipc host, memlock unlimited, weights read-only, big's sampling and effort medium, stop timeout 120 s) and in marvin's llama-swap config (proxy :8731, checkEndpoint /health, unloadTimeout 300, training pin). Not deployed yet: the launcher service must be restarted for the new allowlist fields (sudo) | — | this commit |

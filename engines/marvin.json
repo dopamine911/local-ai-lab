@@ -12,6 +12,33 @@
         "-c",
         "import http.server as h\nclass H(h.BaseHTTPRequestHandler):\n  def do_GET(s):\n    s.send_response(200); s.end_headers(); s.wfile.write(b'ok\\n')\nprint('test-http listening on 8080', flush=True)\nh.ThreadingHTTPServer(('0.0.0.0', 8080), H).serve_forever()"
       ]
+    },
+    "big-halogen": {
+      "_comment": "Halogen Flash 0.20.6 (closed binary, EULA: no telemetry, no outbound connections without HALOGEN_DOWNLOAD) serving Qwen3.8-Flash-Next = big's model, for the comparison in plans/halogen-timeline.md. Device and memory settings from its Quickstart (Docker form). Sampling and thinking effort set to big's so the test is fair. Long stop timeout: an unclean exit can hold GPU memory until a reboot (its issues #79, #34).",
+      "image": "ghcr.io/peonist-ai/halogen-flash-server:0.20.6@sha256:f68892a56d8a1182645042574d702374bff402bb986ec4d49304cbe89483dbaf",
+      "devices": [
+        "/dev/kfd",
+        "/dev/dri"
+      ],
+      "groups": [
+        991,
+        44
+      ],
+      "ipc": "host",
+      "ulimits": [
+        "memlock=-1:-1"
+      ],
+      "volumes": [
+        "/srv/models/halogen:/models:ro"
+      ],
+      "env": {
+        "HALOGEN_REASONING_EFFORT": "medium",
+        "HALOGEN_TEMPERATURE": "1.0",
+        "HALOGEN_TOP_P": "0.95",
+        "HALOGEN_TOP_K": "20",
+        "HALOGEN_MIN_P": "0.0"
+      },
+      "stop_timeout": 120
     }
   }
 }

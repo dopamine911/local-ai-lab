@@ -65,6 +65,15 @@ models:
     checkEndpoint: /
     unloadTimeout: 90
 
+  big-halogen:
+    name: "Qwen3.8-Flash-Next on Halogen Flash (marvin, test)"
+    description: "big's model on the Halogen Flash engine (launcher engine; plans/halogen-timeline.md). Test only. Swaps with big."
+    proxy: http://lab-engine-big-halogen:8731
+    cmd: /engines/lab-engine run big-halogen
+    cmdStop: /engines/lab-engine stop big-halogen
+    checkEndpoint: /health
+    unloadTimeout: 300   # its stop timeout is 120 s (engines/marvin.json)
+
 profiles:
   training:
     # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
@@ -74,6 +83,7 @@ profiles:
       gpt-oss: ~
       chat-teacher: ~
       test-http: ~
+      big-halogen: ~
 hooks:
   on_startup:
     preload: [big]
