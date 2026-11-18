@@ -21,6 +21,7 @@ Good result of the service: `systemctl is-active lab-watchdog` and a "started" l
 import datetime, glob, json, os, re, socket, sqlite3, ssl, subprocess, sys, time, urllib.request
 
 HUB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(HUB)
 STATE = os.path.expanduser(os.environ.get("LAB_WATCHDOG_STATE", "~/.local/state/lab-watchdog"))
 DB, LOG = os.path.join(STATE, "state.db"), os.path.join(STATE, "watchdog.log")
 REMIND_S = 4 * 3600
@@ -92,7 +93,8 @@ def read_all():
         r["sync_last_ok"] = bool(re.match(r"^sync: \d+ uploaded", last))
     except (OSError, IndexError):
         pass
-    for name, (ok, detail) in mcp_calls().items():
+    r["solo_model"] = solo_running()  # a run-alone model: skip the memory call (its embed request would evict it)
+    for name, (ok, detail) in mcp_calls(skip={"memory"} if r["solo_model"] else set()).items():
         r[f"mcp_{name}_ok"], r[f"mcp_{name}_detail"] = ok, detail
     try:
         ctx = ssl.create_default_context()
@@ -115,9 +117,47 @@ MCP_CALLS = [("memory", "memory__search", {"query": "REBUILD", "max_results": 1}
              ("recall", "recall__mnemosyne_recall", {"query": "where does a machine change have to be recorded", "limit": 1})]
 
 
-def mcp_calls():
+LLAMA_CONFIG = os.path.join(REPO, "zaphod", "llama-swap", "config", "config.yaml")
+
+
+def run_alone_models(config):
+    """Models that run alone: in no routing set together with `embed` (gpt-oss, coder-radiance, coder-long). Read
+    from llama-swap's config, so a new run-alone model is covered without a change here (#52)."""
+    import yaml
+    sets = yaml.safe_load(config)["routing"]["router"]["settings"]["matrix"]["sets"]
+
+    def names(expr, seen=()):
+        out = set()
+        for tok in re.findall(r"\+?[A-Za-z0-9][A-Za-z0-9._-]*", expr):
+            out |= names(sets[tok[1:]], seen + (tok,)) if tok.startswith("+") and tok not in seen else {tok.lstrip("+")}
+        return out
+    with_embed, every = set(), set()
+    for expr in sets.values():
+        n = names(expr)
+        every |= n
+        if "embed" in n:
+            with_embed |= n
+    return every - with_embed
+
+
+def solo_running():
+    """The run-alone model loaded (or loading) on zaphod now, or None. None too when llama-swap can't be read: then
+    the memory call runs as before."""
+    try:
+        alone = run_alone_models(open(LLAMA_CONFIG).read())
+        key = [l.split("=", 1)[1].strip().strip("'\"") for l in open(os.path.join(REPO, "zaphod", "llama-swap", ".env"))
+               if l.startswith("ZAPHOD_KEY=")][0]
+        req = urllib.request.Request("http://127.0.0.1:8080/running", headers={"Authorization": "Bearer " + key})
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            running = [m["model"] for m in json.load(resp).get("running", [])]
+    except Exception:
+        return None
+    return next((m for m in running if m in alone), None)
+
+
+def mcp_calls(skip=()):
     """One real call per tool through MCPJungle, as the `watchdog` agent login (hub/mcp/clients/watchdog.json: memory
-    and recall only). Returns {name: (ok, detail)}; {} when the token is missing (check unknown)."""
+    and recall only), except those in `skip`. Returns {name: (ok, detail)}; {} when the token is missing (unknown)."""
     try:
         tok = [l.split("=", 1)[1].strip().strip("'\"") for l in open(os.path.join(HUB, ".env"))
                if l.startswith("MCP_TOKEN_WATCHDOG=")][0]
@@ -145,11 +185,13 @@ def mcp_calls():
         init, sid = post({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {
             "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": {"name": "lab-watchdog", "version": "1"}}})
         if not init or "result" not in init:
-            return {n: (False, "gateway initialize failed") for n, _, _ in MCP_CALLS}
+            return {n: (False, "gateway initialize failed") for n, _, _ in MCP_CALLS if n not in skip}
         post({"jsonrpc": "2.0", "method": "notifications/initialized"}, sid)
     except Exception as e:
-        return {n: (False, f"gateway: {type(e).__name__}") for n, _, _ in MCP_CALLS}
+        return {n: (False, f"gateway: {type(e).__name__}") for n, _, _ in MCP_CALLS if n not in skip}
     for i, (name, tool, args) in enumerate(MCP_CALLS, 2):
+        if name in skip:
+            continue
         try:
             r, _ = post({"jsonrpc": "2.0", "id": i, "method": "tools/call", "params": {"name": tool, "arguments": args}}, sid)
             res = (r or {}).get("result") or {}
@@ -256,11 +298,16 @@ def v_mcp(r):
 
 
 def v_mcp_calls(r):
-    names = [n for n, _, _ in MCP_CALLS]
+    solo = r.get("solo_model")
+    names = [n for n, _, _ in MCP_CALLS if not (solo and n == "memory")]
     if not all(f"mcp_{n}_ok" in r for n in names):
         return "unknown", "no MCP_TOKEN_WATCHDOG in hub/.env"
     value = ", ".join(f"{n}: {r[f'mcp_{n}_detail']}" for n in names)
-    return ("ok" if all(r[f"mcp_{n}_ok"] for n in names) else "bad"), value
+    if not all(r[f"mcp_{n}_ok"] for n in names):
+        return "bad", value
+    if solo:  # unknown changes nothing: no alert, no "resolved" (#52)
+        return "unknown", f"{value}; memory not called while {solo} runs alone (its embed request would evict it)"
+    return "ok", value
 
 
 def v_backup(r):
@@ -588,6 +635,12 @@ def test():
     tick(broken, 2); expect("memory call failing 2 min (< 3): nothing yet", [])
     tick(broken, 2); expect("memory call failing 4 min: one alert", [("alert", "mcp-calls")])
     tick(good, 2); expect("memory answers again: resolved", [("resolved", "mcp-calls")])
+    solo = dict(good, solo_model="gpt-oss")
+    del solo["mcp_memory_ok"], solo["mcp_memory_detail"]  # not called while a run-alone model is loaded (#52)
+    tick(solo, 10); expect("run-alone model loaded 10 min, memory not called: nothing sent", [])
+    tick(dict(solo, mcp_recall_ok=False, mcp_recall_detail="gateway: HTTPError"), 4)
+    expect("run-alone model, recall failing 4 min: still alerts", [("alert", "mcp-calls")])
+    tick(good, 2); expect("recall back, model gone: resolved", [("resolved", "mcp-calls")])
     hot1 = dict(good, zaphod_card1_junction=104)
     tick(hot1, 6); sent.clear()
     w.c.execute("update checks set acked_at=? where id='zaphod-card1-temp'", (int(clock[0]),))
