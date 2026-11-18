@@ -64,7 +64,7 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | Renovate: one PR per newer version of a pinned image, package or download (90 pins: compose, Dockerfiles, Go modules, pip, bun, git commits), with the check to run; held-back items (llama-swap, Python minor, bun, Enso, fan module) need approval on the dashboard | config validated + dry run; hosted Mend Renovate app (decisions.md 40), turned on after the config PR #7 | [renovate.json](renovate.json), [setup/VERSIONS.md](setup/VERSIONS.md) |
 | Beszel monitoring: both machines, containers, disk health, systemd services, network monitors | working | [hub/compose.yaml](hub/compose.yaml), [lab monitors](docs/cli/monitors.md) |
 | MLflow: every benchmark run with its full settings | working | section 5 below |
-| Models panel (load/unload models from a page) | planned (file to copy in) | [hub/models-panel/README.txt](hub/models-panel/README.txt) |
+| Models panel: both machines on one page (what is loaded, load/unload, card memory, last speed), https://models.ai.dopamine911.com | working (2026-11-18, #64) | [hub/models-panel/README.md](hub/models-panel/README.md) |
 
 ## 4. Tools for agents (MCP gateway)
 

@@ -48,18 +48,65 @@
 		reverse_proxy 127.0.0.1:2587
 	}
 
-	# Models panel: Caddy adds the API keys, so the browser never sees them.
+	# Models panel (hub/models-panel, #64): Caddy adds the API keys, so the browser never sees them. Only the calls the
+	# page makes pass (status reads, load = an upstream /health request, unload); chat and the rest get 404 here.
 	# Anyone on your tailnet who opens it can load/unload models.
 	handle @models {
-		handle_path /zaphod/* {
+		@z_read {
+			method GET
+			path /zaphod/running /zaphod/v1/models /zaphod/api/performance /zaphod/api/profiles /zaphod/upstream/*/health /zaphod/upstream/*/slots
+		}
+		@z_unload {
+			method POST
+			path /zaphod/api/models/unload/*
+		}
+		@m_read {
+			method GET
+			path /marvin/running /marvin/v1/models /marvin/api/performance /marvin/api/profiles /marvin/upstream/*/health /marvin/upstream/*/slots
+		}
+		@m_unload {
+			method POST
+			path /marvin/api/models/unload/*
+		}
+		@mlsearch {
+			method POST
+			path /mlflow/runs/search
+		}
+		@api path /zaphod/* /marvin/* /mlflow/*
+		handle @z_read {
+			uri strip_prefix /zaphod
 			reverse_proxy 127.0.0.1:8080 {
 				header_up Authorization "Bearer {env.ZAPHOD_KEY}"
 			}
 		}
-		handle_path /marvin/* {
+		handle @z_unload {
+			uri strip_prefix /zaphod
+			reverse_proxy 127.0.0.1:8080 {
+				header_up Authorization "Bearer {env.ZAPHOD_KEY}"
+			}
+		}
+		handle @m_read {
+			uri strip_prefix /marvin
 			reverse_proxy marvin:8080 {
 				header_up Authorization "Bearer {env.MARVIN_KEY}"
 			}
+		}
+		handle @m_unload {
+			uri strip_prefix /marvin
+			reverse_proxy marvin:8080 {
+				header_up Authorization "Bearer {env.MARVIN_KEY}"
+			}
+		}
+		# Last speed per model: MLflow's run search only (read-only; MLflow is open on the tailnet anyway)
+		handle @mlsearch {
+			rewrite * /api/2.0/mlflow/runs/search
+			reverse_proxy 127.0.0.1:5000 {
+				header_up Host 127.0.0.1:5000
+				header_up -Origin   # MLflow refuses other sites' Origin (403); the call is Caddy's, on zaphod
+			}
+		}
+		handle @api {
+			respond "not a models-panel call" 404
 		}
 		handle {
 			root * /srv/models-panel

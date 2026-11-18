@@ -39,6 +39,8 @@ Status words: **active** (work going on), **open** (ideas or steps not started),
 ## Done (the record)
 | File | What |
 | --- | --- |
+| [models-panel-timeline.md](models-panel-timeline.md) | The models panel at https://models.ai.dopamine911.com (#64), built and tested (2026-11-18) |
+| [housekeeping-52-timeline.md](housekeeping-52-timeline.md) | #52: wrappers removed, lab on marvin, result-file rule, watchdog memory check, memory-sync cron (2026-11-18) |
 | [engine-launcher-timeline.md](engine-launcher-timeline.md) | The engine launcher (option B), built and tested on both machines (2026-11-17) |
 | [llama-cpp-v1-timeline.md](llama-cpp-v1-timeline.md) | llama.cpp 1.0 feature review and the 269 → 273 upgrade on both machines (2026-11-16) |
 | [grammar-bug-timeline.md](grammar-bug-timeline.md) | Tools + JSON-format grammar bug: cause found, fixed upstream in 1.0 |

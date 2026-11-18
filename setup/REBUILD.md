@@ -165,7 +165,7 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
 3. **Beszel** (`https://monitor.<DOMAIN>`): create the account; **Add system** for each machine:
    zaphod = host `127.0.0.1`, port `45876`; marvin = host `100.101.162.9` (its Tailscale IP), port `45876`.
    Then `lab monitors` (asks for the Beszel login) adds the network monitors.
-4. **Models panel:** copy `models-panel/index.html` from the claude.ai project into `hub/models-panel/`.
+4. **Models panel:** nothing to do (`hub/models-panel/index.html` is in git; Caddy serves it). Check: https://models.<DOMAIN> lists both machines.
 
 Data not in git (lost in a rebuild unless backed up): Open WebUI (`hub/data/open-webui`), Beszel (`hub/data/beszel`),
 MLflow (`hub/data/mlflow`). They are backed up every night at 04:17 (Chicago time) to marvin by `setup/backup-to-marvin.sh`

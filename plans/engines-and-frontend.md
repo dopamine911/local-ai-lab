@@ -72,7 +72,7 @@ marvin llama-swap  ── marvin engines: llama.cpp Vulkan `big` (now), Halogen 
 | Option | What you get | Cost |
 | --- | --- | --- |
 | **llama-swap's own web UI** (in 273) | models per machine, load/unload, logs, activity; every engine shows once it is an entry | none; one UI per machine (zaphod's also shows peers) |
-| **Our models panel** (`hub/models-panel`, planned in FEATURES.md) | one page for both machines: what is loaded, start/stop an engine, card memory, last speed result from MLflow | build it (a small page behind Caddy, using llama-swap's API) |
+| **Our models panel** (`hub/models-panel`, built 2026-11-18, #64) | one page for both machines: what is loaded, start/stop an engine, card memory, last speed result from MLflow | build it (a small page behind Caddy, using llama-swap's API) |
 | **`lab` menu** (terminal, exists) | the same actions from the terminal and for agents (`--json`) | add an "engines" screen |
 | Lemonade App | manages only what Lemonade runs | doesn't see llama-swap |
 | AI Toolbox Cockpit | a terminal app for exactly these engines | no licence stated; Toolbx/Podman; its own model folders |
@@ -98,7 +98,7 @@ models panel as the one page for both machines, with `lab` doing the same from t
 6. **NPU on marvin** (Lemonade/FastFlowLM), a peer for small models or helpers. Driver loaded (checked:
    `amdxdna`, `/dev/accel/accel0`). Linux maturity, models, speed: unknown.
 7. **ComfyUI and Strata as entries** (replacing `lab image-mode` and `fork.sh`), using the 5.1 method.
-8. **Models panel**: one page for both machines (section 6).
+8. **Models panel**: one page for both machines (section 6). Built 2026-11-18 (#64, plans/models-panel-timeline.md); engines appear in it as llama-swap entries.
 
 Each engine test records its numbers in tuning/results.md and MLflow like every other test, and its pins in
 setup/VERSIONS.md.
