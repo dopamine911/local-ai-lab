@@ -14,134 +14,134 @@
   No outside files: plain HTML, CSS and JS, fonts in fonts/. Data from the servers is shown with textContent only.
 -->
 <style>
-/* Atkinson Hyperlegible Next / Mono (Braille Institute; OFL 1.1, fonts/LICENSE-*): letters built to be told apart
-   (I l 1, O 0, rn m), chosen for reading ease. Served from this folder: the browser fetches nothing from outside. */
+/* Atkinson Hyperlegible Next / Mono (Braille Institute; OFL 1.1, fonts/LICENSE-*): letters built to be told apart.
+   Served from this folder: the browser fetches nothing from outside. */
 @font-face { font-family: "Hyperlegible"; font-weight: 400; font-display: swap;
   src: url("fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2"); }
 @font-face { font-family: "Hyperlegible"; font-weight: 700; font-display: swap;
   src: url("fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2"); }
 @font-face { font-family: "Hyperlegible Mono"; font-weight: 400; font-display: swap;
   src: url("fonts/atkinson-hyperlegible-mono-latin-400-normal.woff2") format("woff2"); }
-/* Instrument panel: pale anodised aluminium, graphite ink, one teal for the meters; green / amber / red only for state */
+/* Layout by card (Daniel 2026-11-18: less text, one thing at a time, easy to find): each card is a box holding its
+   meter, its loaded models and what can load there. Colours: aluminium, graphite, one teal; green/amber/red = state. */
 :root {
-  --base: #e6ecea; --plate: #f7f9f8; --ink: #1f2b2e; --muted: #56656a; --line: #cfd9d7;
-  --teal: #1d6a73; --cell: #cbd8d6; --lamp: #2a9354; --amber: #a86f08; --fault: #b3352b; --inset: #eef2f1;
+  --base: #e6ecea; --plate: #f8faf9; --ink: #142023; --soft: #3d4c51; --line: #c9d4d2;
+  --teal: #1d6a73; --cell: #c6d4d2; --lamp: #23874b; --amber: #9a6406; --fault: #ab3127; --inset: #edf2f1;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --base: #11181a; --plate: #192326; --ink: #e1eae9; --muted: #95a5a7; --line: #2b3a3d;
-    --teal: #58b4bd; --cell: #283a3d; --lamp: #4cc27c; --amber: #e3a43c; --fault: #ef6b5f; --inset: #141d1f;
+    --base: #11181a; --plate: #1a2427; --ink: #eef4f3; --soft: #b3c2c4; --line: #2f3f42;
+    --teal: #5fbcc5; --cell: #2a3c3f; --lamp: #4cc27c; --amber: #e8aa44; --fault: #f07266; --inset: #141d1f;
   }
 }
 :root[data-theme="dark"] {
-  --base: #11181a; --plate: #192326; --ink: #e1eae9; --muted: #95a5a7; --line: #2b3a3d;
-  --teal: #58b4bd; --cell: #283a3d; --lamp: #4cc27c; --amber: #e3a43c; --fault: #ef6b5f; --inset: #141d1f;
+  --base: #11181a; --plate: #1a2427; --ink: #eef4f3; --soft: #b3c2c4; --line: #2f3f42;
+  --teal: #5fbcc5; --cell: #2a3c3f; --lamp: #4cc27c; --amber: #e8aa44; --fault: #f07266; --inset: #141d1f;
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--base); color: var(--ink);
-  font: 16px/1.5 "Hyperlegible", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  font: 18px/1.5 "Hyperlegible", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
 code, pre { font-family: "Hyperlegible Mono", ui-monospace, monospace; }
-main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+main { max-width: 980px; margin: 0 auto; padding: 24px 16px 56px; }
 header { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; }
-h1 { font-size: 28px; line-height: 1.2; margin: 0; font-weight: 700; }
-.meta { color: var(--muted); font-size: 14px; }
-.machines { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 500px), 1fr)); gap: 20px; margin-top: 20px;
-  align-items: start; }
-section { background: var(--plate); border: 1px solid var(--line); border-radius: 6px; min-width: 0; }
-/* the faceplate: machine name and its meters */
-.face { padding: 16px 18px 18px; border-bottom: 3px solid var(--teal); }
-section h2 { font-size: 24px; line-height: 1.2; margin: 0 0 2px; font-weight: 700; }
-.sub { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
-.err { color: var(--fault); margin: 12px 18px 16px; }
-.dev + .dev { margin-top: 16px; }
-.dev .top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.dev .name { font-weight: 700; }
-.dev .mem { font-size: 15px; }
-.dev .mem b { font-weight: 700; }
-/* segmented meter: one cell per GB, so free memory can be counted */
-.meter { display: flex; gap: 2px; height: 16px; margin: 6px 0 8px; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0; }
+.meta { color: var(--soft); font-size: 16px; }
+.machine { margin-top: 28px; }
+.machine > h2 { font-size: 26px; line-height: 1.2; margin: 0 0 12px; }
+.err { color: var(--fault); }
+.profile { margin: 0 0 12px; padding: 10px 14px; border-left: 4px solid var(--amber); background: var(--plate); }
+.profile b { color: var(--amber); }
+.bays { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; grid-auto-flow: row dense; }
+.bays > .panel { grid-column: 1 / -1; margin-top: 0; }
+.note { font-size: 16px; color: var(--soft); margin: 2px 0 0; }
+.bay { background: var(--plate); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 4px;
+  padding: 14px 16px 16px; min-width: 0; }
+.bay.wide { grid-column: 1 / -1; }
+.bay h3 { font-size: 21px; margin: 0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 12px; }
+.bay h3 .free { font-size: 18px; font-weight: 400; color: var(--soft); }
+.bay h3 .free b { color: var(--ink); font-size: 21px; }
+/* one block per GB, so free memory can be counted */
+.meter { display: flex; gap: 2px; height: 18px; margin: 8px 0 4px; }
 .meter.fine { gap: 1px; }
 .meter i { flex: 1 1 0; min-width: 1px; background: var(--cell); border-radius: 1px; }
 .meter i.on { background: var(--teal); }
 .meter i.part { background: linear-gradient(90deg, var(--teal) var(--p), var(--cell) var(--p)); }
-.read { display: flex; flex-wrap: wrap; gap: 2px 20px; font-size: 14px; color: var(--muted); margin: 0; }
-.read div { display: flex; gap: 6px; }
-.read dt { margin: 0; }
-.read dd { margin: 0; color: var(--ink); }
-.profile { margin: 14px 0 0; padding: 8px 10px; border-left: 3px solid var(--amber); background: var(--inset); font-size: 15px; }
-.profile b { color: var(--amber); }
-/* model list */
-.list { padding: 4px 18px 10px; }
+.label { font-size: 16px; color: var(--soft); margin: 14px 0 2px; }
 ul.models { list-style: none; margin: 0; padding: 0; }
-ul.models li { display: grid; grid-template-columns: 14px 1fr auto; gap: 4px 12px; align-items: start;
-  padding: 12px 0; border-top: 1px solid var(--line); }
-ul.models:first-child > li:first-child { border-top: 0; }
-.lamp { width: 12px; height: 12px; border-radius: 50%; margin-top: 6px; background: transparent;
-  border: 2px solid var(--muted); }
-.lamp.ready { background: var(--lamp); border-color: var(--lamp); box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp) 22%, transparent); }
-.lamp.starting, .lamp.stopping, .lamp.loading, .lamp.unloading { background: var(--amber); border-color: var(--amber);
-  animation: blink 0.9s steps(2, jump-none) infinite; }
+ul.models li { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-top: 1px solid var(--line); }
+ul.models li:first-child { border-top: 0; }
+.lamp { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--lamp);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--lamp) 22%, transparent); }
+.lamp.busy { background: var(--amber); box-shadow: none; animation: blink 0.9s steps(2, jump-none) infinite; }
 @keyframes blink { 50% { opacity: .25; } }
 @media (prefers-reduced-motion: reduce) { .lamp { animation: none !important; } }
-.mid { min-width: 0; }
-.idline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
-.id { font-weight: 700; font-size: 17px; }
-.card { font-size: 13px; padding: 0 7px; border: 1px solid var(--line); border-radius: 3px; color: var(--muted); }
-.state { color: var(--muted); font-size: 14px; }
-.desc { color: var(--muted); font-size: 14px; overflow-wrap: anywhere; }
-.speed { font-size: 14px; }
-.speed span { color: var(--muted); }
-button { font: inherit; font-size: 15px; font-weight: 700; padding: 6px 14px; border-radius: 4px; cursor: pointer;
-  min-width: 84px; background: transparent; border: 1.5px solid var(--teal); color: var(--teal); }
-button.unload { border-color: var(--line); color: var(--muted); }
-button.unload:hover:not(:disabled), button.unload:focus-visible { border-color: var(--fault); color: var(--fault); }
-button:hover:not(:disabled) { background: color-mix(in srgb, currentColor 10%, transparent); }
+.name { flex: 1; min-width: 0; font: inherit; font-weight: 700; font-size: 19px; text-align: left; background: none; border: 0;
+  padding: 0; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
+.name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.state { color: var(--amber); font-size: 16px; }
+.empty { color: var(--soft); margin: 6px 0 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.chip { font: inherit; font-size: 17px; padding: 4px 12px; border-radius: 4px; border: 1px solid var(--line);
+  background: var(--inset); color: var(--ink); cursor: pointer; }
+.chip:hover { border-color: var(--teal); }
+.chip[aria-pressed="true"], .name[aria-pressed="true"] { outline: 2px solid var(--teal); outline-offset: 2px; }
+button.act { font: inherit; font-size: 17px; font-weight: 700; padding: 6px 16px; border-radius: 4px; cursor: pointer;
+  min-width: 96px; background: transparent; border: 1.5px solid var(--teal); color: var(--teal); }
+button.act.unload { border-color: var(--line); color: var(--soft); }
+button.act.unload:hover:not(:disabled), button.act.unload:focus-visible { border-color: var(--fault); color: var(--fault); }
+button.act:hover:not(:disabled) { background: color-mix(in srgb, currentColor 10%, transparent); }
 button:disabled { opacity: .45; cursor: default; }
 :focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
-summary { cursor: pointer; color: var(--muted); padding: 8px 0; font-size: 15px; }
-summary:hover { color: var(--ink); }
-details.off { border-top: 1px solid var(--line); }
-details.cfg { grid-column: 2 / -1; margin: 0; min-width: 0; }
-details.cfg summary { padding: 2px 0; font-size: 14px; }
-details.cfg dl { display: grid; grid-template-columns: 9em 1fr; gap: 6px 12px; margin: 8px 0 4px; font-size: 14px; }
-details.cfg dt { color: var(--muted); }
-details.cfg dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+/* the details panel: one model at a time, below the cards */
+.panel { margin-top: 16px; background: var(--plate); border: 2px solid var(--teal); border-radius: 4px; padding: 16px 18px 18px; }
+.panel .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.panel h3 { font-size: 24px; margin: 0; }
+.panel .where { color: var(--soft); margin: 2px 0 0; }
+.panel .close { font: inherit; font-size: 16px; background: none; border: 1px solid var(--line); border-radius: 4px;
+  padding: 4px 12px; color: var(--soft); cursor: pointer; }
+.panel .what { margin: 12px 0; max-width: 70ch; }
+.panel .warn { margin: 0 0 12px; padding: 8px 12px; border-left: 4px solid var(--amber); background: var(--inset); max-width: 70ch; }
+.panel .line { margin: 6px 0; }
+.panel details { margin-top: 14px; }
+.panel summary { cursor: pointer; color: var(--soft); }
+.panel dl { display: grid; grid-template-columns: 9em 1fr; gap: 8px 14px; margin: 12px 0 0; font-size: 16px; }
+.panel dt { color: var(--soft); }
+.panel dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 pre { margin: 0; padding: 10px; border-radius: 4px; background: var(--inset); border: 1px solid var(--line);
-  font-size: 13px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
-@media (max-width: 560px) {
-  h1 { font-size: 24px; }
-  .face { padding: 14px 14px 16px; }
-  .list { padding: 4px 14px 8px; }
-  .read { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
-  details.cfg { grid-column: 1 / -1; }
-  details.cfg dl { grid-template-columns: 1fr; gap: 2px; }
-  details.cfg dd { margin-bottom: 8px; }
-}
-footer { margin-top: 24px; color: var(--muted); font-size: 14px; max-width: 72ch; }
-footer p { margin: 6px 0; }
-footer code { font-size: 13px; }
+  font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+footer { margin-top: 32px; }
+footer summary { cursor: pointer; color: var(--soft); }
+footer p { max-width: 70ch; margin: 10px 0; }
 .toast { position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 560px; margin: 0 auto; padding: 12px 16px;
-  border-radius: 4px; background: var(--ink); color: var(--plate); font-size: 15px; display: none; }
+  border-radius: 4px; background: var(--ink); color: var(--plate); display: none; }
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  h1 { font-size: 26px; }
+  .bays { grid-template-columns: 1fr; }
+  .panel dl { grid-template-columns: 1fr; gap: 2px; }
+  .panel dd { margin-bottom: 10px; }
+}
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>Models on zaphod and marvin</h1>
-    <div class="meta" id="updated">loading…</div>
+    <h1>Models</h1>
+    <div class="meta" id="updated">Reading…</div>
   </header>
-  <div class="machines" id="machines"></div>
+  <div id="machines"></div>
   <footer>
-    <p>Each block in a meter is 1 GB. On marvin the GPU shares the system's memory, so its meter shows both.</p>
-    <p>Load starts a model. llama-swap first unloads any model that cannot run next to it; a model that runs alone
-      (<code>gpt-oss</code>, <code>coder-long</code>, <code>coder-radiance</code>) unloads everything else on zaphod.
-      Unload stops a model and cuts any answer it is writing.</p>
-    <p>Each entry runs on one card, fixed in its config. To use the other card, load that card's entry: details lists
-      them under "same file". Training and image mode are switched with <code>lab training-mode</code> and
-      <code>lab image-mode</code>.</p>
-    <p>Speed is the latest <code>lab speed</code> run in MLflow. The page refreshes every 5 seconds, and waits while a
-      model's details are open.</p>
+    <details>
+      <summary>How this page works</summary>
+      <p>Each box is one card. It shows how much memory is free (one block is 1 GB), the models loaded on that card,
+        and the models that can load there. On marvin the GPU shares the system's memory.</p>
+      <p>Click a model's name to see what it is, its last speed and its full config. Load and Unload ask first.</p>
+      <p>A model runs on one card, fixed in its config. To use the other card, load that card's entry: coder is card 1,
+        coder-2 is card 2. Loading a model can unload others that cannot run next to it; the details say when.</p>
+      <p>Training and image mode are switched with <code>lab training-mode</code> and <code>lab image-mode</code>.
+        The page refreshes every 5 seconds and waits while a model's details are open.</p>
+    </details>
   </footer>
 </main>
 <div class="toast" id="toast" role="status"></div>
@@ -285,151 +285,177 @@ function cardOf(m, mod, cmd) { // zaphod: from --device (llama.cpp: Vulkan1 = ca
 }
 function fileOf(cmd) { const f = (cmd.match(/(?:^| )-m (\S+)/) || [])[1]; return f ? f.split("/").pop() : ""; }
 
-function details(m, mod, run) {
-  const key = `${m.id}/${mod.id}`;
-  const cfg = configs[m.id];
-  const entry = cfg && cfg.models[mod.id];
-  const cmd = run ? run.cmd : entry ? expand(cfg, entry.cmd) : "";
-  const det = el("details", { class: "cfg" }, el("summary", { text: "details" }));
-  if (openRows.has(key)) det.open = true;
-  det.addEventListener("toggle", () => {
-    if (det.open) openRows.add(key); else { openRows.delete(key); if (!openRows.size) tick(); }
-  });
-  const dl = el("dl");
-  const row = (k, v) => v && dl.append(el("dt", { text: k }), el("dd", {}, v));
-  row("card", cardOf(m, mod, cmd) || (m.id === "marvin" ? "the one GPU (shared memory)" : ""));
-  const ctx = mod.context_length || +((cmd.match(/(?:^| )(?:-c|--ctx-size) (\d+)/) || [])[1] || 0);
-  row("context", ctx ? `${ctx.toLocaleString()} tokens` : "");
-  row("engine", ((mod.meta || {}).llamaswap || {}).upstream || "");
-  const caps = Object.entries(mod.capabilities || {}).filter(([, v]) => v).map(([k]) => k.replace("_", " "));
-  row("can do", caps.join(", "));
-  row("description", mod.description || "");
-  if (cfg && Object.keys(cfg.sets).length) {
-    const mine = Object.entries(cfg.sets).filter(([, e]) => new RegExp(`(^|[^A-Za-z0-9._-])${mod.id.replace(/[.]/g, "\\.")}([^A-Za-z0-9._-]|$)`).test(e));
-    row("routing sets", mine.length ? el("pre", { text: mine.map(([n, e]) => `${n}: ${e}`).join("\n") }) : "in no routing set");
-  }
-  const file = fileOf(cmd);
-  if (cfg && file) { // the same model file in other entries: how to get it on another card
-    const others = Object.entries(cfg.models).filter(([id, e]) => id !== mod.id && fileOf(expand(cfg, e.cmd)) === file)
-      .map(([id, e]) => `${id} (${cardOf(m, { name: "" }, expand(cfg, e.cmd)) || "?"})`);
-    row("same file", others.length ? others.join(", ") : `only this entry (${file})`);
-  }
-  row(run ? "command (running)" : "command", cmd ? el("pre", { text: cmd }) : "");
-  if (entry) row("config", el("pre", { text: entry.block }));
-  else row("config", m.id === "marvin" || cfg ? "not in the config file" : "config file not readable");
-  if (m.id === "marvin") row("note", "config shown is zaphod's repo copy of marvin's file; marvin runs its own checkout (the same after a git pull)");
-  det.append(dl);
-  return det;
-}
-const openRows = new Set();
+let open = null; // {machine, id}: the model whose details are open
 
-function hardware(m, d) {
-  const box = el("div", { class: "hw" });
-  const perf = d.perf;
-  if (!perf || !perf.enabled) { box.append(el("div", { class: "desc", text: "No hardware readings from llama-swap." })); return box; }
-  const gpus = last(perf.gpu_stats, "id").sort((a, b) => a.id - b.id);
-  if (m.id === "marvin") { // the GPU uses system memory (GTT); its own VRAM is a 512 MB carve-out, not shown
-    const sys = Array.isArray(perf.sys_stats) ? perf.sys_stats[perf.sys_stats.length - 1] : perf.sys_stats;
-    const g = gpus[0];
-    if (sys) box.append(device("Memory, GPU and system", sys.mem_used_mb, sys.mem_total_mb, g));
-  } else {
-    gpus.forEach((g, i) => box.append(device(m.cards[i] ? m.cards[i][0].toUpperCase() + m.cards[i].slice(1) : g.name,
-      g.mem_used_mb, g.mem_total_mb, g)));
-  }
-  return box;
-}
-function device(name, used, total, g) {
+function bayKey(card) { return card === "both cards" ? "both" : card || "other"; }
+
+function meter(used, total) {
   const usedGb = used / 1024, totalGb = total / 1024, cells = Math.max(1, Math.round(totalGb));
-  const meter = el("div", { class: "meter" + (cells > 64 ? " fine" : ""), role: "img",
-    "aria-label": `${name}: ${usedGb.toFixed(1)} of ${totalGb.toFixed(1)} GB used` });
+  const box = el("div", { class: "meter" + (cells > 64 ? " fine" : ""), role: "img",
+    "aria-label": `${usedGb.toFixed(1)} of ${totalGb.toFixed(1)} GB used` });
   for (let i = 0; i < cells; i++) {
     const fill = Math.min(1, Math.max(0, usedGb - i));
     const c = el("i", { class: fill >= 1 ? "on" : fill > 0 ? "part" : "" });
     if (fill > 0 && fill < 1) c.style.setProperty("--p", `${Math.round(fill * 100)}%`);
-    meter.append(c);
+    box.append(c);
   }
-  const read = el("dl", { class: "read" });
-  const pair = (k, v) => read.append(el("div", {}, el("dt", { text: k }), el("dd", { text: v })));
-  pair("free", `${Math.max(0, totalGb - usedGb).toFixed(1)} GB`);
-  if (g) {
-    pair("temperature", `${g.temp_c} °C`);
-    pair("busy", `${g.gpu_util_pct}%`);
-    pair("power", `${Math.round(g.power_draw_w)} W`);
-  }
-  return el("div", { class: "dev" },
-    el("div", { class: "top" }, el("span", { class: "name", text: name }),
-      el("span", { class: "mem" }, el("b", { text: usedGb.toFixed(1) }), ` of ${totalGb.toFixed(1)} GB used`)),
-    meter, read);
+  return box;
 }
 
-function modelRow(m, mod, run) {
-  const key = `${m.id}/${mod.id}`;
-  const p = pending[key];
-  const st = p || (run ? run.state : "unloaded");
-  const loaded = !!run && !p;
-  const sp = speeds[key];
+function bay(m, title, mem, loaded, canLoad, wide, note) {
+  const b = el("div", { class: "bay" + (wide ? " wide" : "") });
+  const h = el("h3", {}, el("span", { text: title }));
+  if (mem) h.append(el("span", { class: "free" }, el("b", { text: gb(Math.max(0, mem.total - mem.used)) }), " GB free"));
+  b.append(h);
+  if (mem) b.append(meter(mem.used, mem.total));
+  if (note) b.append(el("p", { class: "note", text: note }));
+  if (loaded.length || !wide) b.append(el("div", { class: "label", text: "Loaded" }));
+  if (loaded.length) {
+    const ul = el("ul", { class: "models" });
+    for (const { mod, run } of loaded) {
+      const key = `${m.id}/${mod.id}`, p = pending[key], busy = p || (run && run.state !== "ready");
+      const btn = el("button", { class: "act unload", onclick: () => unload(m, mod) }, "Unload");
+      if (busy) btn.disabled = true;
+      ul.append(el("li", {},
+        el("span", { class: "lamp" + (busy ? " busy" : ""), title: busy ? (p || run.state) : "loaded" }),
+        el("button", { class: "name", "aria-pressed": String(isOpen(m, mod)), onclick: () => toggle(m, mod) }, mod.id),
+        busy ? el("span", { class: "state", text: p || run.state }) : null, btn));
+    }
+    b.append(ul);
+  } else if (!wide) b.append(el("p", { class: "empty", text: "Nothing loaded here." }));
+  if (canLoad.length) {
+    b.append(el("div", { class: "label", text: "Can load here" }));
+    const chips = el("div", { class: "chips" });
+    for (const mod of canLoad) {
+      const p = pending[`${m.id}/${mod.id}`];
+      chips.append(el("button", { class: "chip", "aria-pressed": String(isOpen(m, mod)), onclick: () => toggle(m, mod) },
+        p ? `${mod.id} (${p})` : mod.id));
+    }
+    b.append(chips);
+  }
+  return b;
+}
+const isOpen = (m, mod) => !!open && open.machine === m.id && open.id === mod.id;
+function toggle(m, mod) {
+  open = isOpen(m, mod) ? null : { machine: m.id, id: mod.id };
+  render(); stamp();
+  const p = document.querySelector(".panel");
+  if (p) p.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
+function machineView(m) {
+  const d = state[m.id];
+  const sec = el("section", { class: "machine" }, el("h2", { text: m.id }));
+  if (!d) { sec.append(el("p", { class: "empty", text: "Reading…" })); return sec; }
+  if (d.error) { sec.append(el("p", { class: "err", text: `${d.error}. The page tries again every 5 seconds.` })); return sec; }
+  const act = d.profiles && d.profiles.active;
+  if (act) {
+    const pr = (d.profiles.profiles || []).find(x => x.id === act);
+    sec.append(el("div", { class: "profile" }, "Profile on: ", el("b", { text: act }), pr ? `. ${pr.description}` : ""));
+  }
+  const runs = Object.fromEntries(d.running.map(r => [r.model, r]));
+  const cfg = configs[m.id];
+  const groups = {};
+  for (const mod of d.models.filter(x => !x.id.includes("/"))) { // peers are shown under their own machine
+    const run = runs[mod.id], entry = cfg && cfg.models[mod.id];
+    const card = m.id === "zaphod" ? cardOf(m, mod, run ? run.cmd : entry ? expand(cfg, entry.cmd) : "") : "GPU";
+    const g = groups[bayKey(card)] = groups[bayKey(card)] || { loaded: [], canLoad: [] };
+    if (run || pending[`${m.id}/${mod.id}`] === "loading") g.loaded.push({ mod, run }); else g.canLoad.push(mod);
+  }
+  const perf = d.perf && d.perf.enabled ? d.perf : null;
+  const bays = el("div", { class: "bays" });
+  const g = k => groups[k] || { loaded: [], canLoad: [] };
+  const openMod = open && open.machine === m.id && d.models.find(x => x.id === open.id);
+  const openBay = openMod && Object.keys(groups).find(k => [...groups[k].loaded.map(x => x.mod), ...groups[k].canLoad].includes(openMod));
+  const add = (key, b) => { // the open model's details go right after its own box (dense grid keeps the cards side by side)
+    bays.append(b);
+    if (openMod && openBay === key) bays.append(panel(m, openMod, runs[openMod.id]));
+  };
+  if (m.id === "zaphod") {
+    const gpus = perf ? last(perf.gpu_stats, "id").sort((a, b) => a.id - b.id) : [];
+    const mem = i => gpus[i] ? { used: gpus[i].mem_used_mb, total: gpus[i].mem_total_mb } : null;
+    add("card 1", bay(m, "Card 1", mem(0), g("card 1").loaded, g("card 1").canLoad));
+    add("card 2", bay(m, "Card 2", mem(1), g("card 2").loaded, g("card 2").canLoad));
+    const both = g("both");
+    if (both.loaded.length || both.canLoad.length) add("both", bay(m, "Both cards", null, both.loaded, both.canLoad, true));
+    const other = g("other");
+    if (other.loaded.length || other.canLoad.length) add("other", bay(m, "Tests, no card", null, other.loaded, other.canLoad, true));
+  } else {
+    const sys = perf && (Array.isArray(perf.sys_stats) ? perf.sys_stats[perf.sys_stats.length - 1] : perf.sys_stats);
+    add("GPU", bay(m, "GPU", sys ? { used: sys.mem_used_mb, total: sys.mem_total_mb } : null,
+      g("GPU").loaded, g("GPU").canLoad, true, "Memory shared with the system"));
+  }
+  sec.append(bays);
+  return sec;
+}
+
+function panel(m, mod, run) {
+  const key = `${m.id}/${mod.id}`, p = pending[key];
   const cfg = configs[m.id], entry = cfg && cfg.models[mod.id];
-  const card = cardOf(m, mod, run ? run.cmd : entry ? expand(cfg, entry.cmd) : "");
-  let desc = mod.name && mod.name !== mod.id ? mod.name : "";
-  if (card) desc = desc.replace(new RegExp(`,?\\s*${card}\\b`, "i"), "").replace(/\s*,\s*$/, "").replace(/,\s*,/, ",");
-  const speed = sp ? el("div", { class: "speed" }, `${sp.w.toFixed(1)} tok/s writing, ${Math.round(sp.r)} reading 32K `,
-    el("span", { text: `(${new Date(sp.t).toLocaleDateString(undefined, { month: "short", day: "numeric" })})` })) : null;
-  const btn = loaded || st === "unloading"
-    ? el("button", { class: "unload", onclick: () => unload(m, mod) }, "Unload")
-    : el("button", { onclick: () => load(m, mod) }, "Load");
+  const cmd = run ? run.cmd : entry ? expand(cfg, entry.cmd) : "";
+  const card = m.id === "zaphod" ? cardOf(m, mod, cmd) : "";
+  const loaded = !!run;
+  const alone = /runs alone/i.test(`${mod.name || ""} ${mod.description || ""}`);
+  const btn = loaded ? el("button", { class: "act unload", onclick: () => unload(m, mod) }, "Unload")
+    : el("button", { class: "act", onclick: () => load(m, mod) }, "Load");
   if (p || (run && run.state !== "ready")) btn.disabled = true;
-  const label = { starting: "starting", stopping: "stopping", loading: "loading", unloading: "unloading" }[st] || "";
-  return el("li", {},
-    el("span", { class: `lamp ${st}`, title: st === "ready" ? "loaded" : st }),
-    el("div", { class: "mid" },
-      el("div", { class: "idline" }, el("span", { class: "id", text: mod.id }), card ? el("span", { class: "card", text: card }) : null,
-        label ? el("span", { class: "state", text: label }) : null),
-      desc ? el("div", { class: "desc", text: desc }) : null, speed),
-    btn, details(m, mod, run));
+  const box = el("div", { class: "panel", role: "region", "aria-label": `${mod.id} details` });
+  box.append(el("div", { class: "top" },
+    el("div", {}, el("h3", { text: mod.id }),
+      el("p", { class: "where", text: `${m.id}${card ? ", " + card : ""}, ${loaded ? "loaded" : "not loaded"}` })),
+    el("button", { class: "close", onclick: () => { open = null; render(); stamp(); } }, "Close")));
+  let name = mod.name || "";
+  if (card) name = name.replace(new RegExp(`,?\\s*${card}\\b`, "i"), "").replace(/\s*,\s*$/, "").replace(/,\s*,/, ",");
+  const what = [name, mod.description].filter(Boolean).join(". ");
+  if (what) box.append(el("p", { class: "what", text: what }));
+  if (!loaded) box.append(el("p", { class: "warn", text: alone
+    ? `This model runs alone: loading it unloads every other model on ${m.id}, including document search and speech.`
+    : m.id === "marvin" ? "marvin runs one model at a time: loading this unloads the one loaded now."
+    : "Loading it unloads any model that cannot run next to it (see its routing sets under Show config)." }));
+  box.append(btn);
+  const sp = speeds[key];
+  if (sp) box.append(el("p", { class: "line", text:
+    `Last speed test: ${sp.w.toFixed(1)} tokens a second writing, ${Math.round(sp.r)} reading a 32K prompt ` +
+    `(${new Date(sp.t).toLocaleDateString(undefined, { month: "short", day: "numeric" })}).` }));
+  const ctx = mod.context_length || +((cmd.match(/(?:^| )(?:-c|--ctx-size) (\d+)/) || [])[1] || 0);
+  if (ctx) box.append(el("p", { class: "line", text: `Context: ${ctx.toLocaleString()} tokens.` }));
+  const file = fileOf(cmd);
+  if (cfg && file && m.id === "zaphod") {
+    const others = Object.entries(cfg.models).filter(([id, e]) => id !== mod.id && fileOf(expand(cfg, e.cmd)) === file)
+      .map(([id, e]) => `${id} (${cardOf(m, { name: "" }, expand(cfg, e.cmd)) || "?"})`);
+    if (others.length) box.append(el("p", { class: "line", text: `Same model on: ${others.join(", ")}.` }));
+  }
+  const more = el("details", {}, el("summary", { text: "Show config" }));
+  const dl = el("dl");
+  const row = (k, v) => v && dl.append(el("dt", { text: k }), el("dd", {}, v));
+  row("engine", ((mod.meta || {}).llamaswap || {}).upstream || "");
+  const caps = Object.entries(mod.capabilities || {}).filter(([, v]) => v).map(([k]) => k.replace("_", " "));
+  row("can do", caps.join(", "));
+  if (cfg && Object.keys(cfg.sets).length) {
+    const mine = Object.entries(cfg.sets).filter(([, e]) => new RegExp(`(^|[^A-Za-z0-9._-])${mod.id.replace(/[.]/g, "\\.")}([^A-Za-z0-9._-]|$)`).test(e));
+    row("routing sets", mine.length ? el("pre", { text: mine.map(([n, e]) => `${n}: ${e}`).join("\n") }) : "in no routing set");
+  }
+  row(run ? "command (running)" : "command", cmd ? el("pre", { text: cmd }) : "");
+  row("config", entry ? el("pre", { text: entry.block }) : "not in the config file");
+  if (m.id === "marvin") row("note", "This is zaphod's copy of marvin's config file; marvin runs the same file after a git pull.");
+  more.append(dl);
+  box.append(more);
+  return box;
 }
 
 function render() {
-  const root = document.getElementById("machines");
-  root.replaceChildren();
-  for (const m of MACHINES) {
-    const d = state[m.id];
-    const face = el("div", { class: "face" }, el("h2", { text: m.id }), el("p", { class: "sub", text: m.sub }));
-    const sec = el("section", {}, face);
-    if (!d) { face.append(el("div", { class: "desc", text: "Reading…" })); root.append(sec); continue; }
-    if (d.error) { sec.append(el("div", { class: "err", text: d.error })); root.append(sec); continue; }
-    face.append(hardware(m, d));
-    const act = d.profiles && d.profiles.active;
-    if (act) {
-      const pr = (d.profiles.profiles || []).find(x => x.id === act);
-      face.append(el("div", { class: "profile" }, "Profile on: ", el("b", { text: act }), pr ? `. ${pr.description}` : ""));
-    }
-    const runs = Object.fromEntries(d.running.map(r => [r.model, r]));
-    const mods = d.models.filter(x => !x.id.includes("/")); // peers (marvin/big on zaphod) are listed under their machine
-    const on = mods.filter(x => runs[x.id] || pending[`${m.id}/${x.id}`]);
-    const off = mods.filter(x => !on.includes(x));
-    const list = el("div", { class: "list" });
-    sec.append(list);
-    const ul = el("ul", { class: "models" });
-    on.forEach(x => ul.append(modelRow(m, x, runs[x.id])));
-    list.append(ul);
-    if (!on.length) list.append(el("p", { class: "desc", text: "Nothing is loaded. Load a model from the list below." }));
-    const det = el("details", { class: "off" }, el("summary", { text: `${off.length} more, not loaded` }));
-    const ul2 = el("ul", { class: "models" });
-    off.forEach(x => ul2.append(modelRow(m, x, null)));
-    det.append(ul2);
-    if (openDetails.has(m.id)) det.open = true;
-    det.addEventListener("toggle", () => det.open ? openDetails.add(m.id) : openDetails.delete(m.id));
-    if (off.length) list.append(det);
-    root.append(sec);
-  }
+  document.getElementById("machines").replaceChildren(...MACHINES.map(machineView));
 }
-const openDetails = new Set();
+function stamp() {
+  document.getElementById("updated").textContent = open ? "Paused while details are open"
+    : "Updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
+}
 
 async function load(m, mod) {
   const alone = /runs alone/i.test(`${mod.name || ""} ${mod.description || ""}`);
   const msg = alone
     ? `Load ${mod.id} on ${m.id}?\n\nIt runs alone: every other model on ${m.id} unloads, including document search and speech.`
-    : `Load ${mod.id} on ${m.id}?\n\nllama-swap unloads any model that cannot run next to it.`;
+    : `Load ${mod.id} on ${m.id}?\n\nModels that cannot run next to it unload.`;
   if (!confirm(msg)) return;
   const key = `${m.id}/${mod.id}`;
   pending[key] = "loading"; render();
@@ -439,7 +465,7 @@ async function load(m, mod) {
   } catch (e) {
     toast(`${mod.id} did not load on ${m.id} (${e.message}). Its log is on the machine: docker compose logs in ~/llama-swap.`);
   } finally {
-    delete pending[key]; await tick();
+    delete pending[key]; await tick(true);
   }
 }
 
@@ -461,27 +487,20 @@ async function unload(m, mod) {
   } catch (e) {
     toast(`${mod.id} did not unload on ${m.id} (${e.message}).`);
   } finally {
-    delete pending[key]; await tick();
+    delete pending[key]; await tick(true);
   }
 }
 
-function renderIfChanged() { // no redraw while a model's details are open, so they and selected text stay put
-  if (openRows.size) {
-    document.getElementById("updated").textContent = "Paused while details are open";
-    return;
-  }
-  render();
-  document.getElementById("updated").textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
-}
-async function tick() {
+async function tick(force) {
   await Promise.all(MACHINES.map(readMachine));
-  renderIfChanged();
+  if (!open || force) render(); // no redraw while details are open, so they and selected text stay put
+  stamp();
 }
 (async () => {
   await Promise.all([readConfigs(), readSpeeds()]);
-  await tick();
+  await tick(true);
   setInterval(tick, 5000);
-  setInterval(async () => { await Promise.all([readSpeeds(), readConfigs()]); renderIfChanged(); }, 300000);
+  setInterval(async () => { await Promise.all([readSpeeds(), readConfigs()]); if (!open) render(); }, 300000);
 })();
 </script>
 </body>
