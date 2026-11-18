@@ -251,16 +251,20 @@ and no peer-to-peer between the cards (Radiance warns about both); its guide's n
 
 | | `coder` (llama.cpp, card 1) | `coder-radiance` (both cards) |
 | --- | --- | --- |
-| writing (lab speed, same day) | 54.0 tok/s (`coder-2` on card 2: 58.9) | **103.3** (1.9x) |
+| writing (lab speed, temp 0 code: the drafter's best case; same day) | 54.0 tok/s (`coder-2` on card 2: 58.9) | **103.3** (1.9x) |
 | reading 32K | 936 (`coder-2` 988) | 968 (same) |
 | writing at 30K / 54-62K / 123K (tuning/depth.py) | 49.0 / 48.0 / n.a. (64K context) | **118 / 114 / 130** |
 | reading at 30K / 54-62K / 123K | 944 / 869 / n.a. | 969 / 943 / 897 |
 | tool use, full suite, temp 0.6, seeds 1-3 | 96 / 93 / 92 | 96 / 93 / 94 |
 | TC-45 runaway (`tool_choice: required`) | 3 of 3 | 0 of 3 |
-| one full tool-use run | 27-31 min | ~11 min |
+| one full tool-use run | 27-31 min, but 12.6-13.4 without TC-45's runaway | 11.1-11.5 (about 15% faster) |
+| writing during the tool-use runs (temp 0.6, server-reported median, >= 50 tokens) | 54.9 tok/s | **133.2** |
 | leak tests (cache-switch; 4 at once; cache-evict 8 x 12K, 8 x 120K over its pool) | 0 (leak flags) | 0; 0; 0 (25/25), prefix cache on |
 
-Cost: both cards (coder, coder-2, chat and the helpers unload; watchdog paused while it runs). Log:
+Tool-use runs are mostly prompt reading (the same speed on both), so a whole run is only ~15% faster although writing is
+2-2.4x. Cost: both cards (coder, coder-2, chat and the helpers unload: no document search or speech while it runs;
+watchdog paused); its KV cache takes all free card memory. Not tested: several requests at once (the guide's headline),
+Terminal-Bench, vision, one card. Log:
 plans/radiance-timeline.md. MLflow: speed a0d7e60f; tool use series `coder-radiance-v1` (engine tags corrected).
 
 ## marvin: Halogen Flash 0.20.6 vs `big` (same model, Qwen3.8-Flash-Next; 2026-11-17)
@@ -275,6 +279,7 @@ Halogen Flash (closed engine for this one model on Strix Halo) started by the en
 | reading at 30K / 62K / 123K (tuning/depth.py) | 360 / 313 / 267 | **2,145 / 2,118 / 2,007** |
 | first token, 123K prompt | 462 s | **61 s** |
 | tool use, full suite, temp 0.6, seeds 1-3 | 96 / 91 / 93 | 93 / 93 / 91 (same range) |
+| one full tool-use run (without TC-45's runaway) | 14.7-15.7 min | 8.5-9.0 min |
 | conversation leak tests (cache-switch; 4 at once; cache-evict: 8 x 12K, 5 x 120K over its pool) | 0 (with the leak flags) | 0; 0; 0 (22/22), with its prompt cache on |
 | returning to a 12K conversation after another | re-read in full (leak flags) | 0.17 s |
 | memory | ~93 GB weights + KV | 88.9 GiB in all (weights 62.1 locked, 47.7 GiB lookup table read from disk) |

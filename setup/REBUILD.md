@@ -148,10 +148,10 @@ the gateway's database; then copy `~/.mcpjungle.conf` from Proton Pass ("MCPJung
    ends, one reminder after 4 h unless acked; at most 12 messages an hour. Install after step 7 (its buttons need
    lab-actions). Check: `~/homelab/hub/watchdog/watchdog.py once` (every line `ok`), `systemctl is-active lab-watchdog`,
    `watchdog.py status`; log `~/.local/state/lab-watchdog/watchdog.log`. Thresholds and commands live in its CHECKS table.
-9. marvin: engine launcher (`engines/lab-engined.py`, service `lab-engined`, `setup/host.sh` step 6f;
-   plans/engine-launcher-timeline.md). Starts only the containers in `engines/marvin.json` (images by digest,
+9. Both machines: engine launcher (`engines/lab-engined.py`, service `lab-engined`, `setup/host.sh` step 6f;
+   plans/engine-launcher-timeline.md). Starts only the containers in `engines/<machine>.json` (images by digest,
    read-only mounts), on the internal Docker network `lab-engines` (no internet, no host ports), when llama-swap asks
-   (`cmd`/`cmdStop`: `engines/lab-engine`). Needs nothing secret. Install before starting marvin's llama-swap (its
+   (`cmd`/`cmdStop`: `engines/lab-engine`). Needs nothing secret. Install before starting that machine's llama-swap (its
    compose mounts `~/.local/state/lab-engined` and joins `lab-engines`). Check:
    `curl -s --unix-socket ~/.local/state/lab-engined/engined.sock http://x/status` → `[]`; `lab setup check` line 6f;
    log `journalctl -u lab-engined`. After changing the allowlist: nothing to restart (read on every request).

@@ -90,6 +90,7 @@ models panel as the one page for both machines, with `lab` doing the same from t
      two unrelated long prompts in a row must not leak;
    - `big-halogen` entry; `lab speed`, a depth test (0 / 32K / 64K / 128K), `lab quality --full` seeds 1-3.
    - Good result: reading and writing clearly faster, tool use within `big`'s seed spread (96 / 91 / 93), no leak.
+2b. **Radiance on zaphod** (both R9700s; Daniel 2026-11-17): tested, see plans/radiance-timeline.md and tuning/results.md.
 3. **llama.cpp ROCm (#16)**, updated for llama.cpp e574a17 (the matching llamacpp-rocm build: check its
    qualification file). Same tests.
 4. **Gufo** (`big-gufo`, and maybe its embedding/speech models), same tests.
