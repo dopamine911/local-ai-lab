@@ -84,7 +84,7 @@ help: **[docs/cli/](docs/cli/README.md)**.
 | Repeated runs: average and spread | `lab series` |
 | Backups | `lab backup list` |
 
-The old scripts (`tuning/speed`, `hub/image-mode`, ...) still work: they are one-line wrappers that call `lab`.
+The old scripts (`tuning/speed`, `hub/image-mode`, ...) were removed 2026-11-18 (#52): older notes that show them mean the `lab` command of the same name.
 
 ## Agents and their tools
 

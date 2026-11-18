@@ -60,7 +60,7 @@ Open WebUI: every setting is in `hub/compose.yaml` (open-webui environment). Nev
 - **Fixed on zaphod 2026-11-16** and on marvin the same day (image 273 on both, llama.cpp v1.0.0 includes upstream fix #31956; `tuning/grammar-repro.py` all OK on both; the client workaround below is no longer needed). llama.cpp b11870 and b12020 (llama-swap 267 and 269; re-tested 2026-11-02) reject Qwen3.8 and Ornith requests that combine tools with a required JSON format ("failed to parse grammar"). Flint is unaffected. Cause found 2026-11-02: `common/parsers/qwen3-coder.cpp` makes the grammar lazy even with a response format, so it comes out empty; upstream issue #31342 open, fix PR #31395 closed unreviewed (plans/grammar-bug-timeline.md). Client workaround: `tool_choice` "required" or "none" with the format. Re-test with `tuning/grammar-repro.py` after a llama.cpp update.
 
 ## Results
-`tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `lab speed`, `quality`, `bench`, `kl`, `tbench`, `compare-skill`, `series` (one CLI for the lab: `lab --help`, docs/cli/; the old scripts are wrappers); see tuning/README.md.
+`tuning/results.md` (summary) and MLflow https://mlflow.ai.dopamine911.com (every run). Tools: `lab speed`, `quality`, `bench`, `kl`, `tbench`, `compare-skill`, `series` (one CLI for the lab: `lab --help`, docs/cli/; the old scripts were removed 2026-11-18, #52); see tuning/README.md.
 
 ## Open work
 GitHub issues are the one backlog (https://github.com/dopamine911/local-ai-lab/issues); `plans/README.md` indexes the plans

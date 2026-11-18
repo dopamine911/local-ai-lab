@@ -178,8 +178,7 @@ tap log; rerun output) and `~/.local/state/lab-watchdog/` (current problems, sno
 `setup/host.sh` step 10 builds and installs it on both machines (`~/homelab/cli/build.sh install`; pinned Go container,
 nothing installed on the host). Good result: `lab version` prints a commit id, `lab manifest` has no "unknown", and
 `lab setup check` ends with "all done". Without a terminal `lab` prints help (safe in scripts). Every command: `lab --help`,
-reference in docs/cli/. The old scripts (tuning/speed, hub/image-mode, ...) are one-line wrappers that call `lab` until
-nothing uses them (~/.cache/lab-wrapper-calls.log). Still scripts: `setup/host.sh` (it installs Docker and builds lab),
+reference in docs/cli/. The old scripts (tuning/speed, hub/image-mode, ...) were removed 2026-11-18 (#52): use `lab`. Still scripts: `setup/host.sh` (it installs Docker and builds lab),
 `setup/backup-to-marvin.sh` (cron; it moves with the NAS, #30; the memory sync cron runs `lab memory sync` since #52), the Strata
 scripts (on hold).
 

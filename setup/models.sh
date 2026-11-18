@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-# Moved to `lab models` (issue #6; same arguments, same results, checked side by side). This wrapper stays until
-# nothing calls it (see ~/.cache/lab-wrapper-calls.log), then it goes. Help: lab models --help
-# Full path on purpose: the Rerun button (hub/actions) runs benchmarks without ~/.local/bin on its PATH.
-LAB="$HOME/.local/bin/lab"
-[ -x "$LAB" ] || { echo "models.sh: lab is not installed. Run: ~/homelab/cli/build.sh install" >&2; exit 1; }
-echo "$(date '+%F %T') setup/models.sh $(ps -o comm= $PPID 2>/dev/null)" >> "$HOME/.cache/lab-wrapper-calls.log" 2>/dev/null || true
-exec "$LAB" models "$@"

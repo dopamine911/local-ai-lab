@@ -153,9 +153,9 @@ SKILL=instructions/the-craft@3c329d0.md lab tbench smoke "the-craft"            
 
 Not set up: a SWE-bench sample (heavy; see the full guide).
 
-**`lab` (issue #6):** every command above is a `lab` command (`lab <command> --help`; reference: docs/cli/). The files
-`speed`, `quality`, `bench`, `kl`, `series`, `log`, `tbench`, `compare-skill`, `sort-log` and `manifest.sh` in this
-folder are one-line wrappers that call `lab`, kept until nothing calls them (`~/.cache/lab-wrapper-calls.log`).
+**`lab` (issue #6):** every command above is a `lab` command (`lab <command> --help`; reference: docs/cli/). The old
+scripts of the same names (`./speed`, `./quality`, ...) were removed 2026-11-18 (#52); older notes that show them mean
+the `lab` command of that name (`manifest.sh`: `lab manifest`).
 
 ## Which result files go in git
 
@@ -170,8 +170,6 @@ Every run's result file is attached to its MLflow run (checked 2026-11-18: speed
 
 | File | What |
 | --- | --- |
-| `bench`, `speed`, `quality`, `kl`, `series`, `log`, `tbench`, `compare-skill`, `sort-log`, `manifest.sh` | One-line wrappers for the `lab` commands of the same name (`manifest.sh`: `lab manifest`); go once nothing calls them |
-| `activity.sh` | Old copy of the request-log reader; `lab log` has its own. Goes with the wrappers |
 | `instructions/` | Pinned instruction files (skills) for testing |
 | `tbench-skill-patch.py` | Adds skill support to Terminal-Bench's prompt hook |
 | `cache-switch.py` | Switch test and leak check for llama.cpp's prompt cache: conversation A, B, A again with codewords (#10; plans/cache-leak-timeline.md) |
