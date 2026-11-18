@@ -157,6 +157,15 @@ Not set up: a SWE-bench sample (heavy; see the full guide).
 `speed`, `quality`, `bench`, `kl`, `series`, `log`, `tbench`, `compare-skill`, `sort-log` and `manifest.sh` in this
 folder are one-line wrappers that call `lab`, kept until nothing calls them (`~/.cache/lab-wrapper-calls.log`).
 
+## Which result files go in git
+
+Every run's result file is attached to its MLflow run (checked 2026-11-18: speed a0d7e60f has its JSON; tool use
+845806e3 its JSON and full report), and MLflow is in the nightly backup. So in git (Daniel, #52, 2026-11-18):
+- **Commit** a result file (`runs/`, `tool-eval/runs/`, `kld/`) when `results.md` or a plan/timeline cites it, in the
+  same commit as the text that cites it.
+- **Leave the rest untracked** (diagnostic runs, repeats, tests of the tools). They stay on disk but are not backed up:
+  MLflow is the record. Never `git add -A` in tuning/.
+
 ## Files here
 
 | File | What |
