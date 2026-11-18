@@ -95,9 +95,11 @@ models:
     checkEndpoint: /health
   coder-long:
     name: "Qwen3.8-27B, both cards, long context"
+    description: "Not yet tested. Runs alone: every other model on zaphod unloads, helpers too."
     cmd: ${server} --device Vulkan1,Vulkan0 -m ${qwen27} -c 262144 -np 2 -kvu ${qwen-sampling}
   gpt-oss:
     name: "gpt-oss-120b, both cards + RAM (test)"
+    description: "Test only (plans/gpt-oss-timeline.md). Runs alone: every other model on zaphod unloads, helpers too."
     # Test (plans/gpt-oss-timeline.md): 63.4 GB does not fit the two cards, so some expert layers stay in RAM.
     # Card 2 first: the RAM-side layers sit next to the x8 card, not card 1's PCIe 3.0 x4 link. Runs alone (helpers off).
     # Same settings as marvin's gpt-oss: 128K, 1 slot, -b/-ub 4096, OpenAI sampling, effort medium.
