@@ -210,7 +210,7 @@ services:
   # no route out except browser-proxy, which refuses home-network/Tailscale/internal addresses. No published port,
   # no files from the host, profile in memory (--isolated), read-only filesystem. Reached only through mcpjungle.
   playwright-mcp:
-    image: mcr.microsoft.com/playwright/mcp:v0.0.83@sha256:690763cbb437ee7233f538a953bb5390bf03791eb5c965b471e59d17a6132fcb
+    image: mcr.microsoft.com/playwright/mcp:v0.0.86@sha256:2dfc17e08e8db54678ec965ce9ffb4100be0aa68135774d761bac9035ceb6668
     container_name: playwright-mcp
     restart: unless-stopped
     init: false                        # the image already runs tini
