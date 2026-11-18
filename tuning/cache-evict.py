@@ -3,7 +3,7 @@
 # entries; this one forces the cache to drop and reuse them, where a stale resume would show.
 #   BASE_URL=http://marvin:8080/v1 API_KEY=... python3 -I tuning/cache-evict.py big-halogen [many|deep|both]
 # many: 8 conversations of ~12K tokens, each with its own codeword, one after another; then a follow-up in each.
-# deep: 5 conversations of ~120K tokens (together more than a 524,288-position pool); then a follow-up in the first.
+# deep: 5 conversations of ~120K tokens (DEEP_N=... for more; together more than the engine's KV pool); then a follow-up in the first.
 # Every answer must name its own codeword and no other: one with another conversation's codeword is a LEAK.
 # The follow-up's first-token time shows whether it resumed (fast) or read the conversation again (slow).
 # Writes tuning/runs/<date>-cache-evict-<model>.json. Good result: leaks 0.
@@ -74,8 +74,9 @@ if MODE in ("many", "both"):
     print("many: 8 conversations of ~12K tokens, then a follow-up in each")
     res["many"] = run(8, 12_000, range(8))
 if MODE in ("deep", "both"):
-    print("deep: 5 conversations of ~120K tokens, then a follow-up in the first")
-    res["deep"] = run(5, 120_000, [0])
+    n = int(os.environ.get("DEEP_N", "5"))  # enough that n x 120K exceeds the engine's KV pool (Radiance on zaphod: 8)
+    print(f"deep: {n} conversations of ~120K tokens, then a follow-up in the first")
+    res["deep"] = run(n, 120_000, [0])
 allrows = res.get("many", []) + res.get("deep", [])
 res["leaks"] = sum(r["leak"] for r in allrows)
 res["own"] = f"{sum(r['own'] for r in allrows)}/{len(allrows)}"

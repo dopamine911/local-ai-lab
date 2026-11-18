@@ -1,0 +1,22 @@
+{
+ "model": "coder",
+ "base_url": "http://127.0.0.1:8080/v1/chat/completions",
+ "rows": [
+  {
+   "depth_k": 32,
+   "prompt_tokens": 30352,
+   "ttft_s": 32.1,
+   "reading_tps": 944.2,
+   "tokens_out": 200,
+   "writing_tps": 49.0
+  },
+  {
+   "depth_k": 56,
+   "prompt_tokens": 53663,
+   "ttft_s": 61.8,
+   "reading_tps": 868.7,
+   "tokens_out": 142,
+   "writing_tps": 48.0
+  }
+ ]
+}

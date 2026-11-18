@@ -1,0 +1,209 @@
+{
+ "model": "coder-radiance",
+ "many": [
+  {
+   "kind": "first",
+   "conversation": 1,
+   "ttft_s": 11.3,
+   "own": true,
+   "leak": false,
+   "answer": "22C942F2"
+  },
+  {
+   "kind": "first",
+   "conversation": 2,
+   "ttft_s": 10.96,
+   "own": true,
+   "leak": false,
+   "answer": "17646A0D"
+  },
+  {
+   "kind": "first",
+   "conversation": 3,
+   "ttft_s": 11.75,
+   "own": true,
+   "leak": false,
+   "answer": "8843A44A"
+  },
+  {
+   "kind": "first",
+   "conversation": 4,
+   "ttft_s": 12.45,
+   "own": true,
+   "leak": false,
+   "answer": "E39E9EB8"
+  },
+  {
+   "kind": "first",
+   "conversation": 5,
+   "ttft_s": 11.43,
+   "own": true,
+   "leak": false,
+   "answer": "8EFAA1C4"
+  },
+  {
+   "kind": "first",
+   "conversation": 6,
+   "ttft_s": 11.92,
+   "own": true,
+   "leak": false,
+   "answer": "D37AECD5"
+  },
+  {
+   "kind": "first",
+   "conversation": 7,
+   "ttft_s": 12.01,
+   "own": true,
+   "leak": false,
+   "answer": "B42F86C5"
+  },
+  {
+   "kind": "first",
+   "conversation": 8,
+   "ttft_s": 10.9,
+   "own": true,
+   "leak": false,
+   "answer": "EE0EB34C"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 1,
+   "ttft_s": 3.06,
+   "own": true,
+   "leak": false,
+   "answer": "22C942F2"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 2,
+   "ttft_s": 2.74,
+   "own": true,
+   "leak": false,
+   "answer": "17646A0D"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 3,
+   "ttft_s": 3.53,
+   "own": true,
+   "leak": false,
+   "answer": "8843A44A"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 4,
+   "ttft_s": 4.22,
+   "own": true,
+   "leak": false,
+   "answer": "E39E9EB8"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 5,
+   "ttft_s": 3.22,
+   "own": true,
+   "leak": false,
+   "answer": "8EFAA1C4"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 6,
+   "ttft_s": 3.68,
+   "own": true,
+   "leak": false,
+   "answer": "D37AECD5"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 7,
+   "ttft_s": 3.75,
+   "own": true,
+   "leak": false,
+   "answer": "B42F86C5"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 8,
+   "ttft_s": 2.67,
+   "own": true,
+   "leak": false,
+   "answer": "EE0EB34C"
+  }
+ ],
+ "deep": [
+  {
+   "kind": "first",
+   "conversation": 1,
+   "ttft_s": 124.5,
+   "own": true,
+   "leak": false,
+   "answer": "CA2C88CD"
+  },
+  {
+   "kind": "first",
+   "conversation": 2,
+   "ttft_s": 126.4,
+   "own": true,
+   "leak": false,
+   "answer": "EA890820"
+  },
+  {
+   "kind": "first",
+   "conversation": 3,
+   "ttft_s": 129.28,
+   "own": true,
+   "leak": false,
+   "answer": "EF45445B"
+  },
+  {
+   "kind": "first",
+   "conversation": 4,
+   "ttft_s": 107.72,
+   "own": true,
+   "leak": false,
+   "answer": "88186CFB"
+  },
+  {
+   "kind": "first",
+   "conversation": 5,
+   "ttft_s": 113.98,
+   "own": true,
+   "leak": false,
+   "answer": "900C9599"
+  },
+  {
+   "kind": "first",
+   "conversation": 6,
+   "ttft_s": 120.57,
+   "own": true,
+   "leak": false,
+   "answer": "75EFB245"
+  },
+  {
+   "kind": "first",
+   "conversation": 7,
+   "ttft_s": 114.07,
+   "own": true,
+   "leak": false,
+   "answer": "0DD69FF7"
+  },
+  {
+   "kind": "first",
+   "conversation": 8,
+   "ttft_s": 196.57,
+   "own": true,
+   "leak": false,
+   "answer": "808B3E25"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 1,
+   "ttft_s": 124.55,
+   "own": true,
+   "leak": false,
+   "answer": "CA2C88CD"
+  }
+ ],
+ "leaks": 0,
+ "own": "25/25"
+}

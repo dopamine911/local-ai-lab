@@ -10,8 +10,8 @@ reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature
 
 | Model | Where | Writing tok/s | Reading 32K tok/s | Tool use (3 seeds) | Measured |
 | --- | --- | ---: | ---: | --- | --- |
-| `coder` | zaphod card 1, llama.cpp v1.0.0+48 | 54.0-54.3 | 936-938 | 96 / 93 / 92 | 2026-11-17 (speed), 11-16 (tool use) |
-| `coder-2` | zaphod card 2 | 59.5-59.7 | not measured | not run | 2026-10-28 (older llama.cpp) |
+| `coder` | zaphod card 1, llama.cpp v1.0.0+48 | 54.0-54.3 (30K / 54K: 49.0 / 48.0) | 936-938 (30K / 54K: 944 / 869) | 96 / 93 / 92 | 2026-11-17 (speed, depth), 11-16 (tool use) |
+| `coder-2` | zaphod card 2, llama.cpp v1.0.0+48 (omp's sub-agents since 11-17, #51) | 58.9 | 988.5 | not run | 2026-11-17 |
 | `ornith` | zaphod card 2 | ~90 | 2,433 (llama-bench) | 93 (temp 0 short suite) | 2026-10-28 (older llama.cpp) |
 | `chat-teacher` | zaphod card 2, 4 slots | 148.1 calls/min (4 workers) | | | 2026-11-16 |
 | `big` | marvin, llama.cpp v1.0.0+48 | 44.8 | 325.7 (30K / 62K / 123K: 360 / 313 / 267) | 96 / 91 / 93 | 2026-11-17 (speed, depth), 11-16 (tool use) |
@@ -19,6 +19,7 @@ reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature
 | `gpt-oss` (test) | zaphod, both cards, 32K | 85.3 | 2,885 | 97 (core 15) | 2026-11-09 (older llama.cpp) |
 | `gpt-oss` (test) | marvin, 128K | 53.4 | 820 | 82 (full) | 2026-11-09 (older llama.cpp) |
 | `big-halogen` (test) | marvin, Halogen Flash 0.20.6 | 83.6 | 2,144 (30K / 62K / 123K: 2,145 / 2,118 / 2,007) | 93 / 93 / 91; Terminal-Bench 17/19 in 3.44 h | 2026-11-17 |
+| `coder-radiance` (test) | zaphod, both cards, Radiance 2.1.0 (IQ8R + DFlash2) | 103.3 (30K / 62K / 123K: 118 / 114 / 130) | 968 (30K / 62K / 123K: 969 / 943 / 897) | 96 / 93 / 94 | 2026-11-17 |
 
 Terminal-Bench (Core-19, pass@2), latest full run per setup: marvin `big` on llama.cpp 18/19 in 5.37 h (2026-11-01,
 older llama.cpp; 19/19 in 5.5 h on 10-29); Strata 0.2.7 17/19 (medium) and 19/19 (xhigh); our UnbiasedStrata fork
@@ -241,6 +242,26 @@ Tests through zaphod's peer (`marvin/big`); chat-teacher direct to marvin:8080. 
 
 Kept. MLflow series `big-ls269-v1`, `big-ls273-v1`; speed 37062caf (269), db14d348 (273). Rollback: `image:
 llama-swap-marvin:269`. Log: plans/llama-cpp-v1-timeline.md.
+
+## zaphod: Radiance 2.1.0 on both R9700s vs `coder` (same model, Qwen3.8-27B; 2026-11-17)
+
+Radiance (open-source C++/HIP engine, Apache-2.0) started by the engine launcher as `coder-radiance`: IQ8R (rotated
+int8) + DFlash2 drafter, tensor-parallel over both cards, `coder`'s sampling and effort. zaphod has Resizable BAR off
+and no peer-to-peer between the cards (Radiance warns about both); its guide's numbers were with ReBAR on.
+
+| | `coder` (llama.cpp, card 1) | `coder-radiance` (both cards) |
+| --- | --- | --- |
+| writing (lab speed, same day) | 54.0 tok/s (`coder-2` on card 2: 58.9) | **103.3** (1.9x) |
+| reading 32K | 936 (`coder-2` 988) | 968 (same) |
+| writing at 30K / 54-62K / 123K (tuning/depth.py) | 49.0 / 48.0 / n.a. (64K context) | **118 / 114 / 130** |
+| reading at 30K / 54-62K / 123K | 944 / 869 / n.a. | 969 / 943 / 897 |
+| tool use, full suite, temp 0.6, seeds 1-3 | 96 / 93 / 92 | 96 / 93 / 94 |
+| TC-45 runaway (`tool_choice: required`) | 3 of 3 | 0 of 3 |
+| one full tool-use run | 27-31 min | ~11 min |
+| leak tests (cache-switch; 4 at once; cache-evict 8 x 12K, 8 x 120K over its pool) | 0 (leak flags) | 0; 0; 0 (25/25), prefix cache on |
+
+Cost: both cards (coder, coder-2, chat and the helpers unload; watchdog paused while it runs). Log:
+plans/radiance-timeline.md. MLflow: speed a0d7e60f; tool use series `coder-radiance-v1` (engine tags corrected).
 
 ## marvin: Halogen Flash 0.20.6 vs `big` (same model, Qwen3.8-Flash-Next; 2026-11-17)
 

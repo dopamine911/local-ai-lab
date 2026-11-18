@@ -1,0 +1,115 @@
+{
+ "model": "coder-radiance",
+ "base_url": "http://127.0.0.1:8080/v1/chat/completions",
+ "rounds": [
+  {
+   "round": 1,
+   "codeword_a": "ALPHA-0FACDCAC",
+   "codeword_b": "BRAVO-2A6E8381",
+   "a1": {
+    "ttft_s": 12.26,
+    "answer": "ALPHA-0FACDCAC",
+    "prompt_tokens": 12117,
+    "cached_tokens": 0,
+    "prompt_n": 12117,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 13.9,
+    "answer": "BRAVO-2A6E8381",
+    "prompt_tokens": 13704,
+    "cached_tokens": 0,
+    "prompt_n": 13704,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 4.05,
+    "answer": "ALPHA-0FACDCAC",
+    "prompt_tokens": 12153,
+    "cached_tokens": 8192,
+    "prompt_n": 3961,
+    "cache_n": 8192,
+    "own_codeword": true,
+    "leak": false
+   }
+  },
+  {
+   "round": 2,
+   "codeword_a": "ALPHA-74735954",
+   "codeword_b": "BRAVO-66F72BAE",
+   "a1": {
+    "ttft_s": 12.28,
+    "answer": "ALPHA-74735954",
+    "prompt_tokens": 12120,
+    "cached_tokens": 0,
+    "prompt_n": 12120,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 13.94,
+    "answer": "BRAVO-66F72BAE",
+    "prompt_tokens": 13703,
+    "cached_tokens": 0,
+    "prompt_n": 13703,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 4.06,
+    "answer": "ALPHA-74735954",
+    "prompt_tokens": 12159,
+    "cached_tokens": 8192,
+    "prompt_n": 3967,
+    "cache_n": 8192,
+    "own_codeword": true,
+    "leak": false
+   }
+  },
+  {
+   "round": 3,
+   "codeword_a": "ALPHA-E45BA71A",
+   "codeword_b": "BRAVO-29747F33",
+   "a1": {
+    "ttft_s": 12.28,
+    "answer": "ALPHA-E45BA71A",
+    "prompt_tokens": 12118,
+    "cached_tokens": 0,
+    "prompt_n": 12118,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "b1": {
+    "ttft_s": 13.94,
+    "answer": "BRAVO-29747F33",
+    "prompt_tokens": 13704,
+    "cached_tokens": 0,
+    "prompt_n": 13704,
+    "cache_n": 0,
+    "own_codeword": true,
+    "leak": false
+   },
+   "a2": {
+    "ttft_s": 4.07,
+    "answer": "ALPHA-E45BA71A",
+    "prompt_tokens": 12155,
+    "cached_tokens": 8192,
+    "prompt_n": 3963,
+    "cache_n": 8192,
+    "own_codeword": true,
+    "leak": false
+   }
+  }
+ ],
+ "leaks": 0,
+ "median_ttft_a_again_s": 4.06,
+ "median_ttft_a_s": 12.28,
+ "median_prompt_read_a_again": 3963
+}

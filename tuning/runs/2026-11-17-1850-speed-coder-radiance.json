@@ -1,0 +1,60 @@
+{
+ "model": "coder-radiance",
+ "base_url": "http://127.0.0.1:8080/v1",
+ "short": [
+  {
+   "writing_tps": 103.1,
+   "tokens": 400,
+   "ttft_s": 0.07,
+   "server_reported_tps": 103.25547419946615
+  },
+  {
+   "writing_tps": 103.3,
+   "tokens": 400,
+   "ttft_s": 0.06,
+   "server_reported_tps": 103.41825582420087
+  },
+  {
+   "writing_tps": 103.3,
+   "tokens": 400,
+   "ttft_s": 0.06,
+   "server_reported_tps": 103.4292308320229
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 32495,
+   "reading_tps": 967.7,
+   "ttft_s": 33.6,
+   "server_reported_tps": 967.861091271601
+  },
+  {
+   "prompt_tokens": 32496,
+   "reading_tps": 967.9,
+   "ttft_s": 33.6,
+   "server_reported_tps": 968.0740039351004
+  },
+  {
+   "prompt_tokens": 32499,
+   "reading_tps": 967.7,
+   "ttft_s": 33.6,
+   "server_reported_tps": 967.8514124439995
+  }
+ ],
+ "speed_write_tps": 103.3,
+ "speed_read_32k_tps": 967.7,
+ "speed_ttft_32k_s": 33.6,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}
