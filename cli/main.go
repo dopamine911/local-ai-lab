@@ -339,7 +339,7 @@ func memoryCmd() *cobra.Command {
 	var install, dry bool
 	s := &cobra.Command{
 		Use:   "sync",
-		Short: "Upload changed Markdown to LocalRecall now (port of hub/memory/sync.sh); --install: hourly cron",
+		Short: "Upload changed Markdown to LocalRecall now; --install: hourly cron (runs lab itself)",
 		Long: "Upload the lab's changed Markdown notes to LocalRecall (the `memory` tool).\n" +
 			"--install puts the hourly line (at :41) in your crontab, replacing an older one (run it yourself).\n" +
 			"--dry-run shows what it would do.\n" +

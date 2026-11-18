@@ -20,20 +20,26 @@ func MemorySync(repo string, dryRun bool) error {
 	return Compose(HubDir(repo), "--profile", "sync", "run", "--rm", "-T", "memory-sync")
 }
 
-// MemorySyncCronLine is the crontab line sync.sh install writes (every hour at :41).
+// MemorySyncCronLine is the hourly crontab line (at :41). Since #52 it runs lab itself (was hub/memory/sync.sh,
+// removed); full path: cron has no ~/.local/bin on its PATH. The watchdog reads the same log.
 func MemorySyncCronLine(repo string) string {
 	home, _ := os.UserHomeDir()
-	return fmt.Sprintf("41 * * * * %s/memory/sync.sh >> %s 2>&1", HubDir(repo), filepath.Join(home, ".cache", "memory-sync.log"))
+	return fmt.Sprintf("41 * * * * %s memory sync >> %s 2>&1", filepath.Join(home, ".local", "bin", "lab"),
+		filepath.Join(home, ".cache", "memory-sync.log"))
 }
 
-// MemorySyncInstall: port of sync.sh install: replace any memory/sync.sh line in the user's crontab with the
-// current one. Run by Daniel (lab rule: no cron job without him); --dry-run prints the new crontab.
+// isMemorySyncLine: the current line or the old sync.sh one, so --install replaces either.
+func isMemorySyncLine(l string) bool {
+	return strings.Contains(l, "memory/sync.sh") || strings.Contains(l, "lab memory sync")
+}
+
+// MemorySyncInstall: replace any memory-sync line in the user's crontab (old sync.sh or lab) with the current one. Run by Daniel (lab rule: no cron job without him); --dry-run prints the new crontab.
 func MemorySyncInstall(repo string, dryRun bool) error {
 	line := MemorySyncCronLine(repo)
 	old, _ := exec.Command("crontab", "-l").Output() // no crontab yet: empty, like the script's "|| true"
 	var keep []string
 	for _, l := range strings.Split(strings.TrimRight(string(old), "\n"), "\n") {
-		if l != "" && !strings.Contains(l, "memory/sync.sh") {
+		if l != "" && !isMemorySyncLine(l) {
 			keep = append(keep, l)
 		}
 	}
@@ -49,7 +55,7 @@ func MemorySyncInstall(repo string, dryRun bool) error {
 		return fmt.Errorf("install FAILED: %v", err)
 	}
 	now, _ := exec.Command("crontab", "-l").Output()
-	if !strings.Contains(string(now), "memory/sync.sh") {
+	if !strings.Contains(string(now), line) {
 		return fmt.Errorf("install FAILED")
 	}
 	fmt.Println("installed: " + line)

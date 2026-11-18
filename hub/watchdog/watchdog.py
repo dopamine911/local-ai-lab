@@ -349,7 +349,7 @@ CHECKS = {
                    good="a success every night at 04:17 (setup/backup-to-marvin.sh)",
                    first=["bash", "-c", "tail -6 ~/.cache/backup-to-marvin.log; crontab -l | grep backup"]),
     "memory-sync": dict(title="memory sync failed or late", verdict=v_sync, for_s=60, ok_after_s=60,
-                        good="a success every hour at :41 (hub/memory/sync.sh)",
+                        good="a success every hour at :41 (lab memory sync)",
                         first=["bash", "-c", "tail -6 ~/.cache/memory-sync.log; crontab -l | grep memory"]),
     "certificate": dict(title="HTTPS certificate expires within 14 days", verdict=v_cert, for_s=60, ok_after_s=60,
                         good="Caddy renews about 30 days before expiry",

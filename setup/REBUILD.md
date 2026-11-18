@@ -104,7 +104,7 @@ mkdir -p ~/homelab/hub/data/localrecall-db && sudo chown 999:999 ~/homelab/hub/d
 cd ~/homelab/hub && docker compose --profile images build && docker compose up -d   # includes localrecall, mcp-localrecall, mnemosyne
 docker compose --profile agent up -d beszel-agent
 lab mcp setup     # MCP gateway: CLI, admin, tool servers, agent logins (tokens from hub/.env)
-~/homelab/hub/memory/sync.sh && ~/homelab/hub/memory/sync.sh install   # memory (LocalRecall): index the notes, then hourly; good result: 'sync: N uploaded'
+lab memory sync && lab memory sync --install   # memory (LocalRecall): index the notes, then hourly at :41; good result: 'sync: N uploaded'
 lab webui drift   # Open WebUI settings come from compose.yaml; good result: 0 setting(s) differ
 lab webui models --apply   # per-model settings (needs OPENWEBUI_API_KEY); good result: then 0 model(s) differ
 lab enso build && lab enso setup   # Enso in a container (agents/enso/README.md)
@@ -180,7 +180,7 @@ nothing installed on the host). Good result: `lab version` prints a commit id, `
 `lab setup check` ends with "all done". Without a terminal `lab` prints help (safe in scripts). Every command: `lab --help`,
 reference in docs/cli/. The old scripts (tuning/speed, hub/image-mode, ...) are one-line wrappers that call `lab` until
 nothing uses them (~/.cache/lab-wrapper-calls.log). Still scripts: `setup/host.sh` (it installs Docker and builds lab),
-`setup/backup-to-marvin.sh` and `hub/memory/sync.sh` (the two cron jobs; the backup moves with the NAS, #30), the Strata
+`setup/backup-to-marvin.sh` (cron; it moves with the NAS, #30; the memory sync cron runs `lab memory sync` since #52), the Strata
 scripts (on hold).
 
 ### Renovate (issue #7, decisions.md 40)
