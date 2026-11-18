@@ -23,7 +23,7 @@ Actions (KINDS below); only these exist:
   wd_ack     watchdog alert: acknowledged, so no 4 h reminder (hub/watchdog/watchdog.py)
   wd_snooze  watchdog alert: no alerts for this check for 1 h; if still bad after, it alerts again
   wd_diag    watchdog alert: run the check's fixed read-only first command, send its output back
-  rerun  start the same benchmark again: one of RERUN_SCRIPTS in tuning/, same arguments and settings, zaphod only
+  rerun  start the same benchmark again: `lab <one of RERUN_SCRIPTS>` from tuning/, same arguments and settings, zaphod only
          (until reservations, #3), one at a time (lock file; "busy" leaves the button usable). Runs detached, output in
          ~/.local/state/lab-actions/jobs/<id>.log; the benchmark's own notification reports the result.
          Restarting this service also stops a running rerun (same service cgroup).
@@ -40,7 +40,8 @@ PORT = int(os.environ.get("LAB_ACTIONS_PORT", "2587"))
 TTL = 24 * 3600
 REPO = os.path.dirname(HUB)
 TUNING = os.path.join(REPO, "tuning")
-RERUN_SCRIPTS = {"speed", "quality", "bench", "kl", "tbench"}
+RERUN_SCRIPTS = {"speed", "quality", "bench", "kl", "tbench"}  # lab commands (were tuning/ wrappers until #52)
+LAB = os.path.expanduser("~/.local/bin/lab")  # full path: this service has no ~/.local/bin on its PATH
 # settings a rerun repeats (never keys: API_KEY etc. are re-read by the script itself from its .env file)
 RERUN_ENV = ["MACHINE", "BASE_URL", "MODEL", "SUITE", "TARGET", "SERIES", "SKILL_NAME", "SKILL_SHA", "BACKEND",
              "BACKEND_VERSION", "CONTEXT_LENGTH", "ENDPOINT", "ENGINE", "MODEL_NAME", "PLATFORM", "PLATFORM_NAME",
@@ -115,7 +116,7 @@ def rerun_argv(args):
     if env.get("MACHINE", "zaphod") != "zaphod" or looks_marvin \
             or not env.get("BASE_URL", "http://127.0.0.1:8080").startswith("http://127.0.0.1:8080"):
         raise ValueError("zaphod runs only (until reservations, #3)")
-    return [os.path.join(TUNING, argv[0]), *argv[1:]], env
+    return [LAB, argv[0], *argv[1:]], env
 
 
 def do_rerun(args):

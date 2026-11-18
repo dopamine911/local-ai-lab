@@ -166,7 +166,7 @@ func zaphodKey(cfg *config.Config) (string, error) {
 // enterTuning moves into tuning/ (outputs and file arguments are relative to it, like the scripts' cd) and records
 // how this run was started for the Rerun button (hub/actions/actiond.py): the script's name and arguments, NUL
 // separated, base64. The outermost command wins (already set: kept). actiond accepts only the script names
-// (speed, quality, bench, kl, tbench) run from tuning/, which re-run through the wrappers.
+// (speed, quality, bench, kl, tbench) run from tuning/, and runs them again as `lab <name>` (#52).
 func enterTuning(cfg *config.Config, name string, args ...string) error {
 	dir := cfg.Tuning()
 	if err := os.Chdir(dir); err != nil {
