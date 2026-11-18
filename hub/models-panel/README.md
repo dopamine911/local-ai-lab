@@ -26,5 +26,11 @@ GET `config/zaphod.yaml`, `config/marvin.yaml` (the llama-swap config files, mou
 public, `${env.X}` references only). marvin's is zaphod's repo copy: marvin runs its own checkout, the same after a pull.
 Anyone on the tailnet who opens the page can load and unload models (Daniel, 2026-11-18).
 
+Design (2026-11-18): an instrument panel. Type: Atkinson Hyperlegible Next (text) and Mono (commands, config), by the
+Braille Institute, chosen because its letters are easy to tell apart; served from `fonts/` (OFL 1.1, licences there;
+@fontsource 5.3.0 woff2, latin, 35 KB), so the page loads nothing from outside. Colours: pale aluminium base, graphite
+ink, one teal for the meters, lamp green / amber / red only for state; dark mode the same roles. The one bold element:
+memory meters with one block per GB, so free memory can be counted. Unload is a quiet button that turns red on hover.
+
 Good result: the page lists both machines with card/memory bars, and Unload then Load of `tts` takes a few seconds.
 Record: plans/models-panel-timeline.md.
