@@ -19,11 +19,12 @@ reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature
 | `gpt-oss` (test) | zaphod, both cards, 32K | 85.3 | 2,885 | 97 (core 15) | 2026-11-09 (older llama.cpp) |
 | `gpt-oss` (test) | marvin, 128K | 53.4 | 820 | 82 (full) | 2026-11-09 (older llama.cpp) |
 | `big-halogen` (test) | marvin, Halogen Flash 0.20.6 | 83.6 | 2,144 (30K / 62K / 123K: 2,145 / 2,118 / 2,007) | 93 / 93 / 91; Terminal-Bench 17/19 in 3.44 h | 2026-11-17 |
-| `coder-radiance` (test) | zaphod, both cards, Radiance 2.1.0 (IQ8R + DFlash2) | 103.3 (30K / 62K / 123K: 118 / 114 / 130) | 968 (30K / 62K / 123K: 969 / 943 / 897) | 96 / 93 / 94 | 2026-11-17 |
+| `coder-radiance` (test) | zaphod, both cards, Radiance 2.1.0 (IQ8R + DFlash2) | 103.3 (30K / 62K / 123K: 118 / 114 / 130) | 968 (30K / 62K / 123K: 969 / 943 / 897) | 96 / 93 / 94; Terminal-Bench 17/19 in 3.05 h | 2026-11-17 |
 
 Terminal-Bench (Core-19, pass@2), latest full run per setup: marvin `big` on llama.cpp 18/19 in 5.37 h (2026-11-01,
 older llama.cpp; 19/19 in 5.5 h on 10-29); Strata 0.2.7 17/19 (medium) and 19/19 (xhigh); our UnbiasedStrata fork
-19/19 in 3.29 h; zaphod `north` 9/19 (stopped early); `big-halogen` (Halogen Flash 0.20.6) 17/19 in 3.44 h (2026-11-17).
+19/19 in 3.29 h; zaphod `north` 9/19 (stopped early); `big-halogen` (Halogen Flash 0.20.6) 17/19 in 3.44 h (2026-11-17); zaphod `coder-radiance` (Radiance 2.1.0,
+Qwen3.8-27B) 17/19 in 3.05 h (2026-11-17; no zaphod llama.cpp run of that model yet: #59).
 
 ## 2026-10-28: card setup (history)
 
@@ -181,6 +182,7 @@ Note 2026-10-29: every marvin speed before 23:28 that day was measured with the 
 | 2026-10-31 | marvin: same model on **our UnbiasedStrata fork** (hip-gfx1151 9223872, ROCm 10.1 + its hipBLASLt table, container, sealed), MTP, 128K, 2 slots, prefill 16384, thinking **medium** | **full (19 tasks)** | **19/19**, all on the first attempt; **3.29 h** | MLflow 1c4aa4b7. Same settings as the Strata medium row above: 2 more tasks passed (openssl-selfsigned-cert, extract-elf) and 25% less time; 213K output tokens vs 355K. One run each: Terminal-Bench varies run to run, so 19 vs 17 is a hint, not proof. Fork's answer-changing switches are off (upstream turns HC_Q8 on). plans/strix-strata.md Phase 3 item 19. |
 | 2026-11-01 | marvin: llama.cpp `big` again, same image 1394eea8116f, BIOS **Performance** (the 10-29 run was Quiet, 55 W) | **full (19 tasks)** | **18/19**: 17 on the first attempt, `llm-inference-batching-scheduler` on the second; `extract-elf` failed both; **5.37 h** | MLflow 3122dd67. Real use: **39.8 tok/s writing** (10-29: 33), 292 reading (254), 60% MTP accepted, 92% from cache; model busy 200 of 322 min. Barely faster overall (5.48 → 5.37 h) because it wrote 28% more (388K output tokens vs 304K). extract-elf also failed on upstream Strata; it passed on 10-29 and on the fork. One run each: 19 vs 18 is noise-level. |
 | 2026-11-02 | zaphod card 2: **north** (North-Mini-Code-1.0 30B-A3B UD-Q4_K_XL), 256K, q8_0 KV, llama.cpp b12020 | **full (19 tasks), stopped early** | **9/19**: 8 on the first attempt (16.8 h), sparql-university on the second; fix-ocaml-gc failed both (agent timeout); stopped 2026-11-03 18:03 by Daniel (results not improving) during mailman's second try, 8 second tries never run. **Card 2 fell off the PCIe bus at 15:16** (kernel: device lost from bus): fix-ocaml-gc's second try (ended 16:51) and mailman's had no working model after that, so those two are not real misses | Not in MLflow (stopped before the runner logged). First attempts: 56.1M input / 1.33M output tokens, 2 agent timeouts. Fails tasks almost every other model passes first try (mailman, pypi-server, openssl); also stray tool-call 500s ("does not match the expected peg-native format", not the Qwen grammar bug). plans/switch-move-timeline.md. |
+| 2026-11-17 | zaphod: **Radiance 2.1.0** `coder-radiance`, both cards (tp 2), Qwen3.8-27B IQ8R + DFlash2, 131K for the agent, thinking medium | **full (19 tasks)** | **17/19**: 16 on the first attempt, `extract-elf` on the second; `break-filter-js-from-html` (its HTML did not get past the filter) and `configure-git-webserver` (never made the SSH account `user`) failed both; **3.05 h** | MLflow 098e473d (engine tags corrected). 0 errors; 2.72M input (2.03M from cache) / 331K output tokens; no model swaps during the run. First Terminal-Bench of this model on zaphod: no llama.cpp `coder-tb` run to compare (#59); the marvin rows above are a bigger model. break-filter-js-from-html passed in every other finished full run above (north's stopped run aside); configure-git-webserver also failed on Halogen. One run: varies run to run. plans/radiance-timeline.md. |
 
 Published full runs in the benchmark repo (other people's machines, for reference): Flash-Next UD-IQ4_XS on Strix Halo
 (EngramHalo engine) 16/19; Flash-Next UD-Q4_K_XL on Strix Halo 19/19; Flash-Next UD-Q2_K_XL on 2x R9700 17/19;
@@ -257,6 +259,7 @@ and no peer-to-peer between the cards (Radiance warns about both); its guide's n
 | reading at 30K / 54-62K / 123K | 944 / 869 / n.a. | 969 / 943 / 897 |
 | tool use, full suite, temp 0.6, seeds 1-3 | 96 / 93 / 92 | 96 / 93 / 94 |
 | TC-45 runaway (`tool_choice: required`) | 3 of 3 | 0 of 3 |
+| Terminal-Bench (Core-19, pass@2) | not run (`coder-tb`: #59) | **17/19 in 3.05 h** |
 | one full tool-use run | 27-31 min, but 12.6-13.4 without TC-45's runaway | 11.1-11.5 (about 15% faster) |
 | writing during the tool-use runs (temp 0.6, server-reported median, >= 50 tokens) | 54.9 tok/s | **133.2** |
 | leak tests (cache-switch; 4 at once; cache-evict 8 x 12K, 8 x 120K over its pool) | 0 (leak flags) | 0; 0; 0 (25/25), prefix cache on |
@@ -264,8 +267,8 @@ and no peer-to-peer between the cards (Radiance warns about both); its guide's n
 Tool-use runs are mostly prompt reading (the same speed on both), so a whole run is only ~15% faster although writing is
 2-2.4x. Cost: both cards (coder, coder-2, chat and the helpers unload: no document search or speech while it runs;
 watchdog paused); its KV cache takes all free card memory. Not tested: several requests at once (the guide's headline),
-Terminal-Bench, vision, one card. Log:
-plans/radiance-timeline.md. MLflow: speed a0d7e60f; tool use series `coder-radiance-v1` (engine tags corrected).
+vision, one card, hours of real agent use. Log:
+plans/radiance-timeline.md. MLflow: speed a0d7e60f; tool use series `coder-radiance-v1`; Terminal-Bench 098e473d (engine tags corrected on all).
 
 ## marvin: Halogen Flash 0.20.6 vs `big` (same model, Qwen3.8-Flash-Next; 2026-11-17)
 
