@@ -72,7 +72,7 @@
 			method POST
 			path /mlflow/runs/search
 		}
-		@api path /zaphod/* /marvin/* /mlflow/*
+		@api path /zaphod/* /marvin/* /mlflow/* /config/*
 		handle @z_read {
 			uri strip_prefix /zaphod
 			reverse_proxy 127.0.0.1:8080 {
@@ -104,6 +104,17 @@
 				header_up Host 127.0.0.1:5000
 				header_up -Origin   # MLflow refuses other sites' Origin (403); the call is Caddy's, on zaphod
 			}
+		}
+		# Each machine's llama-swap config, read-only, for the model details (in the public repo; ${env.X} references only)
+		handle /config/zaphod.yaml {
+			rewrite * /zaphod/config.yaml
+			root * /srv/lab-config
+			file_server
+		}
+		handle /config/marvin.yaml {
+			rewrite * /marvin/config.yaml
+			root * /srv/lab-config
+			file_server
 		}
 		handle @api {
 			respond "not a models-panel call" 404

@@ -9,7 +9,8 @@
   Models panel (#64): both machines on one page. What is loaded, load / unload, card memory, last speed from MLflow.
   Served by Caddy at https://models.<domain> (hub/caddy/Caddyfile). Caddy adds the API keys and passes only the calls
   this page makes: GET running, v1/models, api/performance, api/profiles, upstream/<model>/health (= load),
-  upstream/<model>/slots (busy check); POST api/models/unload/<model>; POST mlflow/runs/search.
+  upstream/<model>/slots (busy check); POST api/models/unload/<model>; POST mlflow/runs/search; and the two llama-swap
+  config files, read-only (config/zaphod.yaml, config/marvin.yaml) for each model's details.
   No outside files: plain HTML, CSS and JS. Data from the servers is shown with textContent only.
 -->
 <style>
@@ -52,9 +53,9 @@ section h2 small { color: var(--muted); font-weight: 400; font-size: 13px; }
 .profile { font-size: 13px; margin: 4px 0 8px; padding: 6px 8px; border-radius: 6px; background: var(--bar); }
 .profile b { color: var(--warn); }
 ul.models { list-style: none; margin: 0; padding: 0; }
-ul.models li { display: grid; grid-template-columns: 12px 1fr auto; gap: 4px 10px; align-items: center;
+ul.models li { display: grid; grid-template-columns: 12px 1fr auto; gap: 4px 10px; align-items: start;
   padding: 9px 0; border-top: 1px solid var(--line); }
-.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--idle); }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: var(--idle); margin-top: 6px; }
 .dot.ready { background: var(--ok); }
 .dot.busy { background: var(--accent); }
 .dot.starting, .dot.stopping, .dot.loading, .dot.unloading { background: var(--warn); animation: pulse 1s infinite alternate; }
@@ -75,6 +76,20 @@ details { margin: 6px 0 8px; font-size: 13px; }
 summary { cursor: pointer; color: var(--muted); padding: 6px 0; }
 footer { margin-top: 18px; color: var(--muted); font-size: 12.5px; }
 footer p { margin: 4px 0; }
+.card { display: inline-block; font-size: 11.5px; padding: 0 6px; margin-left: 6px; border-radius: 9px;
+  background: var(--bar); color: var(--muted); vertical-align: 1px; }
+details.cfg { grid-column: 2 / -1; margin: 0; font-size: 12.5px; min-width: 0; }
+details.cfg summary { padding: 2px 0; font-size: 12.5px; }
+details.cfg dl { display: grid; grid-template-columns: 8.5em 1fr; gap: 4px 10px; margin: 6px 0; }
+details.cfg dt { color: var(--muted); }
+details.cfg dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+  details.cfg { grid-column: 1 / -1; }
+  details.cfg dl { grid-template-columns: 1fr; gap: 2px; }
+  details.cfg dd { margin-bottom: 6px; }
+}
+pre { margin: 0; padding: 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--line);
+  font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .toast { position: fixed; left: 16px; right: 16px; bottom: 16px; max-width: 560px; margin: 0 auto; padding: 10px 14px;
   border-radius: 8px; background: var(--text); color: var(--bg); font-size: 14px; display: none; }
 </style>
@@ -91,7 +106,8 @@ footer p { margin: 4px 0; }
       next to it (for example, <code>gpt-oss</code> and <code>coder-radiance</code> run alone: everything else on zaphod unloads).</p>
     <p>Unload stops the model; a request it is answering is cut. Profiles (training, image mode) are switched with
       <code>lab training-mode</code> and <code>lab image-mode</code>, not here.</p>
-    <p>Speed: the latest <code>lab speed</code> run in MLflow (writing / 32K reading, tok/s). Refreshes every 5 s.</p>
+    <p>Speed: the latest <code>lab speed</code> run in MLflow (writing / 32K reading, tok/s). Refreshes every 5 s, paused while a model's details are open.</p>
+    <p>Card: each entry runs on a fixed card, set in its command (<code>--device</code>: llama.cpp calls card 1 Vulkan1, card 2 Vulkan0). To use another card, load the entry for that card; "same file" in the details lists them.</p>
   </footer>
 </main>
 <div class="toast" id="toast" role="status"></div>
@@ -168,6 +184,111 @@ async function readSpeeds() {
   } catch (e) { /* speeds are optional */ }
 }
 
+// llama-swap's config.yaml, read as text: only the parts this page needs (macros, models, routing sets). The files are
+// in the public repo; they hold ${env.X} references, never key values.
+const configs = {}; // machine -> {macros, models: {id: {block, cmd}}, sets: {name: expr}}
+function parseConfig(text) {
+  const lines = text.split("\n");
+  const macros = {}, models = {}, sets = {};
+  let section = null, cur = null, inSets = false;
+  const multi = (i, indent) => { // the indented lines of a `key: |` value, joined with spaces
+    const out = [];
+    for (let j = i + 1; j < lines.length; j++) {
+      const l = lines[j];
+      if (l.trim() === "") continue;
+      if (l.search(/\S/) < indent) break;
+      if (!l.trim().startsWith("#")) out.push(l.trim());
+    }
+    return out.join(" ");
+  };
+  const val = v => v.replace(/\s+#.*$/, "").trim().replace(/^"(.*)"$/, "$1").replace(/^'(.*)'$/, "$1");
+  lines.forEach((l, i) => {
+    if (/^\S/.test(l) && !l.startsWith("#")) { section = l.split(":")[0]; cur = null; inSets = false; return; }
+    if (section === "macros") {
+      const m = l.match(/^  ([A-Za-z0-9_-]+):\s*(.*)$/);
+      if (m) macros[m[1]] = /^[|>]/.test(m[2]) ? multi(i, 4) : val(m[2]);
+    } else if (section === "models") {
+      const m = l.match(/^  ([A-Za-z0-9._-]+):\s*$/);
+      if (m) { cur = models[m[1]] = { lines: [l], cmd: "" }; return; }
+      if (!cur) return;
+      cur.lines.push(l);
+      const c = l.match(/^    cmd:\s*(.*)$/);
+      if (c) cur.cmd = /^[|>]/.test(c[1]) ? multi(i, 6) : val(c[1]);
+    } else if (section === "routing") {
+      if (/^\s+sets:\s*$/.test(l)) { inSets = true; return; }
+      const m = inSets && l.match(/^\s+([A-Za-z0-9_-]+):\s*"([^"]*)"/);
+      if (m) sets[m[1]] = m[2]; else if (inSets && /^\s{0,8}[A-Za-z]/.test(l) && !/^\s{10}/.test(l)) inSets = false;
+    }
+  });
+  for (const mod of Object.values(models)) { // drop trailing blank lines and the next entry's leading comments
+    while (mod.lines.length > 1 && /^(\s*|  #.*)$/.test(mod.lines[mod.lines.length - 1])) mod.lines.pop();
+    mod.block = mod.lines.join("\n"); delete mod.lines;
+  }
+  return { macros, models, sets };
+}
+function expand(cfg, cmd) { // ${macro} -> its text (nested); ${PORT} and ${env.X} stay as written
+  for (let n = 0; n < 10 && /\$\{[A-Za-z0-9_-]+\}/.test(cmd); n++)
+    cmd = cmd.replace(/\$\{([A-Za-z0-9_-]+)\}/g, (w, k) => (k in cfg.macros ? cfg.macros[k] : w));
+  return cmd.replace(/\s+/g, " ").trim();
+}
+async function readConfigs() {
+  await Promise.all(MACHINES.map(async m => {
+    try {
+      const r = await fetch(`/config/${m.id}.yaml`, { cache: "no-store" });
+      if (r.ok) configs[m.id] = parseConfig(await r.text());
+    } catch (e) { /* details then show what the API gives */ }
+  }));
+}
+function cardOf(m, mod, cmd) { // zaphod: from --device (llama.cpp: Vulkan1 = card 1, Vulkan0 = card 2), else the name
+  if (m.id !== "zaphod") return "";
+  const d = (cmd.match(/--device[= ](Vulkan\S+)/) || [])[1]; // llama.cpp's names only (whisper counts from 0 its own way)
+  if (d) {
+    const c = d.split(",").map(x => ({ Vulkan1: "card 1", Vulkan0: "card 2" }[x] || x));
+    return c.length > 1 ? "both cards" : c[0];
+  }
+  const n = `${mod.name || ""} ${mod.description || ""}`;
+  return /both cards/i.test(n) ? "both cards" : ((n.match(/card ([12])/i) || [])[0] || "").toLowerCase();
+}
+function fileOf(cmd) { const f = (cmd.match(/(?:^| )-m (\S+)/) || [])[1]; return f ? f.split("/").pop() : ""; }
+
+function details(m, mod, run) {
+  const key = `${m.id}/${mod.id}`;
+  const cfg = configs[m.id];
+  const entry = cfg && cfg.models[mod.id];
+  const cmd = run ? run.cmd : entry ? expand(cfg, entry.cmd) : "";
+  const det = el("details", { class: "cfg" }, el("summary", { text: "details" }));
+  if (openRows.has(key)) det.open = true;
+  det.addEventListener("toggle", () => {
+    if (det.open) openRows.add(key); else { openRows.delete(key); if (!openRows.size) tick(); }
+  });
+  const dl = el("dl");
+  const row = (k, v) => v && dl.append(el("dt", { text: k }), el("dd", {}, v));
+  row("card", cardOf(m, mod, cmd) || (m.id === "marvin" ? "the one GPU (shared memory)" : ""));
+  const ctx = mod.context_length || +((cmd.match(/(?:^| )(?:-c|--ctx-size) (\d+)/) || [])[1] || 0);
+  row("context", ctx ? `${ctx.toLocaleString()} tokens` : "");
+  row("engine", ((mod.meta || {}).llamaswap || {}).upstream || "");
+  const caps = Object.entries(mod.capabilities || {}).filter(([, v]) => v).map(([k]) => k.replace("_", " "));
+  row("can do", caps.join(", "));
+  row("description", mod.description || "");
+  if (cfg && Object.keys(cfg.sets).length) {
+    const mine = Object.entries(cfg.sets).filter(([, e]) => new RegExp(`(^|[^A-Za-z0-9._-])${mod.id.replace(/[.]/g, "\\.")}([^A-Za-z0-9._-]|$)`).test(e));
+    row("routing sets", mine.length ? el("pre", { text: mine.map(([n, e]) => `${n}: ${e}`).join("\n") }) : "in no routing set");
+  }
+  const file = fileOf(cmd);
+  if (cfg && file) { // the same model file in other entries: how to get it on another card
+    const others = Object.entries(cfg.models).filter(([id, e]) => id !== mod.id && fileOf(expand(cfg, e.cmd)) === file)
+      .map(([id, e]) => `${id} (${cardOf(m, { name: "" }, expand(cfg, e.cmd)) || "?"})`);
+    row("same file", others.length ? others.join(", ") : `only this entry (${file})`);
+  }
+  row(run ? "command (running)" : "command", cmd ? el("pre", { text: cmd }) : "");
+  if (entry) row("config", el("pre", { text: entry.block }));
+  else row("config", m.id === "marvin" || cfg ? "not in the config file" : "config file not readable");
+  if (m.id === "marvin") row("note", "config shown is zaphod's repo copy of marvin's file; marvin runs its own checkout (the same after a git pull)");
+  det.append(dl);
+  return det;
+}
+const openRows = new Set();
+
 function hardware(m, d) {
   const box = el("div", { class: "hw" });
   const perf = d.perf;
@@ -199,8 +320,10 @@ function modelRow(m, mod, run) {
   const loaded = !!run && !p;
   const desc = mod.name && mod.name !== mod.id ? mod.name : "";
   const sp = speeds[key];
+  const cfg = configs[m.id], entry = cfg && cfg.models[mod.id];
+  const card = cardOf(m, mod, run ? run.cmd : entry ? expand(cfg, entry.cmd) : "");
   const speed = sp ? el("div", { class: "speed" }, `${sp.w.toFixed(1)} / ${Math.round(sp.r)} tok/s `,
-    el("span", { text: new Date(sp.t).toISOString().slice(0, 10) })) : null;
+    el("span", { text: new Date(sp.t).toLocaleDateString("sv-SE") })) : null;
   const btn = loaded || st === "unloading"
     ? el("button", { class: "unload", onclick: () => unload(m, mod) }, "Unload")
     : el("button", { onclick: () => load(m, mod) }, "Load");
@@ -209,9 +332,10 @@ function modelRow(m, mod, run) {
   return el("li", {},
     el("span", { class: `dot ${st}`, title: st }),
     el("div", { class: "mid" },
-      el("div", {}, el("span", { class: "id", text: mod.id }), el("span", { class: "state", text: label })),
+      el("div", {}, el("span", { class: "id", text: mod.id }), card ? el("span", { class: "card", text: card }) : null,
+        el("span", { class: "state", text: label })),
       desc ? el("div", { class: "desc", text: desc }) : null, speed),
-    btn);
+    btn, details(m, mod, run));
 }
 
 function render() {
@@ -288,16 +412,23 @@ async function unload(m, mod) {
   }
 }
 
-async function tick() {
-  await Promise.all(MACHINES.map(readMachine));
+function renderIfChanged() { // no redraw while a model's details are open, so they and selected text stay put
+  if (openRows.size) {
+    document.getElementById("updated").textContent = "paused while details are open";
+    return;
+  }
   render();
   document.getElementById("updated").textContent = "updated " + new Date().toLocaleTimeString();
 }
+async function tick() {
+  await Promise.all(MACHINES.map(readMachine));
+  renderIfChanged();
+}
 (async () => {
-  await Promise.all([tick(), readSpeeds()]);
-  render();
+  await Promise.all([readConfigs(), readSpeeds()]);
+  await tick();
   setInterval(tick, 5000);
-  setInterval(async () => { await readSpeeds(); render(); }, 300000);
+  setInterval(async () => { await Promise.all([readSpeeds(), readConfigs()]); renderIfChanged(); }, 300000);
 })();
 </script>
 </body>
