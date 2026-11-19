@@ -14,7 +14,7 @@ reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature
 | `coder-2` | zaphod card 2, llama.cpp v1.0.0+48 (omp's sub-agents since 11-17, #51) | 58.9 | 988.5 | not run | 2026-11-17 |
 | `ornith` | zaphod card 2 | ~90 | 2,433 (llama-bench) | 93 (temp 0 short suite) | 2026-10-28 (older llama.cpp) |
 | `chat-teacher` | zaphod card 2, 4 slots | 148.1 calls/min (4 workers) | | | 2026-11-16 |
-| `big` | marvin, llama.cpp v1.0.0+48 | 44.8 | 325.7 (30K / 62K / 123K: 360 / 313 / 267) | 96 / 91 / 93 | 2026-11-17 (speed, depth), 11-16 (tool use) |
+| `big` | marvin, llama.cpp v1.0.0+48, `-ub 2048` (#45) | 45.4 | 477.0 (`-ub 512`: 329.4; depth at 512: 30K / 62K / 123K 360 / 313 / 267) | 92 / 89 / 91 / 93 / 93 / 91 (`-ub 512`: 96 / 91 / 93) | 2026-11-19 (speed, tool use), 11-17 (depth) |
 | `chat-teacher` | marvin | 61.7 calls/min (4 workers) | | | 2026-11-17 |
 | `gpt-oss` (test) | zaphod, both cards, 32K | 85.3 | 2,885 | 97 (core 15) | 2026-11-09 (older llama.cpp) |
 | `gpt-oss` (test) | marvin, 128K | 53.4 | 820 | 82 (full) | 2026-11-09 (older llama.cpp) |
