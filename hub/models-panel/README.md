@@ -1,4 +1,4 @@
-# Models panel (#64)
+# Models panel (#64) and results page
 
 One page for both machines: https://models.ai.dopamine911.com (tailnet only). `index.html` is the whole panel: plain
 HTML, CSS and JS, no outside files. Caddy serves this folder and adds the API keys (hub/caddy/Caddyfile, `@models`).
@@ -31,3 +31,20 @@ Text 18 px (17 on a phone), names bold near-black; card temperature and power ar
 
 Good result: the page lists both machines with card/memory bars, and Unload then Load of `tts` takes a few seconds.
 Record: plans/models-panel-timeline.md.
+
+## Results page (`results.html`, https://models.ai.dopamine911.com/results)
+
+Benchmark results from MLflow (Daniel 2026-11-18: current numbers, history, before / after, compare models; one test
+at a time and a side-by-side comparison). Reads only: MLflow's run search through Caddy, and the two config files to
+know which models are in use now. Tabs: Speed, Tool use, Terminal-Bench, KL. In each:
+- **Latest per model**, with a bar to compare models; a choice of which number to show (e.g. writing, reading, first
+  token). Models no longer in a config are hidden unless ticked.
+- **History**: click a model: a chart of that number over time (scale from 0, so noise of 1% looks like 1%; KL keeps a
+  tight scale; points evenly spaced, oldest to newest) and every result with its note.
+- **Side by side**: tick any two results (same model, or two models): every number next to each other with the change,
+  green better, red worse (the page knows which numbers are better lower: time, misses, KL).
+
+What counts: speed runs with a writing number (old llama-bench card runs left out); tool use full suite only
+(128+ points; quick 30-point runs left out), seeds of one `series` averaged with lowest and highest; Terminal-Bench
+full 19-task runs only (smoke runs left out). Dates are when the run was logged. Shared look: `common.css` (fonts,
+colours) for both pages. Caddy serves `/results` from `results.html` (`try_files`).

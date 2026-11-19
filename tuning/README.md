@@ -65,6 +65,8 @@ Use the middle of the three numbers in `lab log`.
 
 ## Reading results in MLflow
 
+Quickest: the results page https://models.ai.dopamine911.com/results (one test at a time: latest per model, a model's
+history with every note, any two results side by side; reads MLflow, changes nothing). MLflow itself:
 Open the `llama-tuning` experiment, tick two or more runs, choose **Compare**. Settings that differ are shown side by side, and you can chart any setting against any result. Your note is on each run's page.
 
 **What each run records** (since 2026-10-29), on the run page under Tags:

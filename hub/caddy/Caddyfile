@@ -121,6 +121,7 @@
 		}
 		handle {
 			root * /srv/models-panel
+			try_files {path} {path}.html   # /results -> results.html
 			file_server
 		}
 	}

@@ -1,0 +1,38 @@
+/* Shared by the lab's pages (index.html: models, results.html: results). Fonts, colours, base text.
+   Change a colour here and both pages follow. */
+/* Atkinson Hyperlegible Next / Mono (Braille Institute; OFL 1.1, fonts/LICENSE-*): letters built to be told apart.
+   Served from this folder: the browser fetches nothing from outside. */
+@font-face { font-family: "Hyperlegible"; font-weight: 400; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Hyperlegible"; font-weight: 700; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2"); }
+@font-face { font-family: "Hyperlegible Mono"; font-weight: 400; font-display: swap;
+  src: url("fonts/atkinson-hyperlegible-mono-latin-400-normal.woff2") format("woff2"); }
+/* Layout by card (Daniel 2026-11-18: less text, one thing at a time, easy to find): each card is a box holding its
+   meter, its loaded models and what can load there. Colours: aluminium, graphite, one teal; green/amber/red = state. */
+:root {
+  --base: #e6ecea; --plate: #f8faf9; --ink: #142023; --soft: #3d4c51; --line: #c9d4d2;
+  --teal: #1d6a73; --cell: #c6d4d2; --lamp: #23874b; --amber: #9a6406; --fault: #ab3127; --inset: #edf2f1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --base: #11181a; --plate: #1a2427; --ink: #eef4f3; --soft: #b3c2c4; --line: #2f3f42;
+    --teal: #5fbcc5; --cell: #2a3c3f; --lamp: #4cc27c; --amber: #e8aa44; --fault: #f07266; --inset: #141d1f;
+  }
+}
+:root[data-theme="dark"] {
+  --base: #11181a; --plate: #1a2427; --ink: #eef4f3; --soft: #b3c2c4; --line: #2f3f42;
+  --teal: #5fbcc5; --cell: #2a3c3f; --lamp: #4cc27c; --amber: #e8aa44; --fault: #f07266; --inset: #141d1f;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--base); color: var(--ink);
+  font: 18px/1.5 "Hyperlegible", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+code, pre { font-family: "Hyperlegible Mono", ui-monospace, monospace; }
+:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+/* page header with the links between the pages */
+.top-nav { display: flex; gap: 6px; margin: 0 0 8px; }
+.top-nav a { color: var(--soft); text-decoration: none; font-size: 17px; padding: 4px 12px; border-radius: 4px;
+  border: 1px solid transparent; }
+.top-nav a:hover { color: var(--ink); border-color: var(--line); }
+.top-nav a[aria-current="page"] { color: var(--ink); font-weight: 700; border-color: var(--teal); }

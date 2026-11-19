@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab results</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolyline points='1,12 5,8 9,10 15,3' fill='none' stroke='%231d6a73' stroke-width='2'/%3E%3Ccircle cx='15' cy='3' r='1.6' fill='%232a9354'/%3E%3C/svg%3E">
+<!--
+  Results page: benchmark results from MLflow, one test at a time (Daniel 2026-11-18): the latest result per model with
+  a bar to compare models, a model's history over time with each run's note, and any two results side by side.
+  Served next to the models panel (https://models.<domain>/results). Data: POST mlflow/runs/search through Caddy
+  (read-only route) and the two llama-swap config files (to know which models are in use now). Nothing from outside.
+-->
+<link rel="stylesheet" href="common.css">
+<style>
+main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 56px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 4px 16px; flex-wrap: wrap; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0; }
+h2 { font-size: 23px; line-height: 1.25; margin: 0 0 4px; }
+.meta { color: var(--soft); font-size: 16px; }
+.err { color: var(--fault); }
+/* the four tests: one on screen at a time */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 0; }
+.tabs button { font: inherit; font-size: 19px; font-weight: 700; padding: 8px 18px; border-radius: 4px; cursor: pointer;
+  background: var(--plate); color: var(--soft); border: 1px solid var(--line); border-bottom: 4px solid var(--line); }
+.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--teal); }
+.block { background: var(--plate); border: 1px solid var(--line); border-top: 4px solid var(--teal); border-radius: 4px;
+  padding: 16px 18px 18px; margin-top: 18px; }
+.lead { color: var(--soft); margin: 0 0 12px; max-width: 72ch; }
+.opts { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0 0 10px; font-size: 16px; color: var(--soft); }
+.opts label { display: inline-flex; gap: 8px; align-items: center; cursor: pointer; }
+.opts input { width: 18px; height: 18px; accent-color: var(--teal); }
+/* latest per model: one row each, a bar to compare */
+.rows { list-style: none; margin: 0; padding: 0; }
+.rows li { border-top: 1px solid var(--line); }
+.rows li:first-child { border-top: 0; }
+.row { display: grid; grid-template-columns: minmax(9em, 15em) 1fr 6.5em; gap: 4px 14px; align-items: center; width: 100%;
+  font: inherit; color: inherit; text-align: left; background: none; border: 0; padding: 10px 6px; cursor: pointer; border-radius: 4px; }
+.row:hover { background: var(--inset); }
+.row[aria-pressed="true"] { background: var(--inset); outline: 2px solid var(--teal); outline-offset: -2px; }
+.who b { font-size: 18px; display: block; overflow-wrap: anywhere; }
+.who span { color: var(--soft); font-size: 15px; }
+.val { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.val .num { font-weight: 700; font-size: 18px; white-space: nowrap; min-width: 5.5em; }
+.val .num small { font-weight: 400; color: var(--soft); font-size: 15px; }
+.bar { flex: 1; height: 14px; background: var(--cell); border-radius: 2px; overflow: hidden; min-width: 40px; }
+.bar i { display: block; height: 100%; background: var(--teal); }
+.when { color: var(--soft); font-size: 15px; text-align: right; }
+.empty { color: var(--soft); margin: 6px 0 0; }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.seg button { font: inherit; font-size: 16px; padding: 5px 12px; border-radius: 4px; cursor: pointer;
+  background: var(--inset); color: var(--ink); border: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { border-color: var(--teal); box-shadow: inset 0 -3px 0 var(--teal); font-weight: 700; }
+/* history chart */
+.chart { width: 100%; height: auto; display: block; margin: 8px 0 4px; }
+.chart .axis { stroke: var(--line); }
+.chart .lbl { fill: var(--soft); font-size: 13px; font-family: inherit; }
+.chart .line { fill: none; stroke: var(--teal); stroke-width: 2.5; }
+.chart .pt { fill: var(--plate); stroke: var(--teal); stroke-width: 2.5; cursor: pointer; }
+.chart .pt.sel { fill: var(--teal); }
+.runs { list-style: none; margin: 10px 0 0; padding: 0; }
+.runs li { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--line); align-items: start; }
+.runs input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--teal); }
+.runs .head { font-weight: 700; }
+.runs .head span { font-weight: 400; color: var(--soft); }
+.runs .note { color: var(--soft); font-size: 16px; overflow-wrap: anywhere; }
+/* side by side */
+table.cmp { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 17px; }
+table.cmp th, table.cmp td { text-align: left; padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; }
+table.cmp thead th { border-top: 0; font-size: 18px; }
+table.cmp td.n, table.cmp th.n { text-align: right; white-space: nowrap; }
+table.cmp tbody th { font-weight: 400; color: var(--soft); }
+.better { color: var(--lamp); font-weight: 700; }
+.worse { color: var(--fault); font-weight: 700; }
+.same { color: var(--soft); }
+.cmp-notes { color: var(--soft); font-size: 15px; overflow-wrap: anywhere; }
+button.plain { font: inherit; font-size: 16px; background: none; border: 1px solid var(--line); border-radius: 4px;
+  padding: 4px 12px; color: var(--soft); cursor: pointer; }
+footer { margin-top: 32px; }
+footer summary { cursor: pointer; color: var(--soft); }
+footer p { max-width: 70ch; margin: 10px 0; }
+@media (max-width: 640px) {
+  body { font-size: 17px; }
+  h1 { font-size: 26px; }
+  .tabs button { font-size: 17px; padding: 6px 12px; }
+  .row { grid-template-columns: 1fr auto; }
+  .row .val { grid-column: 1 / -1; grid-row: 2; }
+  .row .when { grid-row: 1; grid-column: 2; }
+  table.cmp { font-size: 16px; }
+  table.cmp th, table.cmp td { padding: 6px 6px; }
+}
+</style>
+</head>
+<body>
+<main>
+  <nav class="top-nav" aria-label="Lab pages"><a href="./">Models</a><a href="results" aria-current="page">Results</a></nav>
+  <header>
+    <h1>Results</h1>
+    <div class="meta" id="updated">Reading MLflow…</div>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="view"></div>
+  <footer>
+    <details>
+      <summary>How this page works</summary>
+      <p>Every result comes from MLflow, where each test run is logged. Pick a test at the top. The first box shows the
+        latest result for each model; the bars compare them. Click a model to see its history and every run's note.</p>
+      <p>Tick two results to put them side by side, from the same model (before and after a change) or from two models.
+        Green means better, red means worse; for some numbers lower is better (time, misses), and the page knows which.</p>
+      <p>Tool use: three seeds of the same settings form one result (their average, with the lowest and highest).
+        Only the full suite counts here; quick 30-point runs are left out.</p>
+      <p>"In use now" means the model is in a llama-swap config today. All the numbers are also in
+        tuning/results.md and in MLflow itself.</p>
+    </details>
+  </footer>
+</main>
+<script>
+"use strict";
+const MLFLOW_EXPERIMENT = "1"; // llama-tuning
+const CATS = { A: "Tool selection", B: "Parameter precision", C: "Multi-step chains", D: "Restraint and refusal",
+  E: "Error recovery", F: "Localization", G: "Structured reasoning", H: "Instruction following", I: "Context and state",
+  J: "Code patterns", K: "Safety and boundaries", L: "Toolset scale", M: "Autonomous planning", N: "Creative composition",
+  O: "Structured output" };
+// One entry per test. better: which way is good. main: the number the bars and the chart use.
+const TESTS = [
+  { id: "speed", label: "Speed", bench: "speed", main: "speed_write_tps",
+    lead: "Writing and reading speed from lab speed: medians of 3, temperature 0, code prompts.",
+    keep: r => r.m.speed_write_tps != null,
+    metrics: [
+      { pick: true, k: "speed_write_tps", name: "Writing", unit: "tok/s", better: "higher", dp: 1 },
+      { pick: true, k: "speed_read_32k_tps", name: "Reading a 32K prompt", unit: "tok/s", better: "higher", dp: 0 },
+      { pick: true, k: "speed_ttft_32k_s", name: "First token, 32K prompt", unit: "s", better: "lower", dp: 1 } ] },
+  { id: "tool", label: "Tool use", bench: "tool-use", main: "tooleval_score", group: "series",
+    lead: "Tool-use quality from lab quality --full (tool-eval-bench, every scenario). Three seeds form one result.",
+    keep: r => r.m.tooleval_score != null && (r.m.tooleval_max_points || 0) >= 128,
+    metrics: [
+      { pick: true, k: "tooleval_score", name: "Score", unit: "of 100", better: "higher", dp: 1 },
+      { pick: true, k: "tooleval_median_turn_ms", name: "Median turn", unit: "ms", better: "lower", dp: 0 },
+      ...Object.entries(CATS).map(([c, n]) => ({ k: `tooleval_cat_${c}`, name: `${c}. ${n}`, unit: "%", better: "higher", dp: 0 })),
+      { k: "behavior_attacker_echo", name: "Repeated an attacker's text", unit: "times", better: "lower", dp: 1 },
+      { k: "behavior_looping", name: "Looped", unit: "times", better: "lower", dp: 1 },
+      { k: "behavior_ignored_required", name: "No tool call when one was required", unit: "times", better: "lower", dp: 1 },
+      { k: "behavior_invented_query", name: "Made up a search query", unit: "times", better: "lower", dp: 1 },
+      { k: "behavior_q4_claim_sent", name: "Sent an unsupported claim", unit: "times", better: "lower", dp: 1 },
+      { k: "tooleval_max_points", name: "Suite size", unit: "points", better: "none", dp: 0 } ] },
+  { id: "tbench", label: "Terminal-Bench", bench: "terminal-bench", main: "tbench_passed",
+    lead: "Terminal-Bench Core-19: 19 terminal tasks, two tries each, run by an agent through the model. Full runs only.",
+    keep: r => r.m.tbench_passed != null && (r.m.tbench_total || 0) >= 19, // full runs only: a smoke run is 1 task
+    metrics: [
+      { pick: true, k: "tbench_passed", name: "Tasks passed", unit: "of 19", better: "higher", dp: 0 },
+      { pick: true, k: "tbench_hours", name: "Time", unit: "h", better: "lower", dp: 2 },
+      { k: "tbench_output_tokens", name: "Tokens written", unit: "", better: "lower", dp: 0 },
+      { pick: true, k: "live_writing_tps", name: "Writing in real use", unit: "tok/s", better: "higher", dp: 1 },
+      { k: "live_reading_tps", name: "Reading in real use", unit: "tok/s", better: "higher", dp: 0 },
+      { k: "live_cached_pct", name: "Input from cache", unit: "%", better: "higher", dp: 0 } ] },
+  { id: "kl", label: "KL", bench: "kl-divergence", main: "kld_mean", anyModel: true, // its "model" is a file, not a config entry
+    lead: "How far a model file's answers drift from the full-precision reference (lower is closer).",
+    keep: r => r.m.kld_mean != null,
+    metrics: [
+      { pick: true, k: "kld_mean", name: "Mean KL divergence", unit: "", better: "lower", dp: 4, zoom: true },
+      { pick: true, k: "kld_same_top_p_pct", name: "Same top token", unit: "%", better: "higher", dp: 2 },
+      { k: "kld_ppl_ratio", name: "Perplexity ratio", unit: "", better: "lower", dp: 4 },
+      { k: "kld_p99", name: "KL divergence, 99th percentile", unit: "", better: "lower", dp: 4 } ] },
+];
+
+const ui = { test: TESTS[0].id, metric: null, model: null, picked: [], all: false }; // metric: null = the test's main
+let runs = [];             // every MLflow run, simplified
+const inUse = {};          // machine -> Set of model ids in its llama-swap config now
+
+function el(tag, attrs, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (k === "class") e.className = v; else if (k === "text") e.textContent = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) e.append(k);
+  return e;
+}
+const svg = (tag, attrs) => { const e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v); return e; };
+const day = t => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+const fmt = (v, dp) => v == null ? "–" : (+v).toLocaleString(undefined, { minimumFractionDigits: dp, maximumFractionDigits: dp });
+
+async function readRuns() {
+  const out = [];
+  let token;
+  do { // page through every run (MLflow returns up to 1000 per call)
+    const r = await fetch("/mlflow/runs/search", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ experiment_ids: [MLFLOW_EXPERIMENT], max_results: 1000, page_token: token,
+        order_by: ["attributes.start_time DESC"] }) });
+    if (!r.ok) throw new Error(`MLflow search: HTTP ${r.status}`);
+    const j = await r.json();
+    for (const run of j.runs || []) {
+      const t = Object.fromEntries((run.data.tags || []).map(x => [x.key, x.value]));
+      out.push({ id: run.info.run_id, time: run.info.start_time, t,
+        m: Object.fromEntries((run.data.metrics || []).map(x => [x.key, x.value])),
+        machine: t.machine || "?", model: t.model || "?", note: t["mlflow.note.content"] || "" });
+    }
+    token = j.next_page_token;
+  } while (token);
+  return out;
+}
+async function readInUse() {
+  for (const m of ["zaphod", "marvin"]) {
+    try {
+      const r = await fetch(`/config/${m}.yaml`, { cache: "no-store" });
+      if (!r.ok) continue;
+      const ids = new Set();
+      let inModels = false;
+      for (const l of (await r.text()).split("\n")) {
+        if (/^\S/.test(l) && !l.startsWith("#")) inModels = l.startsWith("models:");
+        const k = inModels && l.match(/^  ([A-Za-z0-9._-]+):\s*$/);
+        if (k) ids.add(k[1]);
+      }
+      inUse[m] = ids;
+    } catch (e) { /* then every model counts as in use */ }
+  }
+}
+const isInUse = r => !inUse[r.machine] || inUse[r.machine].has(r.model);
+
+// Results for a test: one per run, or one per series (tool use: seeds averaged, with lowest and highest)
+function results(test) {
+  const rs = runs.filter(r => r.t.benchmark === test.bench && test.keep(r));
+  if (!test.group) return rs.map(r => ({ key: r.id, machine: r.machine, model: r.model, time: r.time, v: r.m, n: 1,
+    note: r.note, commit: r.t.config_commit || "", engine: r.t.engine || "", ids: [r.id] }));
+  const groups = new Map();
+  for (const r of rs) {
+    const g = r.t[test.group] ? `${r.machine}/${r.model}/${r.t[test.group]}` : r.id;
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(r);
+  }
+  return [...groups.values()].map(list => {
+    const v = {}, lo = {}, hi = {};
+    for (const mt of test.metrics) {
+      const xs = list.map(r => r.m[mt.k]).filter(x => x != null);
+      if (xs.length) { v[mt.k] = xs.reduce((a, b) => a + b, 0) / xs.length; lo[mt.k] = Math.min(...xs); hi[mt.k] = Math.max(...xs); }
+    }
+    const first = list[0]; // newest (runs are newest first)
+    const series = first.t[test.group];
+    return { key: series ? `${first.machine}/${first.model}/${series}` : first.id, machine: first.machine, model: first.model,
+      time: first.time, v, lo, hi, n: list.length, series,
+      note: series ? `${series}: ${(list.find(r => r.note) || first).note.replace(/,?\s*seed \d+\s*$/i, "")}` : first.note,
+      commit: first.t.config_commit || "", engine: first.t.engine || "", ids: list.map(r => r.id) };
+  });
+}
+const metricOf = (test, k) => test.metrics.find(x => x.k === k);
+const label = r => `${r.model}`;
+
+function render() {
+  const test = TESTS.find(x => x.id === ui.test);
+  const tabs = document.getElementById("tabs");
+  tabs.replaceChildren(...TESTS.map(x => el("button", { role: "tab", "aria-selected": String(x.id === ui.test),
+    onclick: () => { ui.test = x.id; ui.metric = null; ui.model = null; ui.picked = []; render(); } }, x.label)));
+  const view = document.getElementById("view");
+  view.replaceChildren();
+  const all = results(test);
+  const shown = all.filter(r => ui.all || test.anyModel || isInUse(r));
+  view.append(latestBlock(test, shown, all.length !== shown.length));
+  if (ui.model) view.append(historyBlock(test, all.filter(r => `${r.machine}/${r.model}` === ui.model)));
+  if (ui.picked.length) view.append(compareBlock(test, ui.picked.map(k => all.find(r => r.key === k)).filter(Boolean)));
+}
+
+const lc = t => t[0].toLowerCase() + t.slice(1); // first letter only: keeps 32K, KL
+const shownMetric = test => metricOf(test, ui.metric || test.main);
+function latestBlock(test, shown, hidden) {
+  const main = shownMetric(test), K = main.k;
+  const latest = new Map();
+  for (const r of shown) { const k = `${r.machine}/${r.model}`; if (!latest.has(k) || latest.get(k).time < r.time) latest.set(k, r); }
+  const list = [...latest.values()].filter(r => r.v[K] != null)
+    .sort((a, b) => main.better === "lower" ? a.v[K] - b.v[K] : b.v[K] - a.v[K]);
+  const top = Math.max(...list.map(r => r.v[K]), 0) || 1;
+  const box = el("section", { class: "block" }, el("h2", { text: `Latest ${lc(main.name)} per model` }),
+    el("p", { class: "lead", text: test.lead + (main.better === "lower" ? " Lower is better." : "") }));
+  const choices = test.metrics.filter(x => x.pick);
+  if (choices.length > 1) { // which number the bars and the history chart show
+    const seg = el("div", { class: "seg", role: "group", "aria-label": "Number to show" });
+    for (const x of choices) seg.append(el("button", { "aria-pressed": String(x.k === K),
+      onclick: () => { ui.metric = x.k; render(); } }, x.name));
+    box.append(seg);
+  }
+  if (!test.anyModel) {
+    const opts = el("div", { class: "opts" });
+    const cb = el("input", { type: "checkbox" }); cb.checked = ui.all;
+    cb.addEventListener("change", () => { ui.all = cb.checked; render(); });
+    opts.append(el("label", {}, cb, "Show models no longer in use"));
+    box.append(opts);
+  }
+  if (!list.length) { box.append(el("p", { class: "empty", text: "No results for this test yet." })); return box; }
+  const ul = el("ul", { class: "rows" });
+  for (const r of list) {
+    const k = `${r.machine}/${r.model}`, x = r.v[K];
+    const pct = main.better === "lower" ? (Math.min(...list.map(y => y.v[K])) / x) * 100 : (x / top) * 100;
+    const range = r.n > 1 && r.lo && r.lo[K] !== r.hi[K] ? ` (${fmt(r.lo[K], main.dp)}–${fmt(r.hi[K], main.dp)})` : "";
+    ul.append(el("li", {}, el("button", { class: "row", "aria-pressed": String(ui.model === k),
+      onclick: () => { ui.model = ui.model === k ? null : k; render(); scrollTo(".history"); } },
+      el("span", { class: "who" }, el("b", { text: label(r) }), el("span", { text: r.machine + (r.engine ? `, ${r.engine.split(" (")[0]}` : "") })),
+      el("span", { class: "val" }, el("span", { class: "num" }, fmt(x, main.dp), " ", el("small", { text: main.unit + range })),
+        el("span", { class: "bar", "aria-hidden": "true" }, el("i", { style: `width:${Math.max(2, pct).toFixed(1)}%` }))),
+      el("span", { class: "when", text: day(r.time) }))));
+  }
+  box.append(ul);
+  if (hidden && !ui.all) box.append(el("p", { class: "empty", text: "Older models are hidden; tick the box above to show them." }));
+  return box;
+}
+
+function historyBlock(test, list) {
+  const main = shownMetric(test);
+  list = [...list].sort((a, b) => a.time - b.time);
+  const [machine, model] = ui.model.split("/");
+  const box = el("section", { class: "block history" },
+    el("div", { style: "display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap" },
+      el("h2", { text: `${model} on ${machine}: ${lc(main.name)} over time` }),
+      el("button", { class: "plain", onclick: () => { ui.model = null; render(); } }, "Close")),
+    el("p", { class: "lead", text: "Each point is one result. Tick two below (here or under another model) to compare them side by side." }));
+  box.append(chart(list, main));
+  const ul = el("ul", { class: "runs" });
+  for (const r of [...list].reverse()) {
+    const cb = el("input", { type: "checkbox", "aria-label": `Compare ${day(r.time)}` });
+    cb.checked = ui.picked.includes(r.key);
+    cb.addEventListener("change", () => { pick(r.key, cb.checked); });
+    const vals = test.metrics.slice(0, 3).filter(mt => r.v[mt.k] != null).map(mt => `${mt.name} ${fmt(r.v[mt.k], mt.dp)} ${mt.unit}`.trim()).join(", ");
+    ul.append(el("li", {}, cb, el("div", {},
+      el("div", { class: "head" }, `${day(r.time)}: ${fmt(r.v[main.k], main.dp)} ${main.unit}`, r.n > 1 ? el("span", { text: ` (${r.n} runs)` }) : null),
+      el("div", { class: "note", text: [r.note, vals].filter(Boolean).join(". ") }))));
+  }
+  box.append(ul);
+  return box;
+}
+
+function chart(list, main) {
+  const W = 900, H = 260, L = 64, R = 20, T = 16, B = 40;
+  const s = svg("svg", { class: "chart", viewBox: `0 0 ${W} ${H}`, role: "img",
+    "aria-label": `${main.name} over time: ${list.map(r => `${day(r.time)} ${fmt(r.v[main.k], main.dp)}`).join(", ")}` });
+  const pts = list.filter(r => r.v[main.k] != null);
+  if (!pts.length) return s;
+  const ys = pts.map(r => r.v[main.k]);
+  // Scale from 0 (speeds, scores, tasks), so run-to-run noise of 1% looks like 1%; only KL keeps a tight scale,
+  // because there the small differences are the point (main.zoom).
+  let y0 = main.zoom ? Math.min(...ys) : 0, y1 = Math.max(...ys);
+  if (main.zoom) { const pad = (y1 - y0) * 0.15 || Math.abs(y1) * 0.1 || 1; y0 -= pad; y1 += pad; } else y1 = y1 * 1.08 || 1;
+  // evenly spaced, oldest to newest: runs on the same day do not hide each other
+  const X = i => pts.length === 1 ? (L + W - R) / 2 : L + 10 + (i / (pts.length - 1)) * (W - L - R - 20);
+  const Y = v => T + (1 - (v - y0) / (y1 - y0)) * (H - T - B);
+  s.append(svg("line", { class: "axis", x1: L, y1: H - B, x2: W - R, y2: H - B }));
+  for (const v of main.zoom ? [y0, (y0 + y1) / 2, y1] : [y1 / 2, Math.max(...ys)]) {
+    s.append(svg("line", { class: "axis", x1: L, y1: Y(v), x2: W - R, y2: Y(v), "stroke-dasharray": "3 4" }));
+    const t = svg("text", { class: "lbl", x: L - 8, y: Y(v) + 4, "text-anchor": "end" }); t.textContent = fmt(v, main.dp); s.append(t);
+  }
+  if (!main.zoom) { const t = svg("text", { class: "lbl", x: L - 8, y: H - B + 4, "text-anchor": "end" }); t.textContent = "0"; s.append(t); }
+  const ticks = pts.length <= 6 ? pts.map((r, i) => i) : [0, Math.floor(pts.length / 2), pts.length - 1];
+  for (const i of ticks) { const t = svg("text", { class: "lbl", x: X(i), y: H - B + 22, "text-anchor": "middle" }); t.textContent = day(pts[i].time); s.append(t); }
+  if (pts.length > 1) s.append(svg("polyline", { class: "line", points: pts.map((r, i) => `${X(i)},${Y(r.v[main.k])}`).join(" ") }));
+  for (const [i, r] of pts.entries()) {
+    const c = svg("circle", { class: "pt" + (ui.picked.includes(r.key) ? " sel" : ""), cx: X(i), cy: Y(r.v[main.k]), r: 7, tabindex: "0" });
+    const tt = svg("title"); tt.textContent = `${day(r.time)}: ${fmt(r.v[main.k], main.dp)} ${main.unit}. ${r.note}`; c.append(tt);
+    c.addEventListener("click", () => pick(r.key, !ui.picked.includes(r.key)));
+    c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(r.key, !ui.picked.includes(r.key)); } });
+    s.append(c);
+  }
+  return s;
+}
+
+function pick(key, on) {
+  ui.picked = ui.picked.filter(k => k !== key);
+  if (on) { ui.picked.push(key); if (ui.picked.length > 2) ui.picked.shift(); } // the two most recent picks
+  render();
+  if (ui.picked.length === 2) scrollTo(".compare");
+}
+
+function compareBlock(test, pair) {
+  const box = el("section", { class: "block compare" },
+    el("div", { style: "display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap" },
+      el("h2", { text: pair.length === 2 ? "Side by side" : "Side by side: tick one more result" }),
+      el("button", { class: "plain", onclick: () => { ui.picked = []; render(); } }, "Clear")));
+  if (pair.length < 2) {
+    const r = pair[0];
+    box.append(el("p", { class: "lead", text: `Picked: ${r.model} on ${r.machine}, ${day(r.time)}. Tick another result in a history, of this model or another.` }));
+    return box;
+  }
+  const [a, b] = [...pair].sort((x, y) => x.time - y.time); // older first, so the difference reads as "what changed"
+  const table = el("table", { class: "cmp" });
+  const head = r => el("th", { class: "n" }, `${r.model}`, el("br"), el("span", { class: "meta", text: `${r.machine}, ${day(r.time)}` }));
+  table.append(el("thead", {}, el("tr", {}, el("th", { text: "" }), head(a), head(b), el("th", { class: "n", text: "Change" }))));
+  const tb = el("tbody");
+  for (const mt of test.metrics) {
+    const x = a.v[mt.k], y = b.v[mt.k];
+    if (x == null && y == null) continue;
+    let change = el("span", { class: "same", text: "–" });
+    if (x != null && y != null && mt.better !== "none") {
+      const d = y - x, pct = x ? (d / Math.abs(x)) * 100 : 0;
+      const good = mt.better === "higher" ? d > 0 : d < 0;
+      const tiny = Math.abs(pct) < 0.5 && Math.abs(d) < Math.pow(10, -mt.dp);
+      change = tiny ? el("span", { class: "same", text: "same" })
+        : el("span", { class: good ? "better" : "worse", text: `${d > 0 ? "+" : ""}${fmt(d, mt.dp)}${x ? ` (${pct > 0 ? "+" : ""}${pct.toFixed(1)}%)` : ""}` });
+    }
+    const cell = (r, v) => el("td", { class: "n" }, fmt(v, mt.dp), r.n > 1 && r.lo && r.lo[mt.k] != null && r.lo[mt.k] !== r.hi[mt.k]
+      ? el("span", { class: "meta", text: ` (${fmt(r.lo[mt.k], mt.dp)}–${fmt(r.hi[mt.k], mt.dp)})` }) : null);
+    tb.append(el("tr", {}, el("th", { text: `${mt.name}${mt.unit ? ` (${mt.unit})` : ""}${mt.better === "lower" ? ", lower is better" : ""}` }),
+      cell(a, x), cell(b, y), el("td", { class: "n" }, change)));
+  }
+  table.append(tb);
+  box.append(table);
+  const notes = el("div", { class: "cmp-notes" });
+  for (const [n, r] of [["Older", a], ["Newer", b]])
+    notes.append(el("p", { text: `${n}: ${r.note || "no note"}${r.engine ? `. Engine: ${r.engine}` : ""}${r.commit ? `. Config: ${r.commit.slice(0, 90)}` : ""}` }));
+  box.append(notes);
+  return box;
+}
+
+function scrollTo(sel) {
+  const e = document.querySelector(sel);
+  if (e) e.scrollIntoView({ block: "nearest", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
+(async () => {
+  try {
+    await Promise.all([readInUse(), readRuns().then(r => (runs = r))]);
+    document.getElementById("updated").textContent = `${runs.length} runs, newest ${day(runs[0].time)}`;
+    render();
+  } catch (e) {
+    document.getElementById("updated").textContent = "";
+    document.getElementById("view").replaceChildren(el("p", { class: "err",
+      text: `Could not read MLflow (${e.message}). Check that MLflow is running: https://mlflow.ai.dopamine911.com` }));
+  }
+})();
+</script>
+</body>
+</html>

@@ -65,6 +65,7 @@ All behind Caddy with real certificates at `*.ai.<domain>`, reachable only over 
 | Beszel monitoring: both machines, containers, disk health, systemd services, network monitors | working | [hub/compose.yaml](hub/compose.yaml), [lab monitors](docs/cli/monitors.md) |
 | MLflow: every benchmark run with its full settings | working | section 5 below |
 | Models panel: both machines on one page (what is loaded, load/unload, card memory, last speed), https://models.ai.dopamine911.com | working (2026-11-18, #64) | [hub/models-panel/README.md](hub/models-panel/README.md) |
+| Results page: benchmark results from MLflow, one test at a time (latest per model with bars, history chart with notes, any two results side by side), https://models.ai.dopamine911.com/results | working (2026-11-18) | [hub/models-panel/README.md](hub/models-panel/README.md) |
 
 ## 4. Tools for agents (MCP gateway)
 
