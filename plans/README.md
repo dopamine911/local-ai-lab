@@ -8,7 +8,7 @@ Status words: **active** (work going on), **open** (ideas or steps not started),
 ## Active
 | File | What | Status |
 | --- | --- | --- |
-| [engines-and-frontend.md](engines-and-frontend.md) | Other inference engines through the launcher, one place to manage them | active: launcher on both machines, Halogen and Radiance tested; Gufo, DS4, NPU, ROCm (#16), panel (#64) later |
+| [engines-and-frontend.md](engines-and-frontend.md) | Other inference engines through the launcher, one place to manage them | active: launcher on both machines, Halogen and Radiance tested; panel done (#64, closed 2026-11-19); Gufo, DS4, NPU, ROCm (#16) later |
 | [halogen-timeline.md](halogen-timeline.md) | Halogen Flash vs `big` on marvin | tested (incl. Terminal-Bench 17/19); daily use is Daniel's decision |
 | [radiance-timeline.md](radiance-timeline.md) | Radiance on zaphod's two R9700s | tested 2026-11-17 (incl. Terminal-Bench 17/19 in 3.05 h); next step is Daniel's decision |
 | [audit-2026-11-17.md](audit-2026-11-17.md) | Project audit: gaps, visibility, performance | done; its items are issues #44-#52 (and #13, #30) |
