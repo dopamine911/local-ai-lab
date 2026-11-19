@@ -65,3 +65,7 @@ left an engine running on 2026-11-17).
 | When | What | Result |
 | --- | --- | --- |
 | 2026-11-19 | Repo read, plan written | Nothing run yet |
+| 11:27 | Step 1 (#45): marvin idle (both slots free, no requests for 30 min); zaphod normal set | — |
+| 11:27-11:32 | Before: `lab speed marvin/big` (`-ub 512`, default) | 43.3 writing / 329.4 reading 32K (first token 98.7 s); runs/2026-11-19-1127-speed-marvin-big.json, MLflow 25df9b86 |
+| 11:33 | `big`: `-ub 2048` (commit 487c287), pulled on marvin, reloaded; ready 11:33:41 | Running with `-ub 2048`; marvin's available memory 16 → 11 GB |
+| 11:34-11:38 | After: `lab speed marvin/big` | **45.4 writing / 477.0 reading 32K** (first token 68.1 s; the 3 long runs 505 / 439 / 477): reading **+44.8%**, writing +4.8% (normal spread: 42.6-45.6 on 11-16/17). runs/2026-11-19-1134-speed-marvin-big.json, MLflow 80a14c0f |
