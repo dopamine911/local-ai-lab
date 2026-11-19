@@ -26,6 +26,7 @@ models:
       ${server}
       -m /models/Qwen3.8-Flash-Next-UD-IQ4_XS-00001-of-00003.gguf
       -c 262144 -np 2 -kvu
+      -ub 2048
       ${qwen-sampling}
       ${mtp}
 
