@@ -75,6 +75,15 @@ models:
     checkEndpoint: /health
     unloadTimeout: 300   # its stop timeout is 120 s (engines/marvin.json)
 
+  big-strix:
+    name: "Qwen3.8-Flash-Next on strix-llama.cpp (marvin, test)"
+    description: "big's files and command on the halo-box Strix Halo fork (launcher engine; plans/strix-llama-timeline.md, #66). Test only. Swaps with big."
+    proxy: http://lab-engine-big-strix:8080
+    cmd: /engines/lab-engine run big-strix
+    cmdStop: /engines/lab-engine stop big-strix
+    checkEndpoint: /health
+    unloadTimeout: 90
+
 profiles:
   training:
     # lab training-mode on|off|status (run on zaphod). A training harness checks GET /api/profiles for active == "training".
@@ -85,6 +94,7 @@ profiles:
       chat-teacher: ~
       test-http: ~
       big-halogen: ~
+      big-strix: ~
 hooks:
   on_startup:
     preload: [big]

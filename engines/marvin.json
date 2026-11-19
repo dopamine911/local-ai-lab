@@ -39,6 +39,66 @@
         "HALOGEN_MIN_P": "0.0"
       },
       "stop_timeout": 120
+    },
+    "big-strix": {
+      "_comment": "strix-llama.cpp (halo-box community fork for Strix Halo, MIT) serving big's files with big's exact command, for the comparison in plans/strix-llama-timeline.md (#66). Test only. Same Mesa as big's image (26.0.8). Unprivileged user, read-only root; groups video + render for /dev/dri.",
+      "image": "ghcr.io/halo-box/strix-llama.cpp:server-vulkan-b13570@sha256:89304dcfc1fe5c3bec8c7026ad161a8e368a085d287421aae3d8c06f6fae0d61",
+      "devices": [
+        "/dev/dri"
+      ],
+      "groups": [
+        44,
+        991
+      ],
+      "user": "65534:65534",
+      "read_only": true,
+      "tmpfs": [
+        "/tmp"
+      ],
+      "volumes": [
+        "/srv/models:/models:ro"
+      ],
+      "args": [
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "-ngl",
+        "999",
+        "-fa",
+        "on",
+        "-lm",
+        "dio",
+        "--cache-ram",
+        "0",
+        "--no-cache-idle-slots",
+        "-m",
+        "/models/Qwen3.8-Flash-Next-UD-IQ4_XS-00001-of-00003.gguf",
+        "-c",
+        "262144",
+        "-np",
+        "2",
+        "-kvu",
+        "-ub",
+        "2048",
+        "--temp",
+        "1.0",
+        "--top-p",
+        "0.95",
+        "--top-k",
+        "20",
+        "--min-p",
+        "0.0",
+        "--reasoning-effort",
+        "medium",
+        "--model-draft",
+        "/models/mtp-Qwen3.8-Flash-Next-Q8_0.gguf",
+        "--spec-type",
+        "draft-mtp",
+        "--spec-draft-n-max",
+        "3"
+      ],
+      "stop_timeout": 30
     }
   }
 }
