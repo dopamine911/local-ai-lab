@@ -22,7 +22,7 @@ peer of zaphod, so its models also answer on zaphod as `marvin/<name>`.
 
 | Name | Machine | Model | Notes |
 | --- | --- | --- | --- |
-| `coder`, `coder-2` | zaphod card 1 / card 2 | Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 64K context | daily coding model |
+| `coder`, `coder-2` | zaphod card 1 / card 2 | Qwen3.8-27B UD-Q4_K_XL, MTP speculative decoding, 128K context (8-bit, since 2026-11-20) | daily coding model |
 | `coder-tb` | zaphod card 1 | the same, 256K context (benchmarks) | |
 | `ornith` | zaphod card 2 | Ornith-1.5 35B-A3B, vision; best tool-use score so far | |
 | `chat` | zaphod card 2 | Gemma 4 31B (QAT Q4_0), vision, 128K | |
