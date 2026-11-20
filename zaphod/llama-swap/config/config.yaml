@@ -21,8 +21,8 @@ macros:
 # Check: llama-server --list-devices; the card with less free memory is the busier one.
 models:
   coder:
-    name: "Qwen3.8-27B, card 1"
-    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
+    name: "Qwen3.8-27B, card 1"   # 128K q8_0 since 2026-11-20 (test: plans/coder-context-timeline.md; was 64K f16)
+    cmd: ${server} --device Vulkan1 -m ${qwen27} -c 131072 -np 1 -ctk q8_0 -ctv q8_0 ${qwen-sampling} ${mtp}
   coder-2:
     name: "Qwen3.8-27B, card 2"
     cmd: ${server} --device Vulkan0 -m ${qwen27} -c 65536 -np 1 ${qwen-sampling} ${mtp}
