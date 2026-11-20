@@ -1,0 +1,185 @@
+{
+ "model": "big-strix",
+ "many": [
+  {
+   "kind": "first",
+   "conversation": 1,
+   "ttft_s": 11.47,
+   "own": true,
+   "leak": false,
+   "answer": "BBA6F77C"
+  },
+  {
+   "kind": "first",
+   "conversation": 2,
+   "ttft_s": 11.25,
+   "own": true,
+   "leak": false,
+   "answer": "CFAE4600"
+  },
+  {
+   "kind": "first",
+   "conversation": 3,
+   "ttft_s": 11.93,
+   "own": true,
+   "leak": false,
+   "answer": "1B71E0D4"
+  },
+  {
+   "kind": "first",
+   "conversation": 4,
+   "ttft_s": 12.36,
+   "own": true,
+   "leak": false,
+   "answer": "681C562D"
+  },
+  {
+   "kind": "first",
+   "conversation": 5,
+   "ttft_s": 11.64,
+   "own": true,
+   "leak": false,
+   "answer": "0DE687F2"
+  },
+  {
+   "kind": "first",
+   "conversation": 6,
+   "ttft_s": 12.06,
+   "own": true,
+   "leak": false,
+   "answer": "2D95B3ED"
+  },
+  {
+   "kind": "first",
+   "conversation": 7,
+   "ttft_s": 12.14,
+   "own": true,
+   "leak": false,
+   "answer": "7001A5A9"
+  },
+  {
+   "kind": "first",
+   "conversation": 8,
+   "ttft_s": 11.14,
+   "own": true,
+   "leak": false,
+   "answer": "CC25795D"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 1,
+   "ttft_s": 12.0,
+   "own": true,
+   "leak": false,
+   "answer": "BBA6F77C"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 2,
+   "ttft_s": 11.83,
+   "own": true,
+   "leak": false,
+   "answer": "CFAE4600"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 3,
+   "ttft_s": 12.57,
+   "own": true,
+   "leak": false,
+   "answer": "1B71E0D4"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 4,
+   "ttft_s": 13.12,
+   "own": true,
+   "leak": false,
+   "answer": "681C562D"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 5,
+   "ttft_s": 12.32,
+   "own": true,
+   "leak": false,
+   "answer": "0DE687F2"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 6,
+   "ttft_s": 12.7,
+   "own": true,
+   "leak": false,
+   "answer": "2D95B3ED"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 7,
+   "ttft_s": 12.8,
+   "own": true,
+   "leak": false,
+   "answer": "7001A5A9"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 8,
+   "ttft_s": 11.82,
+   "own": true,
+   "leak": false,
+   "answer": "CC25795D"
+  }
+ ],
+ "deep": [
+  {
+   "kind": "first",
+   "conversation": 1,
+   "ttft_s": 126.87,
+   "own": true,
+   "leak": false,
+   "answer": "A3B06DC1"
+  },
+  {
+   "kind": "first",
+   "conversation": 2,
+   "ttft_s": 129.37,
+   "own": true,
+   "leak": false,
+   "answer": "1BC7984E"
+  },
+  {
+   "kind": "first",
+   "conversation": 3,
+   "ttft_s": 133.06,
+   "own": true,
+   "leak": false,
+   "answer": "638AB715"
+  },
+  {
+   "kind": "first",
+   "conversation": 4,
+   "ttft_s": 111.07,
+   "own": true,
+   "leak": false,
+   "answer": "64B7F7F6"
+  },
+  {
+   "kind": "first",
+   "conversation": 5,
+   "ttft_s": 116.93,
+   "own": true,
+   "leak": false,
+   "answer": "3D192350"
+  },
+  {
+   "kind": "follow-up",
+   "conversation": 1,
+   "ttft_s": 127.02,
+   "own": true,
+   "leak": false,
+   "answer": "A3B06DC1"
+  }
+ ],
+ "leaks": 0,
+ "own": "22/22"
+}
