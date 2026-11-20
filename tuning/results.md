@@ -10,8 +10,8 @@ reading: `lab speed` (medians of 3). Tool use: `lab quality --full --temperature
 
 | Model | Where | Writing tok/s | Reading 32K tok/s | Tool use (3 seeds) | Measured |
 | --- | --- | ---: | ---: | --- | --- |
-| `coder` | zaphod card 1, llama.cpp v1.0.0+48 | 54.0-54.3 (30K / 54K: 49.0 / 48.0) | 936-938 (30K / 54K: 944 / 869) | 96 / 93 / 92 | 2026-11-17 (speed, depth), 11-16 (tool use) |
-| `coder-2` | zaphod card 2, llama.cpp v1.0.0+48 (omp's sub-agents since 11-17, #51) | 58.9 | 988.5 | not run | 2026-11-17 |
+| `coder` | zaphod card 1, llama.cpp v1.0.0+48, 128K q8_0 context (since 2026-11-20; was 64K f16) | 53.6 (30K / 54K / 120K: 45.2 / 43.7 / 36.1) | 904.8 (30K / 54K / 120K: 910 / 831 / 663) | 93 / 93 / 93 | 2026-11-20. 64K f16 the same day: 54.1 (30K / 54K: 48.5 / 46.7), 937.4, tool use 96 / 93 / 92 (11-16). plans/coder-context-timeline.md |
+| `coder-2` | zaphod card 2, llama.cpp v1.0.0+48 (omp's sub-agents since 11-17, #51), 128K q8_0 context (since 2026-11-20) | 58.5 | 946.6 | not run (same model and setting as `coder`: 93 / 93 / 93) | 2026-11-20 (64K f16 the same day: 59.2 / 980.7) |
 | `ornith` | zaphod card 2 | ~90 | 2,433 (llama-bench) | 93 (temp 0 short suite) | 2026-10-28 (older llama.cpp) |
 | `chat-teacher` | zaphod card 2, 4 slots | 148.1 calls/min (4 workers) | | | 2026-11-16 |
 | `big` | marvin, llama.cpp v1.0.0+48, `-ub 2048` (#45) | 45.4 | 477.0 (`-ub 512`: 329.4; depth at 512: 30K / 62K / 123K 360 / 313 / 267) | 92 / 89 / 91 / 93 / 93 / 91 (`-ub 512`: 96 / 91 / 93) | 2026-11-19 (speed, tool use), 11-17 (depth) |

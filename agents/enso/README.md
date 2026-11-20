@@ -38,7 +38,7 @@ no push credentials). Review them there; nothing reaches GitHub unless Daniel pu
 | `~/agents/work/enso-harness` | `/work/enso-harness` | the workspace (a clone) |
 | image `/opt/enso` | | Enso at commit 537559a, with packages installed; pi = its lockfile's 1.1.0 |
 
-Models (`config/models.json`, provider `lab`): `coder` (64K), `coder-tb` (256K, same model; swaps with `coder`),
+Models (`config/models.json`, provider `lab`): `coder` (128K since 2026-11-20), `coder-tb` (256K, same model; swaps with `coder`),
 `ornith` (256K, vision), `chat` (128K, vision), `marvin/big` (128K; offline while marvin runs other tests).
 
 ## Things learned setting it up (2026-10-30)
