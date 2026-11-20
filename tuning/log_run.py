@@ -197,7 +197,7 @@ def terminal_bench_table(summary_path):
                "passed_at_attempt": r.get("succeeded_at_attempt") or 0,
                "minutes": round((r.get("duration_ms") or 0) / 60000, 1), "agent_steps": r.get("agent_steps") or 0,
                "input_tokens": tok.get("input", 0), "cached_tokens": tok.get("cached", 0), "output_tokens": tok.get("output", 0),
-               "peak_context": max([(a.get("tokens") or {}).get("peak_context", 0) for a in att] or [0]),
+               "peak_context": max([(a.get("tokens") or {}).get("peak_context") or 0 for a in att] or [0]),  # null in an attempt the harness failed to start
                "error": "; ".join(errs)}
         for c in cols:
             table[c].append(row[c])
