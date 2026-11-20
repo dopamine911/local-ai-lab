@@ -39,6 +39,7 @@ Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
   TARGET=marvin-strata lab tbench full "strata"   (Strata on marvin; start it first: marvin's strata-test.sh start)
   TARGET=marvin-fork lab tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
   TARGET=marvin-halogen lab tbench full "halogen" (Halogen Flash on marvin, launcher engine big-halogen; marvin idle)
+  TARGET=marvin-strix lab tbench full "strix"     (strix-llama.cpp fork on marvin, launcher engine big-strix; marvin idle)
   RERUN=1 TARGET=marvin lab tbench full "again"   (same model and profile again: without RERUN=1 the suite skips it)
 `
 
@@ -90,6 +91,15 @@ func tbFromEnv() tbSettings {
 		s.Platform, s.PlatformName = "strixhalo", strix
 		or(&s.Context, "131072") // the same limit as the other marvin runs (Halogen itself allows 262144 per request)
 		s.Endpoint, s.Engine, s.Backend, s.BackendVersion = "http://marvin:8080/v1", "halogen-flash", "hip", "0.20.6"
+		os.Setenv("MACHINE", "marvin")
+	case "marvin-strix": // halo-box strix-llama.cpp fork on marvin (launcher engine big-strix), direct to marvin's llama-swap
+		or(&s.Model, "big-strix")
+		or(&s.ModelName, "Qwen3.8-Flash-Next")
+		or(&s.Quant, "UD-IQ4_XS")
+		or(&s.Profile, "strixllama-b13570-mtp3-128k-np2-ub2048")
+		s.Platform, s.PlatformName = "strixhalo", strix
+		or(&s.Context, "131072")
+		s.Endpoint, s.Engine, s.Backend, s.BackendVersion = "http://marvin:8080/v1", "strix-llama.cpp", "vulkan", "mesa-26.0"
 		os.Setenv("MACHINE", "marvin")
 	case "marvin-fork": // our UnbiasedStrata gfx1151 build on marvin, started with fork.sh start
 		or(&s.Model, "big-fork")
@@ -217,7 +227,7 @@ func tbKey(cfg *config.Config, s tbSettings) error {
 			return fmt.Errorf("Strata key from marvin: %v", err)
 		}
 		key = strings.TrimRight(string(b), "\n")
-	case "halogen-flash": // marvin's llama-swap key (MARVIN_KEY in marvin's ~/llama-swap/.env)
+	case "halogen-flash", "strix-llama.cpp": // marvin's llama-swap key (MARVIN_KEY in marvin's ~/llama-swap/.env)
 		b, err := exec.Command("ssh", "marvin", "grep", "^MARVIN_KEY=", "llama-swap/.env").Output()
 		if err != nil {
 			return fmt.Errorf("MARVIN_KEY from marvin: %v", err)
