@@ -29,7 +29,7 @@ Status words: **active** (work going on), **open** (ideas or steps not started),
 | File | What | Status |
 | --- | --- | --- |
 | [marvin-writing-speed.md](marvin-writing-speed.md) | Why `big`'s writing slows with long context: theories and a test each | open (none tested) |
-| [strix-llama-timeline.md](strix-llama-timeline.md) | strix-llama.cpp (Strix Halo fork) as test model `big-strix` on marvin (#66; after #45) | open (not started) |
+| [strix-llama-timeline.md](strix-llama-timeline.md) | strix-llama.cpp (Strix Halo fork) as test model `big-strix` on marvin (#66) | tested 2026-11-19 (steps 1-8: reading 2.1x, writing +12%, tool use same, 0 leaks; KL 0.021 fails the bar, PPL not worse); next step is Daniel's decision |
 | [strix-performance-review.md](strix-performance-review.md) | Ranked ideas for marvin speed | partly tested (gpt-oss `-ub`, Mesa 26.2: +1%, rolled back); `-ub` on `big`: #45 |
 
 ## Reference
