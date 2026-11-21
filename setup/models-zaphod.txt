@@ -35,3 +35,6 @@ ggml-org/gpt-oss-120b-GGUF 7200b74bea78b0a2964ef9f3897eefa401e890ff gpt-oss-120b
 google/gemma-4-26B-A4B-it-qat-q4_0-gguf d1c082be9cf3c8a514acf63b8761f4b41935842e gemma-4-26B_q4_0-it.gguf gemma/gemma-4-26B_q4_0-it.gguf 14439363584 3eca3b8f6d7baf218a7dd6bba5fb59a56ee25fe2d567b6f5f589b4f697eca51d
 # Radiance (plans/radiance-timeline.md): Qwen3.8-27B IQ8R + DFlash2 drafter container for radiance 2.1.0, tp 2
 StillDeadcode/qwen3.8-27b-iq8r-dflash c127a34140e4cbc5c7c1a1925810f323b3f10920 qwen3.8-27b-iq8r-dflash.rad radiance/qwen3.8-27b-iq8r-dflash.rad 30876340224 9388f4c0d1a050b1254f5a9c0e47b7fbf753248792a29b5072f9698957badfcc
+# Inkling 2 Mini test (plans/inkling-timeline.md, #67): unsloth's mainline-llama.cpp layout (the .gguf_file name is theirs; saved as .gguf), needs llama.cpp with #32704
+unsloth/Inkling-2-Mini-GGUF ae9327c5fbc7333116ba32eee78bb5d2bbefae4f Mainline_Support/Inkling-2-Mini-UD-Q4_K_XL.gguf_file inkling/Inkling-2-Mini-UD-Q4_K_XL.gguf 17629760736 e64276656f072e9b2197a61723667cbdb71da66a716ffd966e572c21088f3cd3
+unsloth/Inkling-2-Mini-GGUF ae9327c5fbc7333116ba32eee78bb5d2bbefae4f mmproj-F16.gguf inkling/mmproj-F16.gguf 639348160 3bff75ffeb2d6e0371ba7bd42e30d26a7d98aea681fa44b03b5a20891cfa2c5f
