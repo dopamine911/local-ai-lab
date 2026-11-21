@@ -64,3 +64,4 @@ Stop and ask Daniel if step 3 fails, or if speed or tool use misses its bar.
 | 2026-11-21, before 12:53 | Model card, llama.cpp PRs, files checked; plan to Daniel | Daniel: write the plan, start step 1 |
 | 12:53 | Step 1: plan, issue #67, file lines in setup/models-zaphod.txt (rev ae9327c); `lab models zaphod inkling` started | downloading |
 | 12:54 | Official image: `ghcr.io/ggml-org/llama.cpp:server-vulkan-<build>` (Ubuntu 26.04 base), built once a day at 04:12 UTC (22:12 CST). Latest `server-vulkan-b12602` (built 2026-11-21 04:16 UTC from 418fe97): has #32694, **not #32704**. The 2026-11-19 and 11-20 nightly runs failed | first image with the fix: tonight's nightly, if it succeeds. Check with the image's `org.opencontainers.image.revision` containing 690b87d |
+| 12:53-13:02 | Download done (`lab models zaphod inkling`) | **both files pass sha256** (MODELS-OK): model 17,629,760,736 bytes (6.8 min), mmproj 639,348,160. Step 1 waits only for the image now |
