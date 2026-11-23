@@ -38,6 +38,60 @@
         "/etc/radiance/config.yaml"
       ],
       "stop_timeout": 60
+    },
+    "inkling": {
+      "_comment": "Inkling 2 Mini (Thinking Machines, Apache 2.0) on the official llama.cpp Vulkan server image, for plans/inkling-timeline.md (#67). Test only: our pinned llama.cpp does not know the model (needs #32694 + #32704). Card 2 only (renderD129 = PCI 0b:00.0, so Vulkan0 inside). Same Mesa as our image (26.0.8). Settings as zaphod's ${server} macro (incl. the #27148 cache switches) and GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM (CLAUDE.md: do not undo). Sampling from the model card; reasoning effort medium as coder-2.",
+      "image": "ghcr.io/ggml-org/llama.cpp:server-vulkan-b12648@sha256:298c82bf50830ab711a75a6945fb9a8ffad3972f789d434d32a3c5b0f695e4b0",
+      "devices": [
+        "/dev/dri/renderD129"
+      ],
+      "groups": [
+        44,
+        991
+      ],
+      "user": "65534:65534",
+      "read_only": true,
+      "tmpfs": [
+        "/tmp"
+      ],
+      "env": {
+        "GGML_VK_DISABLE_HOST_VISIBLE_VIDMEM": "1"
+      },
+      "volumes": [
+        "/srv/models/inkling:/models:ro"
+      ],
+      "args": [
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8080",
+        "-ngl",
+        "999",
+        "-fa",
+        "on",
+        "--cache-ram",
+        "0",
+        "--no-cache-idle-slots",
+        "-m",
+        "/models/Inkling-2-Mini-UD-Q4_K_XL.gguf",
+        "--mmproj",
+        "/models/mmproj-F16.gguf",
+        "-c",
+        "131072",
+        "-np",
+        "1",
+        "--temp",
+        "1.0",
+        "--top-p",
+        "1.0",
+        "--top-k",
+        "0",
+        "--min-p",
+        "0.0",
+        "--reasoning-effort",
+        "medium"
+      ],
+      "stop_timeout": 30
     }
   }
 }

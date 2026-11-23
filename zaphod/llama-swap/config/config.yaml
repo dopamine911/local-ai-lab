@@ -132,6 +132,15 @@ models:
     cmdStop: /engines/lab-engine stop coder-radiance
     checkEndpoint: /health
     unloadTimeout: 180   # its stop timeout is 60 s (engines/zaphod.json)
+  inkling:
+    name: "Inkling 2 Mini 26B-A3B, card 2, 128K context, vision (test)"
+    description: "Thinking Machines Inkling 2 Mini UD-Q4_K_XL on the official llama.cpp image b12648 (plans/inkling-timeline.md, #67). Test only. Swaps with coder-2."
+    # Official llama.cpp Vulkan server through the launcher: our pinned build does not know the model. Settings in engines/zaphod.json.
+    proxy: http://lab-engine-inkling:8080
+    cmd: /engines/lab-engine run inkling
+    cmdStop: /engines/lab-engine stop inkling
+    checkEndpoint: /health
+    unloadTimeout: 90   # its stop timeout is 30 s (engines/zaphod.json)
 profiles:
   image-mode:
     description: "Card 2 lent to ComfyUI (hub/image-mode on): coder-2 answered by coder; other card-2 chat models off"
@@ -146,6 +155,7 @@ profiles:
       tts-qwen: ~
       gpt-oss: ~           # uses card 2
       coder-radiance: ~    # uses card 2
+      inkling: ~           # card 2
   training:
     # lab training-mode on|off|status. A training harness checks GET /api/profiles for active == "training".
     description: "Both cards lent to model training (lab training-mode on); search and speech helpers stay"
@@ -165,6 +175,7 @@ profiles:
       tts-qwen: ~          # only loads next to coder-2 (voice set)
       gpt-oss: ~
       coder-radiance: ~
+      inkling: ~
       test-http: ~
 routing:
   router:
@@ -173,13 +184,13 @@ routing:
       matrix:
         sets:
           helpers: "embed & rerank & stt & stt-whisper & tts"   # small models that stay loaded next to everything below
-          one_per_card: "+helpers & (coder | coder-tb) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"
+          one_per_card: "+helpers & (coder | coder-tb) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b | inkling)"
           voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
           gpt_oss: "gpt-oss"   # both cards + RAM; runs alone, helpers unload (Daniel 2026-11-09)
           radiance: "coder-radiance"   # Radiance on both cards; runs alone, helpers unload (test, 2026-11-17)
           launcher_test: "+helpers & test-http"   # no GPU
-          teachers: "+helpers & (chat-teacher-c1 | chat-teacher-26b-c1) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b)"   # card 1 teacher instead of coder
+          teachers: "+helpers & (chat-teacher-c1 | chat-teacher-26b-c1) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b | inkling)"   # card 1 teacher instead of coder
 hooks:
   on_startup:
     preload: [coder, coder-2, embed, rerank, stt, stt-whisper, tts]
