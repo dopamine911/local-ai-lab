@@ -21,6 +21,7 @@ Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
   TARGET=marvin-fork lab tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
   TARGET=marvin-halogen lab tbench full "halogen" (Halogen Flash on marvin, launcher engine big-halogen; marvin idle)
   TARGET=marvin-strix lab tbench full "strix"     (strix-llama.cpp fork on marvin, launcher engine big-strix; marvin idle)
+  TARGET=inkling lab tbench full "inkling"       (Inkling 2 Mini on zaphod card 2, launcher engine inkling, official llama.cpp image)
   RERUN=1 TARGET=marvin lab tbench full "again"   (same model and profile again: without RERUN=1 the suite skips it)
 
 With a skill: SKILL=instructions/the-craft@3c329d0.md lab tbench smoke "the-craft"

@@ -40,6 +40,7 @@ Model: MODEL=coder-tb by default (QUANT and PROFILE describe it in the results):
   TARGET=marvin-fork lab tbench full "fork"       (our UnbiasedStrata build on marvin; start it first: fork.sh start)
   TARGET=marvin-halogen lab tbench full "halogen" (Halogen Flash on marvin, launcher engine big-halogen; marvin idle)
   TARGET=marvin-strix lab tbench full "strix"     (strix-llama.cpp fork on marvin, launcher engine big-strix; marvin idle)
+  TARGET=inkling lab tbench full "inkling"       (Inkling 2 Mini on zaphod card 2, launcher engine inkling, official llama.cpp image)
   RERUN=1 TARGET=marvin lab tbench full "again"   (same model and profile again: without RERUN=1 the suite skips it)
 `
 
@@ -101,6 +102,13 @@ func tbFromEnv() tbSettings {
 		or(&s.Context, "131072")
 		s.Endpoint, s.Engine, s.Backend, s.BackendVersion = "http://marvin:8080/v1", "strix-llama.cpp", "vulkan", "mesa-26.0"
 		os.Setenv("MACHINE", "marvin")
+	case "inkling": // Inkling 2 Mini on zaphod card 2 (launcher engine inkling, official llama.cpp image; plans/inkling-timeline.md)
+		or(&s.Model, "inkling")
+		or(&s.ModelName, "Inkling-2-Mini")
+		or(&s.Quant, "UD-Q4_K_XL")
+		or(&s.Profile, "llamacpp-b12648-128k-f16-np1-medium")
+		or(&s.Context, "131072")
+		s.Engine = "llama.cpp-b12648" // the official image, not our pinned build; key: zaphod's (default)
 	case "marvin-fork": // our UnbiasedStrata gfx1151 build on marvin, started with fork.sh start
 		or(&s.Model, "big-fork")
 		or(&s.ModelName, "Qwen3.8-Flash-Next")
