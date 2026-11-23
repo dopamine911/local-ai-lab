@@ -1,0 +1,60 @@
+{
+ "model": "inkling",
+ "base_url": "http://127.0.0.1:8080/v1",
+ "short": [
+  {
+   "writing_tps": 40.3,
+   "tokens": 400,
+   "ttft_s": 0.44,
+   "server_reported_tps": 39.91058029483616
+  },
+  {
+   "writing_tps": 41.1,
+   "tokens": 400,
+   "ttft_s": 0.14,
+   "server_reported_tps": 40.805164645259936
+  },
+  {
+   "writing_tps": 41.1,
+   "tokens": 400,
+   "ttft_s": 0.13,
+   "server_reported_tps": 40.85487651587975
+  }
+ ],
+ "long": [
+  {
+   "prompt_tokens": 42076,
+   "reading_tps": 460.6,
+   "ttft_s": 91.3,
+   "server_reported_tps": 464.8832298624435
+  },
+  {
+   "prompt_tokens": 42076,
+   "reading_tps": 463.9,
+   "ttft_s": 90.7,
+   "server_reported_tps": 464.65137388797353
+  },
+  {
+   "prompt_tokens": 42074,
+   "reading_tps": 462.9,
+   "ttft_s": 90.9,
+   "server_reported_tps": 463.6799235853017
+  }
+ ],
+ "speed_write_tps": 41.1,
+ "speed_read_32k_tps": 462.9,
+ "speed_ttft_32k_s": 90.9,
+ "prompt_files": [
+  "argparse.py",
+  "inspect.py",
+  "typing.py",
+  "dataclasses.py",
+  "pathlib/__init__.py",
+  "subprocess.py",
+  "tarfile.py",
+  "zipfile/__init__.py",
+  "logging/__init__.py",
+  "json/decoder.py"
+ ],
+ "python_stdlib": "/usr/lib/python3.14"
+}
