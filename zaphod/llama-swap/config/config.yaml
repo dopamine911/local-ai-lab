@@ -114,6 +114,20 @@ models:
       -m /models/gpt-oss-120b-MXFP4.gguf
       -c 32768 -np 1 -b 2048 -ub 2048 -lm none
       --temp 1.0 --top-p 1.0 --reasoning-effort medium
+  glm-flash:
+    name: "GLM-5.3-Flash 321B-A18B, both cards + RAM + SSD (test)"
+    description: "Test only (plans/bigger-model-timeline.md). 157 GB: experts in RAM and on the SSD, the most-used ones cached on the cards. Runs alone: every other model on zaphod unloads, helpers too."
+    # Step 3: -cmoe keeps every expert off the cards (mmap: page cache + SSD); --moe-cache-mib caches the most-used
+    # ones on the cards (split like the layers). Card 2 first (x8 link). Sampling: Z.ai's evals (temp 1.0, top-p 0.95).
+    # 32768 and 24576 failed (2026-11-27): the cache keeps each weight kind in one block per card (ffn_down IQ4_XS: 4.46 MB
+    # per expert); the block went 4.64 / 4.30 GB, over the card's ~4 GB buffer limit. 16384: ~2.9 GB blocks.
+    cmd: |
+      ${server}
+      --device Vulkan0,Vulkan1
+      -m /models/glm-5.3-flash/GLM-5.3-Flash-UD-IQ4_XS-00001-of-00005.gguf
+      -cmoe --moe-cache-mib 16384
+      -c 32768 -np 1
+      --temp 1.0 --top-p 0.95
   # Engines started by the launcher (engines/lab-engined.py; allowlist engines/zaphod.json); llama-swap runs the client.
   test-http:
     name: "Launcher test (no GPU)"
@@ -156,6 +170,7 @@ profiles:
       gpt-oss: ~           # uses card 2
       coder-radiance: ~    # uses card 2
       inkling: ~           # card 2
+      glm-flash: ~         # both cards
   training:
     # lab training-mode on|off|status. A training harness checks GET /api/profiles for active == "training".
     description: "Both cards lent to model training (lab training-mode on); search and speech helpers stay"
@@ -176,6 +191,7 @@ profiles:
       gpt-oss: ~
       coder-radiance: ~
       inkling: ~
+      glm-flash: ~
       test-http: ~
 routing:
   router:
@@ -188,6 +204,7 @@ routing:
           voice: "+helpers & (coder | coder-tb) & coder-2 & tts-qwen"   # Qwen-TTS only fits next to coder-2
           both_cards: "coder-long"
           gpt_oss: "gpt-oss"   # both cards + RAM; runs alone, helpers unload (Daniel 2026-11-09)
+          glm_flash: "glm-flash"   # both cards + RAM + SSD; runs alone, helpers unload (test, 2026-11-27)
           radiance: "coder-radiance"   # Radiance on both cards; runs alone, helpers unload (test, 2026-11-17)
           launcher_test: "+helpers & test-http"   # no GPU
           teachers: "+helpers & (chat-teacher-c1 | chat-teacher-26b-c1) & (coder-2 | flint | north | ornith | chat | chat-teacher | chat-teacher-26b | inkling)"   # card 1 teacher instead of coder
