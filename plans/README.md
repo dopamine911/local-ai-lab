@@ -12,7 +12,7 @@ Status words: **active** (work going on), **open** (ideas or steps not started),
 | [halogen-timeline.md](halogen-timeline.md) | Halogen Flash vs `big` on marvin | tested (incl. Terminal-Bench 17/19); daily use is Daniel's decision |
 | [radiance-timeline.md](radiance-timeline.md) | Radiance on zaphod's two R9700s | tested 2026-11-17 (incl. Terminal-Bench 17/19 in 3.05 h); next step is Daniel's decision |
 | [inkling-timeline.md](inkling-timeline.md) | Inkling 2 Mini as `coder-2`? Test model `inkling` on card 2 through the engine launcher (#67) | waiting on Daniel: runs, but slower (41 / 463 vs coder-2 58.5 / 947) and tool use lower (90.0 vs 93.0, attacker echo 1.7 vs 0); Terminal-Bench 18/19 (coder-radiance 17/19) but 10.1 h vs 3.05 h |
-| [bigger-model-timeline.md](bigger-model-timeline.md) | A model bigger than zaphod's cards, part of it from the SSD (llama.cpp's built-in expert cache) | waiting on Daniel: GLM-5.3-Flash runs (cache max ~16 GB on Vulkan: 4 GB buffer limit) but ~1 tok/s vs `big` 40 |
+| [bigger-model-timeline.md](bigger-model-timeline.md) | A model bigger than zaphod's cards, part of it from the SSD (llama.cpp's built-in expert cache) | waiting on Daniel: GLM-5.3-Flash runs (cache max ~16 GB on Vulkan: 4 GB buffer limit) but ~1.3-1.9 tok/s after tuning (8 expert layers on the cards + CPU share) vs `big` 40 |
 | [audit-2026-11-17.md](audit-2026-11-17.md) | Project audit: gaps, visibility, performance | done; its items are issues #44-#52 (and #13, #30) |
 | [renovate-timeline.md](renovate-timeline.md) | Every Renovate update deployed and checked | ongoing log |
 | [agent-infra.md](agent-infra.md) | Infrastructure for every agent: gateway, memory, tracing, reliability, hardening | partly done (gateway, memory, recall); the rest open |

@@ -121,11 +121,17 @@ models:
     # ones on the cards (split like the layers). Card 2 first (x8 link). Sampling: Z.ai's evals (temp 1.0, top-p 0.95).
     # 32768 and 24576 failed (2026-11-27): the cache keeps each weight kind in one block per card (ffn_down IQ4_XS: 4.46 MB
     # per expert); the block went 4.64 / 4.30 GB, over the card's ~4 GB buffer limit. 16384: ~2.9 GB blocks.
+    # 16384 with every expert off the cards: ~1 tok/s, cards 31.8 of 68.4 GB used. Tuning 1 (2026-11-27): the experts of
+    # 8 whole layers on the cards (first matching -ot wins): 3-6 on card 2 (its own first layers), 42-45 on card 1.
+    # Result 0.92 / 1.39 / 1.14 tok/s (was 0.68 / 0.94), cards 56.1 GB. Tuning 2: half the cache misses computed on the CPU.
     cmd: |
       ${server}
       --device Vulkan0,Vulkan1
       -m /models/glm-5.3-flash/GLM-5.3-Flash-UD-IQ4_XS-00001-of-00005.gguf
-      -cmoe --moe-cache-mib 16384
+      -ot blk.(3|4|5|6).ffn_(gate|up|down)_exps=Vulkan0
+      -ot blk.(42|43|44|45).ffn_(gate|up|down)_exps=Vulkan1
+      -ot ffn_(gate|up|down)_exps=CPU
+      --moe-cache-mib 16384 --moe-cache-cpu-share 0.5
       -c 32768 -np 1
       --temp 1.0 --top-p 0.95
   # Engines started by the launcher (engines/lab-engined.py; allowlist engines/zaphod.json); llama-swap runs the client.
