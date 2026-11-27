@@ -64,3 +64,4 @@ plans/inkling-timeline.md assumed it did not know the model. The launcher route 
 | by 13:06 | Step 1 (architecture names, file sizes, published benchmarks) | GLM-5.3-Flash UD-IQ4_XS picked (above). Waiting on Daniel for step 2 |
 | 13:07 | Daniel: yes, start the download | — |
 | 13:08 | Step 2: 5 lines in setup/models-zaphod.txt (unsloth rev a38483c, sha256 from Hugging Face), `lab models zaphod glm-5.3-flash` in tmux `glm-dl`. Disk before: 356 GB free | downloading at ~45 MB/s, about 1 h |
+| 2026-11-25 13:08-14:23 | Step 2 done (`lab models zaphod glm-5.3-flash`) | **All 5 files pass sha256 (MODELS-OK)**, 157 GB in 75 min (~35 MB/s). Disk 210 GB free after. Step 3 (first run, needs both cards) waits for Daniel |
